@@ -1,0 +1,19 @@
+{
+  "name": "adaptive-html",
+  "version": "1.0.0",
+  "description": "HTML to Adaptive Card converter",
+  "main": "index.js",
+  "scripts": {
+    "build:watch": "parcel watch ./client/public/index.html --out-dir client/dist --public-url ./",
+    "client": "npm run build:watch & node ./client/server.js"
+  },
+  "keywords": [],
+  "author": "Richie Casto",
+  "license": "ISC",
+  "dependencies": {
+    "turndown": "^4.0.1"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.6.2"
+  }
+}

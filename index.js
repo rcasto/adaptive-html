@@ -1,27 +1,19 @@
+import TurndownService from './turndown';
+
 var AdaptiveHtml = (function () {
     var parser = new DOMParser();
 
-    function transform(html) {
-        var htmlDoc = parser.parseFromString(html, 'text/html');
-        var parsedHtml = htmlDoc.body;
-        Array.prototype.slice.call(parsedHtml.children)
-            .forEach(function (child) {
-                replace(child);
-            });
-    }
-
-    function replace(node) {
-        var nodeName = (node.nodeName || '').toLowerCase();
-        switch (nodeName) {
-            case 'div':
-                console.log('found a div!') 
-                break;
-            default:
-                console.error('Unhandled node replacement:', nodeName, node);
+    TurndownService.prototype.turndown = function (input) {
+        if (!canConvert(input)) {
+            throw new TypeError(
+                input + ' is not a string, or an element/document/fragment node.'
+            )
         }
-    }
 
-    return {
-        transform: transform
+        if (input === '') return ''
+
+        var output = process.call(this, new RootNode(input));
+        return postProcess.call(this, output)
     };
+
 }());
