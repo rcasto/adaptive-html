@@ -6,13 +6,12 @@ import Rules from './rules'
 import { extend } from './utilities'
 import RootNode from './root-node'
 import Node from './node'
-import adaptiveCardFilter from '../lib/adaptiveCardFilter';
 
 var reduce = Array.prototype.reduce
 var leadingNewLinesRegExp = /^\n*/
 var trailingNewLinesRegExp = /\n*$/
 
-export default function TurndownService (options) {
+export default function TurndownService(options) {
   if (!(this instanceof TurndownService)) return new TurndownService(options)
 
   var defaults = {
@@ -36,7 +35,7 @@ export default function TurndownService (options) {
       // return node.isBlock ? AdaptiveCardHelper.wrap(node.outerHTML) + '\n\n' : node.outerHTML
     },
     defaultReplacement: function (content, node) {
-      return node.isBlock ? 
+      return node.isBlock ?
         AdaptiveCardHelper.wrap(content) : AdaptiveCardHelper.createTextBlock(content);
     }
   }
@@ -63,7 +62,6 @@ TurndownService.prototype = {
     if (input === '') return ''
 
     var cardElems = process.call(this, new RootNode(input));
-    cardElems = AdaptiveCardHelper.combineTextBlocks(cardElems);
     return AdaptiveCardHelper.createCard(cardElems);
   },
 
@@ -188,38 +186,40 @@ TurndownService.prototype = {
  * @type String
  */
 
-function process (parentNode) {
+function process(parentNode) {
   var self = this;
-  return reduce.call(parentNode.childNodes, function (output, node) {
+  var currText = '';
+
+  var blocks = reduce.call(parentNode.childNodes, function (output, node) {
     node = new Node(node);
 
     var replacement = [];
     if (node.nodeType === 3) { // text node
-      replacement = node.isCode ? node.nodeValue : AdaptiveCardHelper.createTextBlock(self.escape(node.nodeValue));
+      replacement = node.isCode ? node.nodeValue : self.escape(node.nodeValue);
     } else if (node.nodeType === 1) { // element node
       replacement = replacementForNode.call(self, node);
     }
 
     console.log(node.nodeName, replacement);
 
-    //  on <br /> tag wrap previous textblock in a container so it is
-    // not combined, this is pretty hacky will need a cleaner solution
-    if (node.nodeName === 'BR' && output.length > 0) {
-      let prevOutput = output[output.length - 1];
-      if (AdaptiveCardFilter.isTextBlock(prevOutput)) {
-        output[output.length - 1] = AdaptiveCardHelper.wrap(prevOutput);
+    if (typeof replacement === 'string') {
+      if (replacement === '\n') {
+        output.push(AdaptiveCardHelper.createTextBlock(currText));
+        currText = '';
+      } else {
+        currText += replacement;
       }
+      return output;
     }
 
-    // combine textblocks within a container
-    if (AdaptiveCardFilter.isContainer(replacement)) {
-      let replacementContents = AdaptiveCardHelper.unwrap(replacement);
-      replacementContents = AdaptiveCardHelper.combineTextBlocks(replacementContents);
-      replacement = AdaptiveCardHelper.wrap(replacementContents);
-    }
-
-    return join(output, replacement);
+    return output.concat(UtilityHelper.toArray(replacement));
   }, []);
+
+  if (currText) {
+    blocks.push(AdaptiveCardHelper.createTextBlock(currText));
+  }
+
+  return blocks;
 }
 
 /**
@@ -234,12 +234,6 @@ function replacementForNode(node) {
   var rule = this.rules.forNode(node);
   var content = process.call(this, node); // get's internal content of node
   return rule.replacement(content, node, this.options);
-}
-
-function join(blocks1, blocks2) {
-  blocks1 = UtilityHelper.toArray(blocks1);
-  blocks2 = UtilityHelper.toArray(blocks2);
-  return blocks1.concat(blocks2);
 }
 
 /**

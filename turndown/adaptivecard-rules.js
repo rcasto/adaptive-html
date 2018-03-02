@@ -12,13 +12,13 @@ rules.paragraph = {
   }
 };
 
-// rules.lineBreak = {
-//   filter: 'br',
+rules.lineBreak = {
+  filter: 'br',
 
-//   replacement: function (content, node, options) {
-//     return null;
-//   }
-// };
+  replacement: function (content, node, options) {
+    return '\n';
+  }
+};
 
 rules.heading = {
   filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
@@ -125,8 +125,7 @@ rules.inlineLink = {
     var href = node.getAttribute('href');
     var title = node.title ? ' "' + node.title + '"' : '';
     var linkText = AdaptiveCardFilter.getTextBlocksAsString(content);
-    linkText = `[${linkText}](${href})`;
-    return AdaptiveCardHelper.createTextBlock(linkText);
+    return `[${linkText}](${href})`;
   }
 };
 
@@ -181,8 +180,7 @@ rules.emphasis = {
 
   replacement: function (content, node, options) {
     var emText = AdaptiveCardFilter.getTextBlocksAsString(content);
-    emText = `${options.emDelimiter}${emText}${options.emDelimiter}`;
-    return AdaptiveCardHelper.createTextBlock(emText);
+    return `${options.emDelimiter}${emText}${options.emDelimiter}`;
   }
 };
 
@@ -191,8 +189,7 @@ rules.strong = {
 
   replacement: function (content, node, options) {
     var strongText = AdaptiveCardFilter.getTextBlocksAsString(content);
-    strongText = `${options.strongDelimiter}${strongText}${options.strongDelimiter}`;
-    return AdaptiveCardHelper.createTextBlock(strongText);
+    return `${options.strongDelimiter}${strongText}${options.strongDelimiter}`;
   }
 };
 
