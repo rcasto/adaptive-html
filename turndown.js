@@ -53,13 +53,13 @@ rules.paragraph = {
   }
 };
 
-rules.lineBreak = {
-  filter: 'br',
+// rules.lineBreak = {
+//   filter: 'br',
 
-  replacement: function (content, node, options) {
-    return options.br + '\n'
-  }
-};
+//   replacement: function (content, node, options) {
+//     return null;
+//   }
+// };
 
 rules.heading = {
   filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
@@ -85,11 +85,11 @@ rules.list = {
   filter: ['ul', 'ol'],
 
   replacement: function (content, node) {
-    var parent = node.parentNode;
-    if (parent.nodeName === 'LI' && parent.lastElementChild === node) {
-      return '\n' + content
+    console.log(content);
+    if (node.nodeName === 'OL') {
+
     } else {
-      return '\n\n' + content + '\n\n'
+
     }
   }
 };
@@ -98,20 +98,8 @@ rules.listItem = {
   filter: 'li',
 
   replacement: function (content, node, options) {
-    content = content
-      .replace(/^\n+/, '') // remove leading newlines
-      .replace(/\n+$/, '\n') // replace trailing newlines with just a single one
-      .replace(/\n/gm, '\n    '); // indent
-    var prefix = options.bulletListMarker + '   ';
-    var parent = node.parentNode;
-    if (parent.nodeName === 'OL') {
-      var start = parent.getAttribute('start');
-      var index = Array.prototype.indexOf.call(parent.children, node);
-      prefix = (start ? Number(start) + index : index + 1) + '.  ';
-    }
-    return (
-      prefix + content + (node.nextSibling && !/\n$/.test(content) ? '\n' : '')
-    )
+    console.log(content);
+    return AdaptiveCardHelper.wrap(content);
   }
 };
 
@@ -839,7 +827,23 @@ function process (parentNode) {
       replacement = replacementForNode.call(self, node);
     }
 
-    return AdaptiveCardHelper.combineTextBlocks(join(output, replacement));
+    //  on <br /> tag wrap previous textblock in a container so it is
+    // not combined, this is pretty hacky will need a cleaner solution
+    if (node.nodeName === 'BR' && output.length > 0) {
+      let prevOutput = output[output.length - 1];
+      if (AdaptiveCardFilter.isTextBlock(prevOutput)) {
+        output[output.length - 1] = AdaptiveCardHelper.wrap(prevOutput);
+      }
+    }
+
+    // combine textblocks within a container
+    if (AdaptiveCardFilter.isContainer(replacement)) {
+      let replacementContents = AdaptiveCardHelper.unwrap(replacement);
+      replacementContents = AdaptiveCardHelper.combineTextBlocks(replacementContents);
+      replacement = AdaptiveCardHelper.wrap(replacementContents);
+    }
+
+    return join(output, replacement);
   }, []);
 }
 
