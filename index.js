@@ -1,10 +1,11 @@
 import TurndownService from './turndown';
+import UtilityHelper from './utilityHelper';
 
 var turndownService = new TurndownService();
 
 function transform(input) {
     var transform = turndownService.turndown(input);
-    console.log(input, transform);
+    UtilityHelper.prettyPrint(transform);
     return transform;
 }
 
