@@ -176,7 +176,9 @@ rules.inlineLink = {
   replacement: function (content, node) {
     var href = node.getAttribute('href');
     var title = node.title ? ' "' + node.title + '"' : '';
-    return '[' + content + '](' + href + title + ')'
+    var linkText = AdaptiveCardFilter.getTextBlocksAsString(content);
+    linkText = `[${linkText}](${href})`;
+    return AdaptiveCardHelper.createTextBlock(linkText);
   }
 };
 
@@ -230,11 +232,9 @@ rules.emphasis = {
   filter: ['em', 'i'],
 
   replacement: function (content, node, options) {
-    AdaptiveCardFilter.getTextBlocks(content)
-      .forEach(card => {
-        card.text = `${options.emDelimiter}${card.text}${options.emDelimiter}`
-      });
-    return content;
+    var emText = AdaptiveCardFilter.getTextBlocksAsString(content);
+    emText = `${options.emDelimiter}${emText}${options.emDelimiter}`;
+    return AdaptiveCardHelper.createTextBlock(emText);
   }
 };
 
@@ -242,11 +242,9 @@ rules.strong = {
   filter: ['strong', 'b'],
 
   replacement: function (content, node, options) {
-    AdaptiveCardFilter.getTextBlocks(content)
-      .forEach(card => {
-        card.text = `${options.strongDelimiter}${card.text}${options.strongDelimiter}`
-      });
-    return content;
+    var strongText = AdaptiveCardFilter.getTextBlocksAsString(content);
+    strongText = `${options.strongDelimiter}${strongText}${options.strongDelimiter}`;
+    return AdaptiveCardHelper.createTextBlock(strongText);
   }
 };
 
