@@ -4,8 +4,9 @@
   "description": "HTML to Adaptive Card converter",
   "main": "index.js",
   "scripts": {
-    "build:watch": "parcel watch ./client/public/index.html --out-dir client/dist --public-url ./",
-    "client": "npm run build:watch & node ./client/server.js"
+    "client": "npm run build:watch & node ./client/server.js",
+    "client:run": "node ./client/server.js",
+    "client:watch": "parcel watch ./client/public/index.html --out-dir client/dist --public-url ./"
   },
   "keywords": [],
   "author": "Richie Casto",

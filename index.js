@@ -1,5 +1,5 @@
-import TurndownService from './turndown';
-import UtilityHelper from './utilityHelper';
+import TurndownService from './turndown/turndown';
+import UtilityHelper from './lib/utilityHelper';
 
 var turndownService = new TurndownService();
 
