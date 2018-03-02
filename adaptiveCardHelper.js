@@ -1,15 +1,9 @@
 import UtilityHelper from './utilityHelper';
-
-var adaptiveCardTypes = {
-    textBlock: "TextBlock",
-    container: "Container",
-    image: "Image",
-    adaptiveCard: "AdaptiveCard"
-};
+import AdaptiveCardFilter from './adaptiveCardFilter';
 
 function createCard(elements) {
     var card = {
-        type: adaptiveCardTypes.adaptiveCard,
+        type: AdaptiveCardFilter.cardTypes.adaptiveCard,
         body: UtilityHelper.toArray(elements),
         actions: [],
         version: '1.0'
@@ -19,7 +13,7 @@ function createCard(elements) {
 
 function createTextBlock(text, options) {
     var textBlock = {
-        type: adaptiveCardTypes.textBlock,
+        type: AdaptiveCardFilter.cardTypes.textBlock,
         text: text || '',
         wrap: true
     };
@@ -56,7 +50,7 @@ function createHeadingTextBlock(text, depth) {
 
 function createImage(url, options) {
     var image = {
-        type: adaptiveCardTypes.image,
+        type: AdaptiveCardFilter.cardTypes.image,
         url: url
     };
     setOptions(image, options);
@@ -66,7 +60,7 @@ function createImage(url, options) {
 // Wrap adaptive card elements in a container
 function wrap(elements) {
     var container = {
-        type: adaptiveCardTypes.container,
+        type: AdaptiveCardFilter.cardTypes.container,
         items: UtilityHelper.toArray(elements)
     };
     return container;
@@ -75,19 +69,32 @@ function wrap(elements) {
 // Returns the list of elements within a container
 // If the item passed in is not a container, it is simply returned
 function unwrap(container) {
-    if (!isCardType(container, adaptiveCardTypes.container)) {
+    if (!AdaptiveCardFilter.isContainer(container)) {
         return container;
     }
     return (container.items || []); 
 }
 
-function isCardType(card, type) {
-    if (!card) {
-        return false;
+function combineTextBlocks(elements) {
+    var currTextBlock = createTextBlock();
+    var textBlocks = elements.reduce((prevElems, currElem) => {
+        if (AdaptiveCardFilter.isTextBlock(currElem)) {
+            currTextBlock.text += currElem.text;
+        } else {
+            if (currTextBlock.text) {
+                prevElems.push(currTextBlock);
+                currTextBlock = createTextBlock();
+            }
+            prevElems.push(currElem);
+        }
+        return prevElems;
+    }, []);
+    
+    if (currTextBlock.text) {
+        textBlocks.push(currTextBlock);
     }
-    var cardType = (card.type || '').toLowerCase();
-    type = (type || '').toLowerCase();
-    return cardType === type;
+
+    return textBlocks;
 }
 
 function setOptions(obj, options) {
@@ -104,6 +111,5 @@ export default {
     createCard,
     wrap,
     unwrap,
-    types: adaptiveCardTypes,
-    isCardType
+    combineTextBlocks
 };

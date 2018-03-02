@@ -1,6 +1,6 @@
 import AdaptiveCardHelper from './adaptiveCardHelper';
 import UtilityHelper from './utilityHelper';
-import utilityHelper from './utilityHelper';
+import AdaptiveCardFilter from './adaptiveCardFilter';
 
 function extend (destination) {
   for (var i = 1; i < arguments.length; i++) {
@@ -237,8 +237,11 @@ rules.emphasis = {
   filter: ['em', 'i'],
 
   replacement: function (content, node, options) {
-    if (!content.trim()) return ''
-    return options.emDelimiter + content + options.emDelimiter
+    AdaptiveCardFilter.getTextBlocks(content)
+      .forEach(card => {
+        card.text = `${options.emDelimiter}${card.text}${options.emDelimiter}`
+      });
+    return content;
   }
 };
 
@@ -246,8 +249,11 @@ rules.strong = {
   filter: ['strong', 'b'],
 
   replacement: function (content, node, options) {
-    if (!content.trim()) return ''
-    return options.strongDelimiter + content + options.strongDelimiter
+    AdaptiveCardFilter.getTextBlocks(content)
+      .forEach(card => {
+        card.text = `${options.strongDelimiter}${card.text}${options.strongDelimiter}`
+      });
+    return content;
   }
 };
 
@@ -705,7 +711,8 @@ TurndownService.prototype = {
 
     if (input === '') return ''
 
-    return process.call(this, new RootNode(input));
+    var cardElems = process.call(this, new RootNode(input));
+    return AdaptiveCardHelper.createCard(cardElems);
   },
 
   /**
@@ -841,8 +848,8 @@ function process (parentNode) {
       replacement = replacementForNode.call(self, node);
     }
 
-    return join(output, replacement)
-  }, [])
+    return AdaptiveCardHelper.combineTextBlocks(join(output, replacement));
+  }, []);
 }
 
 /**
