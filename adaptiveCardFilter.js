@@ -27,6 +27,13 @@ function getTextBlocks(cardCollection) {
     return getBlocks(cardCollection, cardTypes.textBlock);
 }
 
+function getTextBlocksAsString(cardCollection) {
+    return getTextBlocks(cardCollection)
+        .reduce((prevStr, currTextBlock) => {
+            return prevStr + currTextBlock.text;
+        }, '');
+}
+
 function getBlocks(cardCollection, type) {
     cardCollection = UtilityHelper.toArray(cardCollection);
     return cardCollection.filter(card => isCardType(card, type));
@@ -47,5 +54,6 @@ export default {
     isImage,
     isCard,
     getTextBlocks,
+    getTextBlocksAsString,
     cardTypes
 };

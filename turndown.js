@@ -49,7 +49,7 @@ rules.paragraph = {
   filter: 'p',
 
   replacement: function (content) {
-    return '\n\n' + content + '\n\n'
+    return AdaptiveCardHelper.wrap(content);
   }
 };
 
@@ -66,15 +66,8 @@ rules.heading = {
 
   replacement: function (content, node, options) {
     var hLevel = Number(node.nodeName.charAt(1));
-
-    if (options.headingStyle === 'setext' && hLevel < 3) {
-      var underline = repeat((hLevel === 1 ? '=' : '-'), content.length);
-      return (
-        '\n\n' + content + '\n' + underline + '\n\n'
-      )
-    } else {
-      return '\n\n' + repeat('#', hLevel) + ' ' + content + '\n\n'
-    }
+    var hText = AdaptiveCardFilter.getTextBlocksAsString(content);
+    return AdaptiveCardHelper.createHeadingTextBlock(hText, hLevel);
   }
 };
 
