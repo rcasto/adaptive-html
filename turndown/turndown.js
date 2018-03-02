@@ -230,13 +230,13 @@ function process (parentNode) {
  * @type String
  */
 
-function replacementForNode (node) {
+function replacementForNode(node) {
   var rule = this.rules.forNode(node);
-  var content = process.call(this, node);
+  var content = process.call(this, node); // get's internal content of node
   return rule.replacement(content, node, this.options);
 }
 
-function join (blocks1, blocks2) {
+function join(blocks1, blocks2) {
   blocks1 = UtilityHelper.toArray(blocks1);
   blocks2 = UtilityHelper.toArray(blocks2);
   return blocks1.concat(blocks2);
@@ -250,7 +250,7 @@ function join (blocks1, blocks2) {
  * @type String|Object|Array|Boolean|Number
  */
 
-function canConvert (input) {
+function canConvert(input) {
   return (
     input != null && (
       typeof input === 'string' ||
