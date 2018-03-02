@@ -70,7 +70,7 @@ function wrap(elements) {
 // If the item passed in is not a container, it is simply returned
 function unwrap(container) {
     if (!AdaptiveCardFilter.isContainer(container)) {
-        return container;
+        return UtilityHelper.toArray(container);
     }
     return (container.items || []); 
 }

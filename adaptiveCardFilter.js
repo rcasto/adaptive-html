@@ -1,11 +1,11 @@
 import UtilityHelper from './utilityHelper';
 
-var cardTypes = {
+var cardTypes = Object.freeze({
     textBlock: "TextBlock",
     container: "Container",
     image: "Image",
     adaptiveCard: "AdaptiveCard"
-};
+});
 
 function isTextBlock(card) {
     return isCardType(card, cardTypes.textBlock);
