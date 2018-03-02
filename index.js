@@ -1,5 +1,10 @@
+import TurndownService from './turndown';
+
+var turndownService = new TurndownService();
+
 function transform(input) {
-    console.log(input);
+    var transform = turndownService.turndown(input);
+    console.log(input, transform);
 }
 
 export default {

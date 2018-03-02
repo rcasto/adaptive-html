@@ -1,8 +1,6 @@
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-	typeof define === 'function' && define.amd ? define(factory) :
-	(global.TurndownService = factory());
-}(this, (function () { 'use strict';
+import AdaptiveCardHelper from './adaptiveCardHelper';
+import UtilityHelper from './utilityHelper';
+import utilityHelper from './utilityHelper';
 
 function extend (destination) {
   for (var i = 1; i < arguments.length; i++) {
@@ -672,13 +670,17 @@ function TurndownService (options) {
     linkReferenceStyle: 'full',
     br: '  ',
     blankReplacement: function (content, node) {
-      return node.isBlock ? '\n\n' : ''
+      console.log('Blanking replacement');
+      // return node.isBlock ? AdaptiveCardHelper.wrap() : AdaptiveCardHelper.createTextBlock();
     },
     keepReplacement: function (content, node) {
-      return node.isBlock ? '\n\n' + node.outerHTML + '\n\n' : node.outerHTML
+      console.log('Keeping replacement');
+      // return node.isBlock ? AdaptiveCardHelper.wrap(node.outerHTML) + '\n\n' : node.outerHTML
     },
     defaultReplacement: function (content, node) {
-      return node.isBlock ? '\n\n' + content + '\n\n' : content
+      console.log('default replacement');
+      return node.isBlock ? 
+        AdaptiveCardHelper.wrap(content) : AdaptiveCardHelper.createTextBlock(content);
     }
   };
   this.options = extend({}, defaults, options);
@@ -703,8 +705,7 @@ TurndownService.prototype = {
 
     if (input === '') return ''
 
-    var output = process.call(this, new RootNode(input));
-    return postProcess.call(this, output)
+    return process.call(this, new RootNode(input));
   },
 
   /**
@@ -833,34 +834,15 @@ function process (parentNode) {
   return reduce.call(parentNode.childNodes, function (output, node) {
     node = new Node(node);
 
-    var replacement = '';
-    if (node.nodeType === 3) {
-      replacement = node.isCode ? node.nodeValue : self.escape(node.nodeValue);
-    } else if (node.nodeType === 1) {
+    var replacement = [];
+    if (node.nodeType === 3) { // text node
+      replacement = node.isCode ? node.nodeValue : AdaptiveCardHelper.createTextBlock(self.escape(node.nodeValue));
+    } else if (node.nodeType === 1) { // element node
       replacement = replacementForNode.call(self, node);
     }
 
     return join(output, replacement)
-  }, '')
-}
-
-/**
- * Appends strings as each rule requires and trims the output
- * @private
- * @param {String} output The conversion output
- * @returns A trimmed version of the ouput
- * @type String
- */
-
-function postProcess (output) {
-  var self = this;
-  this.rules.forEach(function (rule) {
-    if (typeof rule.append === 'function') {
-      output = join(output, rule.append(self.options));
-    }
-  });
-
-  return output.replace(/^[\t\r\n]+/, '').replace(/[\t\r\n\s]+$/, '')
+  }, [])
 }
 
 /**
@@ -874,41 +856,13 @@ function postProcess (output) {
 function replacementForNode (node) {
   var rule = this.rules.forNode(node);
   var content = process.call(this, node);
-  var whitespace = node.flankingWhitespace;
-  if (whitespace.leading || whitespace.trailing) content = content.trim();
-  return (
-    whitespace.leading +
-    rule.replacement(content, node, this.options) +
-    whitespace.trailing
-  )
+  return rule.replacement(content, node, this.options);
 }
 
-/**
- * Determines the new lines between the current output and the replacement
- * @private
- * @param {String} output The current conversion output
- * @param {String} replacement The string to append to the output
- * @returns The whitespace to separate the current output and the replacement
- * @type String
- */
-
-function separatingNewlines (output, replacement) {
-  var newlines = [
-    output.match(trailingNewLinesRegExp)[0],
-    replacement.match(leadingNewLinesRegExp)[0]
-  ].sort();
-  var maxNewlines = newlines[newlines.length - 1];
-  return maxNewlines.length < 2 ? maxNewlines : '\n\n'
-}
-
-function join (string1, string2) {
-  var separator = separatingNewlines(string1, string2);
-
-  // Remove trailing/leading newlines and replace with separator
-  string1 = string1.replace(trailingNewLinesRegExp, '');
-  string2 = string2.replace(leadingNewLinesRegExp, '');
-
-  return string1 + separator + string2
+function join (blocks1, blocks2) {
+  blocks1 = UtilityHelper.toArray(blocks1);
+  blocks2 = UtilityHelper.toArray(blocks2);
+  return blocks1.concat(blocks2);
 }
 
 /**
@@ -930,6 +884,4 @@ function canConvert (input) {
   )
 }
 
-return TurndownService;
-
-})));
+export default TurndownService;
