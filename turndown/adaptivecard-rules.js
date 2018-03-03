@@ -58,8 +58,8 @@ rules.listItem = {
   filter: 'li',
 
   replacement: function (content, node, options) {
-    return content;
-    // return AdaptiveCardHelper.wrap(content);
+    // return content;
+    return AdaptiveCardHelper.wrap(content);
   }
 };
 
