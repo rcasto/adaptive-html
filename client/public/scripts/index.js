@@ -10,5 +10,25 @@ import AdaptiveHtml from '../../../index';
 // AdaptiveHtml.transform('<p><img alt="This is the image alt text" src="https://cdn.pixabay.com/photo/2017/01/18/08/25/social-1989152_1280.jpg" style="height:334px; width:500px" /></p><p>That was something</p>');
 // AdaptiveHtml.transform('<ul><li>This is a simple list item</li><li><strong>This one</strong> is more <em>unique</em></li><li><img alt="This is a photo" src="https://cdn.pixabay.com/photo/2015/01/09/11/11/office-594132_1280.jpg" style="height:133px; width:200px" /></li><li><em>Another item just for good measure</em></li></ul>');
 // AdaptiveHtml.transform('<p>hello<br />there <em>this</em> is a line with<br />breaks in it</p>');
-AdaptiveHtml.transform('<ol><li>This is an ordered list<ol><li>This is a nested ordered list</li></ol></li><li>This <em>one</em> <strong>get&#39;s fancy</strong><br />There is now another line</li></ol>');
+// AdaptiveHtml.transform('<ol><li>This is an ordered list<ol><li>This is a nested ordered list</li></ol></li><li>This <em>one</em> <strong>get&#39;s fancy</strong><br />There is now another line</li></ol>');
 // AdaptiveHtml.transform('<h1>This is a heading</h1><p>That was some <strong>really</strong> <em>important</em> stuff</p>');
+AdaptiveHtml.transform(`
+    <ul>
+        <li>list item 1
+            <ul>
+                <li>
+                    nested list item
+                    <img src="http://fake.com" />
+                </li>
+            </ul>
+        </li>
+        <li>list item 2</li>
+    </ul>
+`);
+// AdaptiveHtml.transform(`
+//     <p>
+//         <em>
+//             <img alt="" src="https://images.unsplash.com/photo-1507670092296-5c5c6a2b5cc3?ixlib=rb-0.3.5&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;s=3413b9e6d95d354330f7954e85f89019&amp;auto=format&amp;fit=crop&amp;w=1051&amp;q=80" />
+//         </em>
+//     </p>
+// `);

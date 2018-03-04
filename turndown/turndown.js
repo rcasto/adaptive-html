@@ -35,6 +35,7 @@ export default function TurndownService(options) {
       // return node.isBlock ? AdaptiveCardHelper.wrap(node.outerHTML) + '\n\n' : node.outerHTML
     },
     defaultReplacement: function (content, node) {
+      console.log('Default replacement');
       return node.isBlock ?
         AdaptiveCardHelper.wrap(content) : AdaptiveCardHelper.createTextBlock(content);
     }
@@ -189,7 +190,6 @@ TurndownService.prototype = {
 function process(parentNode) {
   var self = this;
   var currText = '';
-
   var blocks = reduce.call(parentNode.childNodes, function (output, node) {
     node = new Node(node);
 
@@ -203,21 +203,30 @@ function process(parentNode) {
     console.log(node.nodeName, replacement);
 
     if (typeof replacement === 'string') {
+      // '\n' is output by br tag replacement and is used to indicate
+      // separation or a new text block should be constructed
       if (replacement === '\n') {
         output.push(AdaptiveCardHelper.createTextBlock(currText));
         currText = '';
-      } else {
+      } else { // We're still constructing text for same text block, simply add it
         currText += replacement;
       }
       return output;
     }
 
+    // Make sure to add any leftover text as an additional textblock to the block list
+    if (currText) {
+      output.push(AdaptiveCardHelper.createTextBlock(currText));
+      currText = '';
+    }
+
     return output.concat(UtilityHelper.toArray(replacement));
   }, []);
 
-  if (currText) {
-    blocks.push(AdaptiveCardHelper.createTextBlock(currText));
-  }
+    // Make sure to add any leftover text as an additional textblock to the block list
+    if (currText) {
+      blocks.push(AdaptiveCardHelper.createTextBlock(currText));
+    }
 
   return blocks;
 }

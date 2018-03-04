@@ -1,4 +1,6 @@
-import { repeat } from './utilities';
+import {
+  repeat
+} from './utilities';
 import AdaptiveCardHelper from '../lib/adaptiveCardHelper';
 import AdaptiveCardFilter from '../lib/adaptiveCardFilter';
 
@@ -7,26 +9,26 @@ var rules = {};
 rules.paragraph = {
   filter: 'p',
 
-  replacement: function (content) {
-    return AdaptiveCardHelper.wrap(content);
+  replacement: function(content) {
+      return AdaptiveCardHelper.wrap(content);
   }
 };
 
 rules.lineBreak = {
   filter: 'br',
 
-  replacement: function (content, node, options) {
-    return '\n';
+  replacement: function(content, node, options) {
+      return '\n';
   }
 };
 
 rules.heading = {
   filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
 
-  replacement: function (content, node, options) {
-    var hLevel = Number(node.nodeName.charAt(1));
-    var hText = AdaptiveCardFilter.getTextBlocksAsString(content);
-    return AdaptiveCardHelper.createHeadingTextBlock(hText, hLevel);
+  replacement: function(content, node, options) {
+      var hLevel = Number(node.nodeName.charAt(1));
+      var hText = AdaptiveCardFilter.getTextBlocksAsString(content);
+      return AdaptiveCardHelper.createHeadingTextBlock(hText, hLevel);
   }
 };
 
@@ -42,24 +44,64 @@ rules.heading = {
 
 rules.list = {
   filter: ['ul', 'ol'],
+  // content = array of listitem containers
+  replacement: function(content, node) {
+      var isOrdered = node.nodeName === 'OL';
 
-  replacement: function (content, node) {
-    var listItemElems = AdaptiveCardHelper.unwrap(content);
-    console.log(listItemElems);
-    // if (node.nodeName === 'OL') {
+      console.log(content);
 
-    // } else {
+      // Want to take the list item unwrap it to get to the contents
+      // Go through contents and add indentation or tab to nested lists
+      // push images to bottom so as to show continuous list
+      // All of list must be part of the same text block
 
-    // }
+      var blocks = (content || []).reduce(listItemContainer => {
+          var listItemContents = AdaptiveCardHelper.unwrap(listItemContainer);
+          (listItemContents || []).forEach(listItemContentItem => {
+              console.log(listItemContentItem);
+          });
+      }, []);
+
+      return AdaptiveCardHelper.wrap(content);
   }
 };
 
 rules.listItem = {
   filter: 'li',
+  // list items will simply wrap their content in a container
+  replacement: function(content, node, options) {
+      var currText = '';
+      var blocks = (content || []).reduce((prevBlocks, currBlock) => {
+          var cardType = currBlock.type;
+          switch (cardType) {
+              case AdaptiveCardFilter.cardTypes.textBlock:
+                  currText += currBlock.text;
+                  break;
+              case AdaptiveCardFilter.cardTypes.container:
+                  let nestedListElems = AdaptiveCardHelper.unwrap(currBlock);
+                  nestedListElems
+                      .forEach(nestedListElem => {
+                          if (AdaptiveCardFilter.isTextBlock(nestedListElem)) {
+                              currText += '\r\t' + nestedListElem.text;
+                          } else {
+                              prevBlocks.push(nestedListElem);
+                          }
+                      });
+                  break;
+              case AdaptiveCardFilter.cardTypes.image:
+                  prevBlocks.push(currBlock);
+                  break;
+              default:
+                  console.error(`Unsupported card type: ${cardType} ${currBlock}`);
+          }
+          return prevBlocks;
+      }, []);
 
-  replacement: function (content, node, options) {
-    // return content;
-    return AdaptiveCardHelper.wrap(content);
+      if (currText) {
+          blocks.unshift(AdaptiveCardHelper.createTextBlock(currText));
+      }
+
+      return AdaptiveCardHelper.wrap(blocks);
   }
 };
 
@@ -113,19 +155,19 @@ rules.listItem = {
 // };
 
 rules.inlineLink = {
-  filter: function (node, options) {
-    return (
-      options.linkStyle === 'inlined' &&
-      node.nodeName === 'A' &&
-      node.getAttribute('href')
-    )
+  filter: function(node, options) {
+      return (
+          options.linkStyle === 'inlined' &&
+          node.nodeName === 'A' &&
+          node.getAttribute('href')
+      )
   },
 
-  replacement: function (content, node) {
-    var href = node.getAttribute('href');
-    var title = node.title ? ' "' + node.title + '"' : '';
-    var linkText = AdaptiveCardFilter.getTextBlocksAsString(content);
-    return `[${linkText}](${href})`;
+  replacement: function(content, node) {
+      var href = node.getAttribute('href');
+      var title = node.title ? ' "' + node.title + '"' : '';
+      var linkText = AdaptiveCardFilter.getTextBlocksAsString(content);
+      return `[${linkText}](${href})`;
   }
 };
 
@@ -177,19 +219,19 @@ rules.inlineLink = {
 
 rules.emphasis = {
   filter: ['em', 'i'],
-
-  replacement: function (content, node, options) {
-    var emText = AdaptiveCardFilter.getTextBlocksAsString(content);
-    return `${options.emDelimiter}${emText}${options.emDelimiter}`;
+  // TODO: what elements are valid inside of these elements?
+  replacement: function(content, node, options) {
+      var emText = AdaptiveCardFilter.getTextBlocksAsString(content);
+      return `${options.emDelimiter}${emText}${options.emDelimiter}`;
   }
 };
 
 rules.strong = {
   filter: ['strong', 'b'],
 
-  replacement: function (content, node, options) {
-    var strongText = AdaptiveCardFilter.getTextBlocksAsString(content);
-    return `${options.strongDelimiter}${strongText}${options.strongDelimiter}`;
+  replacement: function(content, node, options) {
+      var strongText = AdaptiveCardFilter.getTextBlocksAsString(content);
+      return `${options.strongDelimiter}${strongText}${options.strongDelimiter}`;
   }
 };
 
@@ -221,12 +263,12 @@ rules.strong = {
 rules.image = {
   filter: 'img',
 
-  replacement: function (content, node) {
-    var alt = node.alt || '';
-    var src = node.getAttribute('src') || '';
-    return AdaptiveCardHelper.createImage(src, {
-      altText: alt
-    });
+  replacement: function(content, node) {
+      var alt = node.alt || '';
+      var src = node.getAttribute('src') || '';
+      return AdaptiveCardHelper.createImage(src, {
+          altText: alt
+      });
   }
 };
 
