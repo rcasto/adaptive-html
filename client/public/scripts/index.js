@@ -18,7 +18,8 @@ AdaptiveHtml.transform(`
             <ul>
                 <li>
                     nested list item
-                    <img src="http://fake.com" />
+                    <img src="https://images.unsplash.com/photo-1459909633680-206dc5c67abb?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=7e9283d9297a7140d6ec620a8a7d2e84&auto=format&fit=crop&w=1051&q=80" />
+                    more text afterwards
                 </li>
             </ul>
         </li>

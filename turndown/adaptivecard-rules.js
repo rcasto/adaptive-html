@@ -45,30 +45,26 @@ rules.heading = {
 rules.list = {
     filter: ['ul', 'ol'],
     // content = array of listitem containers
-    replacement: function (content, node) {
+    replacement: function (listItemContainers, node) {
         var isOrdered = node.nodeName === 'OL';
-
-        console.log(content);
-
-        // Want to take the list item unwrap it to get to the contents
-        // Go through contents and add indentation or tab to nested lists
-        // push images to bottom so as to show continuous list
-        // All of list must be part of the same text block
-
-        var blocks = (content || []).reduce(listItemContainer => {
-            var listItemContents = AdaptiveCardHelper.unwrap(listItemContainer);
-            (listItemContents || []).forEach(listItemContentItem => {
-                console.log(listItemContentItem);
-            });
+        var blocks = (listItemContainers || []).map((listItemContainer, i) => {
+            var listItemElems = AdaptiveCardHelper.unwrap(listItemContainer);
+            var firstListItemElem = listItemElems[0];
+            if (firstListItemElem && AdaptiveCardFilter.isTextBlock(firstListItemElem)) {
+                let firstListItemPrefix = isOrdered ? `${i + 1}. ` : `- `;
+                firstListItemElem.text = firstListItemPrefix + firstListItemElem.text;
+            }
+            return listItemElems;
+        }).reduce((prevBlocks, listItemBlocks) => {
+            return prevBlocks.concat(listItemBlocks);
         }, []);
-
-        return AdaptiveCardHelper.wrap(content);
+        return AdaptiveCardHelper.wrap(blocks);
     }
 };
 
 rules.listItem = {
     filter: 'li',
-    // list items will simply wrap their content in a container
+
     replacement: function (content, node, options) {
         var currText = '';
         var blocks = (content || []).reduce((prevBlocks, currBlock) => {
