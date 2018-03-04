@@ -28,15 +28,15 @@ export default function TurndownService(options) {
         linkStyle: 'inlined',
         linkReferenceStyle: 'full',
         br: '  ',
-        blankReplacement: function(content, node) {
+        blankReplacement: function (content, node) {
             console.log('Blanking replacement');
             // return node.isBlock ? AdaptiveCardHelper.wrap() : AdaptiveCardHelper.createTextBlock();
         },
-        keepReplacement: function(content, node) {
+        keepReplacement: function (content, node) {
             console.log('Keeping replacement');
             // return node.isBlock ? AdaptiveCardHelper.wrap(node.outerHTML) + '\n\n' : node.outerHTML
         },
-        defaultReplacement: function(content, node) {
+        defaultReplacement: function (content, node) {
             console.log('Default replacement');
             return node.isBlock ?
                 AdaptiveCardHelper.wrap(content) : AdaptiveCardHelper.createTextBlock(content);
@@ -55,7 +55,7 @@ TurndownService.prototype = {
      * @type String
      */
 
-    turndown: function(input) {
+    turndown: function (input) {
         if (!canConvert(input)) {
             throw new TypeError(
                 input + ' is not a string, or an element/document/fragment node.'
@@ -76,7 +76,7 @@ TurndownService.prototype = {
      * @type Object
      */
 
-    use: function(plugin) {
+    use: function (plugin) {
         if (Array.isArray(plugin)) {
             for (var i = 0; i < plugin.length; i++) this.use(plugin[i])
         } else if (typeof plugin === 'function') {
@@ -96,7 +96,7 @@ TurndownService.prototype = {
      * @type Object
      */
 
-    addRule: function(key, rule) {
+    addRule: function (key, rule) {
         this.rules.add(key, rule)
         return this
     },
@@ -109,7 +109,7 @@ TurndownService.prototype = {
      * @type Object
      */
 
-    keep: function(filter) {
+    keep: function (filter) {
         this.rules.keep(filter)
         return this
     },
@@ -122,7 +122,7 @@ TurndownService.prototype = {
      * @type Object
      */
 
-    remove: function(filter) {
+    remove: function (filter) {
         this.rules.remove(filter)
         return this
     },
@@ -135,48 +135,48 @@ TurndownService.prototype = {
      * @type String
      */
 
-    escape: function(string) {
+    escape: function (string) {
         return (
             string
-            // Escape backslash escapes!
-            .replace(/\\(\S)/g, '\\\\$1')
+                // Escape backslash escapes!
+                .replace(/\\(\S)/g, '\\\\$1')
 
-            // Escape headings
-            .replace(/^(#{1,6} )/gm, '\\$1')
+                // Escape headings
+                .replace(/^(#{1,6} )/gm, '\\$1')
 
-            // Escape hr
-            .replace(/^([-*_] *){3,}$/gm, function(match, character) {
-                return match.split(character).join('\\' + character)
-            })
+                // Escape hr
+                .replace(/^([-*_] *){3,}$/gm, function (match, character) {
+                    return match.split(character).join('\\' + character)
+                })
 
-            // Escape ol bullet points
-            .replace(/^(\W* {0,3})(\d+)\. /gm, '$1$2\\. ')
+                // Escape ol bullet points
+                .replace(/^(\W* {0,3})(\d+)\. /gm, '$1$2\\. ')
 
-            // Escape ul bullet points
-            .replace(/^([^\\\w]*)[*+-] /gm, function(match) {
-                return match.replace(/([*+-])/g, '\\$1')
-            })
+                // Escape ul bullet points
+                .replace(/^([^\\\w]*)[*+-] /gm, function (match) {
+                    return match.replace(/([*+-])/g, '\\$1')
+                })
 
-            // Escape blockquote indents
-            .replace(/^(\W* {0,3})> /gm, '$1\\> ')
+                // Escape blockquote indents
+                .replace(/^(\W* {0,3})> /gm, '$1\\> ')
 
-            // Escape em/strong *
-            .replace(/\*+(?![*\s\W]).+?\*+/g, function(match) {
-                return match.replace(/\*/g, '\\*')
-            })
+                // Escape em/strong *
+                .replace(/\*+(?![*\s\W]).+?\*+/g, function (match) {
+                    return match.replace(/\*/g, '\\*')
+                })
 
-            // Escape em/strong _
-            .replace(/_+(?![_\s\W]).+?_+/g, function(match) {
-                return match.replace(/_/g, '\\_')
-            })
+                // Escape em/strong _
+                .replace(/_+(?![_\s\W]).+?_+/g, function (match) {
+                    return match.replace(/_/g, '\\_')
+                })
 
-            // Escape code _
-            .replace(/`+(?![`\s\W]).+?`+/g, function(match) {
-                return match.replace(/`/g, '\\`')
-            })
+                // Escape code _
+                .replace(/`+(?![`\s\W]).+?`+/g, function (match) {
+                    return match.replace(/`/g, '\\`')
+                })
 
-            // Escape link brackets
-            .replace(/[\[\]]/g, '\\$&') // eslint-disable-line no-useless-escape
+                // Escape link brackets
+                .replace(/[\[\]]/g, '\\$&') // eslint-disable-line no-useless-escape
         )
     }
 }
@@ -192,7 +192,7 @@ TurndownService.prototype = {
 function process(parentNode) {
     var self = this;
     var currText = '';
-    var blocks = reduce.call(parentNode.childNodes, function(output, node) {
+    var blocks = reduce.call(parentNode.childNodes, function (output, node) {
         node = new Node(node);
 
         var replacement = [];

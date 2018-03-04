@@ -19,17 +19,17 @@ function canParseHTMLNatively() {
         if (new Parser().parseFromString('', 'text/html')) {
             canParse = true
         }
-    } catch (e) {}
+    } catch (e) { }
 
     return canParse
 }
 
 function createHTMLParser() {
-    var Parser = function() {}
+    var Parser = function () { }
 
     if (process.browser) {
         if (shouldUseActiveX()) {
-            Parser.prototype.parseFromString = function(string) {
+            Parser.prototype.parseFromString = function (string) {
                 var doc = new window.ActiveXObject('htmlfile')
                 doc.designMode = 'on' // disable on-page scripts
                 doc.open()
@@ -38,7 +38,7 @@ function createHTMLParser() {
                 return doc
             }
         } else {
-            Parser.prototype.parseFromString = function(string) {
+            Parser.prototype.parseFromString = function (string) {
                 var doc = document.implementation.createHTMLDocument('')
                 doc.open()
                 doc.write(string)
@@ -48,7 +48,7 @@ function createHTMLParser() {
         }
     } else {
         var JSDOM = require('jsdom').JSDOM
-        Parser.prototype.parseFromString = function(string) {
+        Parser.prototype.parseFromString = function (string) {
             return new JSDOM(string).window.document
         }
     }
