@@ -1,14 +1,14 @@
-export function extend (destination) {
+export function extend(destination) {
   for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i]
-    for (var key in source) {
-      if (source.hasOwnProperty(key)) destination[key] = source[key]
-    }
+      var source = arguments[i]
+      for (var key in source) {
+          if (source.hasOwnProperty(key)) destination[key] = source[key]
+      }
   }
   return destination
 }
 
-export function repeat (character, count) {
+export function repeat(character, count) {
   return Array(count + 1).join(character)
 }
 
@@ -21,7 +21,7 @@ export var blockElements = [
   'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'ul'
 ]
 
-export function isBlock (node) {
+export function isBlock(node) {
   return blockElements.indexOf(node.nodeName.toLowerCase()) !== -1
 }
 
@@ -30,11 +30,11 @@ export var voidElements = [
   'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'
 ]
 
-export function isVoid (node) {
+export function isVoid(node) {
   return voidElements.indexOf(node.nodeName.toLowerCase()) !== -1
 }
 
 var voidSelector = voidElements.join()
-export function hasVoid (node) {
+export function hasVoid(node) {
   return node.querySelector && node.querySelector(voidSelector)
 }
