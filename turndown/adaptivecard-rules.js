@@ -71,7 +71,12 @@ rules.listItem = {
             var cardType = currBlock.type;
             switch (cardType) {
                 case AdaptiveCardFilter.cardTypes.textBlock:
-                    currText += currBlock.text;
+                    // if (currText === '\n') { // indicates br tag or just new line
+                    //     prevBlocks.unshift(AdaptiveCardHelper.createTextBlock(currText));
+                    //     currText = '';
+                    // } else {
+                        currText += currBlock.text;
+                    // }
                     break;
                 case AdaptiveCardFilter.cardTypes.container:
                     let nestedListElems = AdaptiveCardHelper.unwrap(currBlock);

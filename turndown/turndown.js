@@ -37,9 +37,10 @@ export default function TurndownService(options) {
             // return node.isBlock ? AdaptiveCardHelper.wrap(node.outerHTML) + '\n\n' : node.outerHTML
         },
         defaultReplacement: function (content, node) {
-            console.log('Default replacement');
+            console.log('Default replacement', node);
             return node.isBlock ?
                 AdaptiveCardHelper.wrap(content) : AdaptiveCardHelper.createTextBlock(content);
+            // return AdaptiveCardHelper.wrap(content);
         }
     }
     this.options = extend({}, defaults, options)
