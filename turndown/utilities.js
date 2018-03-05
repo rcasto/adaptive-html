@@ -38,3 +38,21 @@ var voidSelector = voidElements.join()
 export function hasVoid(node) {
     return node.querySelector && node.querySelector(voidSelector)
 }
+
+export function isNestedListItem(node) {
+    if (!node || 
+        node.nodeName !== 'LI' &&
+        (node.parentNode !== 'UL' ||
+        node.parentNode !== 'OL')) {
+        return false;
+    }
+    var currNode = node.parentNode.parentNode;
+    while (currNode) {
+        if (currNode.nodeName === 'OL' ||
+            currNode.nodeName === 'UL') {
+            return true;
+        }
+        currNode = currNode.parentNode;
+    }
+    return false;
+}
