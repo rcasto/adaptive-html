@@ -1,5 +1,3 @@
-import AdaptiveHtml from '../../../index';
-
 // AdaptiveHtml.transform('testing');
 // AdaptiveHtml.transform('<div>Hello Div</div>');
 // AdaptiveHtml.transform('There is some <strong>text</strong> with a <a href="https://google.com">Link</a> in <em>it</em>');

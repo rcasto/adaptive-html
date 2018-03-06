@@ -1,3 +1,4 @@
 node_modules
 .cache
 dist
+client/public/scripts/adaptive-html.js

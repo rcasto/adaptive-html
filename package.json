@@ -4,19 +4,18 @@
   "description": "HTML to Adaptive Card converter",
   "main": "index.js",
   "scripts": {
-    "build": "parcel build ./index.js --out-dir dist",
-    "client": "npm run client:watch & node ./client/server.js",
-    "client:run": "node ./client/server.js",
-    "client:watch": "parcel watch ./client/public/index.html --out-dir client/dist --public-url ./"
+    "build:rollup": "rollup --config rollup.config.js",
+    "dev:rollup": "rollup --config rollup.config.js --watch --output.file client/public/scripts/adaptive-html.js",
+    "client:run": "node ./client/server.js"
   },
   "keywords": [],
   "author": "Richie Casto",
   "license": "ISC",
-  "dependencies": {
-    "turndown": "^4.0.1"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.1",
-    "parcel-bundler": "^1.6.2"
+    "rollup": "^0.56.4",
+    "rollup-plugin-babel": "^3.0.3"
   }
 }
