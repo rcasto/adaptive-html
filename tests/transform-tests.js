@@ -155,3 +155,31 @@ test('can handle heading tags', t => {
         version: "1.0"
     });
 });
+
+test('can handle inline links (a tags)', t => {
+    var result = AdaptiveHtml.transform('This is an <a href="https://support.microsoft.com/">inline link</a>');
+    t.deepEqual(result, {
+        type: "AdaptiveCard",
+        body: [{
+            type: "TextBlock",
+            text: "This is an [inline link](https://support.microsoft.com/)",
+            wrap: true
+        }],
+        actions: [],
+        version: "1.0"
+    });
+});
+
+test('can handle img tags', t => {
+    var result = AdaptiveHtml.transform('<img alt="This is some alt text" src="https://images.unsplash.com/photo-1505245208761-ba872912fac0?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=608629c5a6a368d239d44bf9e84956b8&auto=format&fit=crop&w=1500&q=80" />');
+    t.deepEqual(result, {
+        type: "AdaptiveCard",
+        body: [{
+            type: "Image",
+            url: "https://images.unsplash.com/photo-1505245208761-ba872912fac0?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=608629c5a6a368d239d44bf9e84956b8&auto=format&fit=crop&w=1500&q=80",
+            altText: "This is some alt text"
+        }],
+        actions: [],
+        version: "1.0"
+    });
+});
