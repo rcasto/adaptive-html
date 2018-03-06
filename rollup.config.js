@@ -1,15 +1,26 @@
 import babel from 'rollup-plugin-babel';
+import uglify from 'rollup-plugin-uglify';
+
+var buildMinifiedLibrary = shouldMinify(process.argv);
+var plugins = buildMinifiedLibrary ? [
+    babel(),
+    uglify()
+] : [
+    babel()
+];
+
+function shouldMinify(args) {
+    return (args || []).indexOf('--minify') > -1;
+}
 
 export default {
     input: "index.js",
     output: {
         format: "iife",
-        file: "dist/adaptive-html.js",
+        file:  buildMinifiedLibrary ? "dist/adaptive-html.min.js" : "dist/adaptive-html.js",
         name: "AdaptiveHtml"
     },
-    plugins: [
-        babel()
-    ],
+    plugins: plugins,
     watch: {
         include: [
             "lib/*.js",
