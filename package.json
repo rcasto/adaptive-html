@@ -6,16 +6,25 @@
   "scripts": {
     "build:rollup": "rollup --config rollup.config.js",
     "dev:rollup": "rollup --config rollup.config.js --watch --output.file client/public/scripts/adaptive-html.js",
-    "client:run": "node ./client/server.js"
+    "client:run": "node ./client/server.js",
+    "test": "rollup --config rollup.config.js --output.format cjs --output.file tests/adaptive-html.js && ava"
   },
   "keywords": [],
   "author": "Richie Casto",
   "license": "ISC",
   "dependencies": {},
   "devDependencies": {
+    "ava": "^0.25.0",
     "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.1",
+    "jsdom": "^11.6.2",
     "rollup": "^0.56.4",
     "rollup-plugin-babel": "^3.0.3"
+  },
+  "ava": {
+    "files": [
+      "tests/*.js",
+      "!tests/adaptive-html.js"
+    ]
   }
 }
