@@ -4,9 +4,9 @@
   "description": "HTML to Adaptive Card converter",
   "main": "index.js",
   "scripts": {
-    "build:rollup": "rollup --config rollup.config.js",
-    "dev:rollup": "rollup --config rollup.config.js --watch --output.file client/public/scripts/adaptive-html.js",
-    "client:run": "node ./client/server.js",
+    "build": "rollup --config rollup.config.js",
+    "dev": "rollup --config rollup.config.js --watch --output.file client/public/scripts/adaptive-html.js",
+    "client": "node ./client/server.js",
     "test": "rollup --config rollup.config.js --output.format cjs --output.file tests/adaptive-html.js && ava"
   },
   "keywords": [],
