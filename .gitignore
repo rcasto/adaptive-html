@@ -1,3 +1,5 @@
 node_modules
 client/public/scripts/adaptive-html.js
 tests/adaptive-html.js
+.nyc_output
+coverage
