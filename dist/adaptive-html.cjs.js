@@ -1,4 +1,3 @@
-var AdaptiveHtml = (function () {
 'use strict';
 
 function extend(destination) {
@@ -490,14 +489,10 @@ rules.image = {
 
 function Rules(options) {
     this.options = options;
-    this._keep = [];
-    this._remove = [];
 
     this.blankRule = {
         replacement: options.blankReplacement
     };
-
-    this.keepReplacement = options.keepReplacement;
 
     this.defaultRule = {
         replacement: options.defaultReplacement
@@ -510,41 +505,13 @@ function Rules(options) {
 }
 
 Rules.prototype = {
-    add: function add(key, rule) {
-        this.array.unshift(rule);
-    },
-
-    keep: function keep(filter) {
-        this._keep.unshift({
-            filter: filter,
-            replacement: this.keepReplacement
-        });
-    },
-
-    remove: function remove(filter) {
-        this._remove.unshift({
-            filter: filter,
-            replacement: function replacement() {
-                return '';
-            }
-        });
-    },
-
     forNode: function forNode(node) {
         if (node.isBlank) return this.blankRule;
         var rule;
 
         if (rule = findRule(this.array, node, this.options)) return rule;
-        if (rule = findRule(this._keep, node, this.options)) return rule;
-        if (rule = findRule(this._remove, node, this.options)) return rule;
 
         return this.defaultRule;
-    },
-
-    forEach: function forEach(fn) {
-        for (var i = 0; i < this.array.length; i++) {
-            fn(this.array[i], i);
-        }
     }
 };
 
@@ -910,67 +877,6 @@ TurndownService.prototype = {
     },
 
     /**
-     * Add one or more plugins
-     * @public
-     * @param {Function|Array} plugin The plugin or array of plugins to add
-     * @returns The Turndown instance for chaining
-     * @type Object
-     */
-
-    use: function use(plugin) {
-        if (Array.isArray(plugin)) {
-            for (var i = 0; i < plugin.length; i++) {
-                this.use(plugin[i]);
-            }
-        } else if (typeof plugin === 'function') {
-            plugin(this);
-        } else {
-            throw new TypeError('plugin must be a Function or an Array of Functions');
-        }
-        return this;
-    },
-
-    /**
-     * Adds a rule
-     * @public
-     * @param {String} key The unique key of the rule
-     * @param {Object} rule The rule
-     * @returns The Turndown instance for chaining
-     * @type Object
-     */
-
-    addRule: function addRule(key, rule) {
-        this.rules.add(key, rule);
-        return this;
-    },
-
-    /**
-     * Keep a node (as HTML) that matches the filter
-     * @public
-     * @param {String|Array|Function} filter The unique key of the rule
-     * @returns The Turndown instance for chaining
-     * @type Object
-     */
-
-    keep: function keep(filter) {
-        this.rules.keep(filter);
-        return this;
-    },
-
-    /**
-     * Remove a node that matches the filter
-     * @public
-     * @param {String|Array|Function} filter The unique key of the rule
-     * @returns The Turndown instance for chaining
-     * @type Object
-     */
-
-    remove: function remove(filter) {
-        this.rules.remove(filter);
-        return this;
-    },
-
-    /**
      * Escapes Markdown syntax
      * @public
      * @param {String} string The string to escape
@@ -1113,6 +1019,4 @@ var index = {
     transform: transform
 };
 
-return index;
-
-}());
+module.exports = index;

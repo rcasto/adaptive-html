@@ -1,5 +1,5 @@
 var test = require('ava');
-var AdaptiveHtml = require('./adaptive-html');
+var AdaptiveHtml = require('../dist/adaptive-html.cjs');
 
 test('can transform text node', t => {
     var result = AdaptiveHtml.transform('This is some text');

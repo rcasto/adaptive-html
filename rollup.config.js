@@ -17,7 +17,7 @@ export default {
     input: "index.js",
     output: {
         format: "iife",
-        file:  buildMinifiedLibrary ? "dist/adaptive-html.min.js" : "dist/adaptive-html.js",
+        file:  buildMinifiedLibrary ? "dist/adaptive-html.iife.min.js" : "dist/adaptive-html.iife.js",
         name: "AdaptiveHtml"
     },
     plugins: plugins,
