@@ -30,8 +30,7 @@
   },
   "ava": {
     "files": [
-      "tests/*.js",
-      "!tests/adaptive-html.js"
+      "tests/*.js"
     ]
   }
 }
