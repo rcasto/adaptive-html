@@ -5,7 +5,6 @@ var turndownService = new TurndownService();
 
 function transform(input) {
     var transform = turndownService.turndown(input);
-    UtilityHelper.prettyPrint(transform);
     return transform;
 }
 
