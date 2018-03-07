@@ -4,19 +4,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Test AdaptiveHtml Client</title>
-    <script src="//cdn.ckeditor.com/4.8.0/standard/ckeditor.js"></script>
 </head>
 <body>
     <textarea id="adaptive-ckeditor"></textarea>
+    <div class="adaptive-preview"></div>
 
+    <script src="//cdn.ckeditor.com/4.8.0/standard/ckeditor.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@8.4.1/dist/markdown-it.min.js"></script>
+    <script src="https://unpkg.com/adaptivecards/dist/adaptivecards.js"></script>
     <script src="scripts/adaptive-html.js"></script>
-    <script src="scripts/index.js"></script>
     <script>
         var editor = CKEDITOR.replace('adaptive-ckeditor');
-        editor.on('change', function (event) {
-            var data = event.editor.getData();
-            // console.log(data);
-        });
+        var adaptivePreview = document.querySelector('.adaptive-preview');
+        var adaptiveCard = new AdaptiveCards.AdaptiveCard();
+
+        function debounce(func, debounceTimeInMs) {
+            var debounceId = null;
+            return function () {
+                var that = this;
+                var args = arguments;
+                if (debounceId) {
+                    clearTimeout(debounceId);
+                }
+                debounceId = setTimeout(function () {
+                    func.apply(that, args);
+                    debounceId = null;
+                }, debounceTimeInMs);
+            };
+        }
+
+        editor.on('change', debounce(function (event) {
+            var html = event.editor.getData();
+            if (!html) {
+                return;
+            }
+            var adaptiveJson = AdaptiveHtml.transform(html);
+            adaptiveCard.parse(adaptiveJson);
+            adaptivePreview.textContent = '';
+            adaptivePreview.appendChild(adaptiveCard.render());
+        }, 500));
     </script>
 </body>
 </html>
