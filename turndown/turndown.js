@@ -91,65 +91,6 @@ TurndownService.prototype = {
     },
 
     /**
-     * Add one or more plugins
-     * @public
-     * @param {Function|Array} plugin The plugin or array of plugins to add
-     * @returns The Turndown instance for chaining
-     * @type Object
-     */
-
-    use: function (plugin) {
-        if (Array.isArray(plugin)) {
-            for (var i = 0; i < plugin.length; i++) this.use(plugin[i])
-        } else if (typeof plugin === 'function') {
-            plugin(this)
-        } else {
-            throw new TypeError('plugin must be a Function or an Array of Functions')
-        }
-        return this
-    },
-
-    /**
-     * Adds a rule
-     * @public
-     * @param {String} key The unique key of the rule
-     * @param {Object} rule The rule
-     * @returns The Turndown instance for chaining
-     * @type Object
-     */
-
-    addRule: function (key, rule) {
-        this.rules.add(key, rule)
-        return this
-    },
-
-    /**
-     * Keep a node (as HTML) that matches the filter
-     * @public
-     * @param {String|Array|Function} filter The unique key of the rule
-     * @returns The Turndown instance for chaining
-     * @type Object
-     */
-
-    keep: function (filter) {
-        this.rules.keep(filter)
-        return this
-    },
-
-    /**
-     * Remove a node that matches the filter
-     * @public
-     * @param {String|Array|Function} filter The unique key of the rule
-     * @returns The Turndown instance for chaining
-     * @type Object
-     */
-
-    remove: function (filter) {
-        this.rules.remove(filter)
-        return this
-    },
-
-    /**
      * Escapes Markdown syntax
      * @public
      * @param {String} string The string to escape
