@@ -4,6 +4,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Test AdaptiveHtml Client</title>
+    <style>
+        .adaptive-preview > .ac-container {
+            margin-top: 6px;
+            border: 3px solid #E2E2E2;
+        }
+    </style>
 </head>
 <body>
     <textarea id="adaptive-ckeditor"></textarea>
@@ -17,6 +23,7 @@
         var editor = CKEDITOR.replace('adaptive-ckeditor');
         var adaptivePreview = document.querySelector('.adaptive-preview');
         var adaptiveCard = new AdaptiveCards.AdaptiveCard();
+        var debounceTimeInMs = 500;
 
         function debounce(func, debounceTimeInMs) {
             var debounceId = null;
@@ -41,8 +48,10 @@
             var adaptiveJson = AdaptiveHtml.transform(html);
             adaptiveCard.parse(adaptiveJson);
             adaptivePreview.textContent = '';
-            adaptivePreview.appendChild(adaptiveCard.render());
-        }, 500));
+            var adaptiveHtml = adaptiveCard.render();
+            console.log(adaptiveHtml);
+            adaptivePreview.appendChild(adaptiveHtml);
+        }, debounceTimeInMs));
     </script>
 </body>
 </html>
