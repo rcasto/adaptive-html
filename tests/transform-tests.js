@@ -350,3 +350,32 @@ test('can handle unordered list with nested list', t => {
         version: "1.0"
     });
 });
+
+test('can handle nested nested list', t => {
+    var result = AdaptiveHtml.transform(`
+        <ul>
+            <li>List item 1
+                <ul>
+                    <li>Nested list item 1
+                        <ul>
+                            <li>Nested nested list item 1</li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    `);
+    t.deepEqual(result, {
+        type: "AdaptiveCard",
+        body: [{
+            type: "Container",
+            items: [{
+                type: "TextBlock",
+                text: "- List item 1\r\t- Nested list item 1\r\t\t- Nested nested list item 1",
+                wrap: true
+            }]
+        }],
+        actions: [],
+        version: "1.0"
+    });
+});
