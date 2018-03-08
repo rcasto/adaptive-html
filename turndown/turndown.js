@@ -51,15 +51,12 @@ export default function TurndownService(options) {
         linkReferenceStyle: 'full',
         br: '  ',
         blankReplacement: function (content, node) {
-            console.log('Blanking replacement');
             // return node.isBlock ? AdaptiveCardHelper.wrap() : AdaptiveCardHelper.createTextBlock();
         },
         keepReplacement: function (content, node) {
-            console.log('Keeping replacement');
             // return node.isBlock ? AdaptiveCardHelper.wrap(node.outerHTML) + '\n\n' : node.outerHTML
         },
         defaultReplacement: function (content, node) {
-            console.log('Default replacement', node, content);
             return node.isBlock ?
                 AdaptiveCardHelper.wrap(content) : content;
         }

@@ -183,3 +183,170 @@ test('can handle img tags', t => {
         version: "1.0"
     });
 });
+
+test('can handle unsupported block tag', t => {
+    var result = AdaptiveHtml.transform(`<div>Testing div</div>`);
+    t.deepEqual(result, {
+        type: "AdaptiveCard",
+        body: [{
+            type: "Container",
+            items: [{
+                type: "TextBlock",
+                text: "Testing div",
+                wrap: true
+            }]
+        }],
+        actions: [],
+        version: "1.0"
+    });
+});
+
+test('can handle unsupported inline tag', t => {
+    var result = AdaptiveHtml.transform(`<span>Testing span</span>`);
+    t.deepEqual(result, {
+        type: "AdaptiveCard",
+        body: [{
+            type: "TextBlock",
+            text: "Testing span",
+            wrap: true
+        }],
+        actions: [],
+        version: "1.0"
+    });
+});
+
+test('can handle simple ordered list', t => {
+    var result = AdaptiveHtml.transform(`
+        <ol>
+            <li>List item 1</li>
+            <li>List item 2</li>
+            <li>List item 3</li>
+        </ol>
+    `);
+    t.deepEqual(result, {
+        type: "AdaptiveCard",
+        body: [{
+            type: "Container",
+            items: [{
+                type: "TextBlock",
+                text: "1. List item 1",
+                wrap: true
+            }, {
+                type: "TextBlock",
+                text: "2. List item 2",
+                wrap: true
+            }, {
+                type: "TextBlock",
+                text: "3. List item 3",
+                wrap: true
+            }]
+        }],
+        actions: [],
+        version: "1.0"
+    });
+});
+
+test('can handle simple unordered list', t => {
+    var result = AdaptiveHtml.transform(`
+        <ul>
+            <li>List item 1</li>
+            <li>List item 2</li>
+            <li>List item 3</li>
+        </ul>
+    `);
+    t.deepEqual(result, {
+        type: "AdaptiveCard",
+        body: [{
+            type: "Container",
+            items: [{
+                type: "TextBlock",
+                text: "- List item 1",
+                wrap: true
+            }, {
+                type: "TextBlock",
+                text: "- List item 2",
+                wrap: true
+            }, {
+                type: "TextBlock",
+                text: "- List item 3",
+                wrap: true
+            }]
+        }],
+        actions: [],
+        version: "1.0"
+    });
+});
+
+test('can handle ordered list with nested list', t => {
+    var result = AdaptiveHtml.transform(`
+        <ol>
+            <li>
+                List item 1
+                <ol>
+                    <li>Nested list item 1</li>
+                    <li>Nested list item 2</li>
+                </ol>
+            </li>
+            <li>List item 2</li>
+            <li>List item 3</li>
+        </ol>
+    `);
+    t.deepEqual(result, {
+        type: "AdaptiveCard",
+        body: [{
+            type: "Container",
+            items: [{
+                type: "TextBlock",
+                text: "1. List item 1\r\t1. Nested list item 1\r\t2. Nested list item 2",
+                wrap: true
+            }, {
+                type: "TextBlock",
+                text: "2. List item 2",
+                wrap: true
+            }, {
+                type: "TextBlock",
+                text: "3. List item 3",
+                wrap: true
+            }]
+        }],
+        actions: [],
+        version: "1.0"
+    });
+});
+
+test('can handle unordered list with nested list', t => {
+    var result = AdaptiveHtml.transform(`
+        <ul>
+            <li>
+                List item 1
+                <ul>
+                    <li>Nested list item 1</li>
+                    <li>Nested list item 2</li>
+                </ul>
+            </li>
+            <li>List item 2</li>
+            <li>List item 3</li>
+        </ul>
+    `);
+    t.deepEqual(result, {
+        type: "AdaptiveCard",
+        body: [{
+            type: "Container",
+            items: [{
+                type: "TextBlock",
+                text: "- List item 1\r\t- Nested list item 1\r\t- Nested list item 2",
+                wrap: true
+            }, {
+                type: "TextBlock",
+                text: "- List item 2",
+                wrap: true
+            }, {
+                type: "TextBlock",
+                text: "- List item 3",
+                wrap: true
+            }]
+        }],
+        actions: [],
+        version: "1.0"
+    });
+});
