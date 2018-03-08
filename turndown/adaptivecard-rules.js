@@ -68,7 +68,7 @@ rules.listItem = {
                     nestedListElems
                         .forEach(nestedListElem => {
                             if (AdaptiveCardFilter.isTextBlock(nestedListElem)) {
-                                currText += '\r\t' + nestedListElem.text;
+                                currText += '\r\t' + nestedListElem.text.replace(/\r\t/g, '\r\t\t');
                             } else {
                                 prevBlocks.push(nestedListElem);
                             }
