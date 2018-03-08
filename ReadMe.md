@@ -17,7 +17,7 @@ There are [pre-built versions of the library](https://github.com/rcasto/adaptive
 
 #### Browser
 ```html
-<script src="adaptive-html.js"></script>
+<script src="adaptive-html.iife.min.js"></script>
 <script>
     var adaptiveCardJson = AdaptiveHtml.transform(`
         <p>Turn me into an Adaptive Card</p>
@@ -29,7 +29,8 @@ There are [pre-built versions of the library](https://github.com/rcasto/adaptive
 #### CommonJs
 ```javascript
 var AdaptiveHtml = require('adaptive-html');
-AdaptiveHtml.transform(`
+
+var adaptiveCardJson = AdaptiveHtml.transform(`
     <p>Turn me into an Adaptive Card</p>
 `);
 console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
@@ -38,7 +39,8 @@ console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
 #### ES
 ```javascript
 import AdaptiveHtml from 'adaptive-html';
-AdaptiveHtml.transform(`
+
+var adaptiveCardJson = AdaptiveHtml.transform(`
     <p>Turn me into an Adaptive Card</p>
 `);
 console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
