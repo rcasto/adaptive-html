@@ -51,10 +51,7 @@ export default function TurndownService(options) {
         linkReferenceStyle: 'full',
         br: '  ',
         blankReplacement: function (content, node) {
-            // return node.isBlock ? AdaptiveCardHelper.wrap() : AdaptiveCardHelper.createTextBlock();
-        },
-        keepReplacement: function (content, node) {
-            // return node.isBlock ? AdaptiveCardHelper.wrap(node.outerHTML) + '\n\n' : node.outerHTML
+            return null;
         },
         defaultReplacement: function (content, node) {
             return node.isBlock ?
@@ -153,14 +150,17 @@ function process(parentNode) {
     var self = this;
     var currText = '';
     var blocks = reduce.call(parentNode.childNodes, function (output, node) {
+        var replacement = [];
+
         node = new Node(node);
 
-        var replacement = [];
         if (node.nodeType === 3) { // text node
             replacement = node.isCode ? node.nodeValue : self.escape(node.nodeValue);
         } else if (node.nodeType === 1) { // element node
             replacement = replacementForNode.call(self, node);
         }
+
+        replacement = replacement || [];
 
         if (typeof replacement === 'string') {
             // '\n' is output by br tag replacement and is used to indicate
