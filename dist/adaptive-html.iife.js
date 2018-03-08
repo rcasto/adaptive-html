@@ -248,16 +248,6 @@ rules.heading = {
     }
 };
 
-// rules.blockquote = {
-//   filter: 'blockquote',
-
-//   replacement: function (content) {
-//     content = content.replace(/^\n+|\n+$/g, '');
-//     content = content.replace(/^/gm, '> ');
-//     return '\n\n' + content + '\n\n'
-//   }
-// };
-
 rules.list = {
     filter: ['ul', 'ol'],
     // content = array of listitem containers
@@ -287,18 +277,13 @@ rules.listItem = {
             var cardType = currBlock.type;
             switch (cardType) {
                 case AdaptiveCardFilter.cardTypes.textBlock:
-                    // if (currText === '\n') { // indicates br tag or just new line
-                    //     prevBlocks.unshift(AdaptiveCardHelper.createTextBlock(currText));
-                    //     currText = '';
-                    // } else {
                     currText += currBlock.text;
-                    // }
                     break;
                 case AdaptiveCardFilter.cardTypes.container:
                     var nestedListElems = AdaptiveCardHelper.unwrap(currBlock);
                     nestedListElems.forEach(function (nestedListElem) {
                         if (AdaptiveCardFilter.isTextBlock(nestedListElem)) {
-                            currText += '\r\t' + nestedListElem.text;
+                            currText += '\r\t' + nestedListElem.text.replace(/\r\t/g, '\r\t\t');
                         } else {
                             prevBlocks.push(nestedListElem);
                         }
@@ -321,55 +306,6 @@ rules.listItem = {
     }
 };
 
-// rules.indentedCodeBlock = {
-//   filter: function (node, options) {
-//     return (
-//       options.codeBlockStyle === 'indented' &&
-//       node.nodeName === 'PRE' &&
-//       node.firstChild &&
-//       node.firstChild.nodeName === 'CODE'
-//     )
-//   },
-
-//   replacement: function (content, node, options) {
-//     return (
-//       '\n\n    ' +
-//       node.firstChild.textContent.replace(/\n/g, '\n    ') +
-//       '\n\n'
-//     )
-//   }
-// };
-
-// rules.fencedCodeBlock = {
-//   filter: function (node, options) {
-//     return (
-//       options.codeBlockStyle === 'fenced' &&
-//       node.nodeName === 'PRE' &&
-//       node.firstChild &&
-//       node.firstChild.nodeName === 'CODE'
-//     )
-//   },
-
-//   replacement: function (content, node, options) {
-//     var className = node.firstChild.className || '';
-//     var language = (className.match(/language-(\S+)/) || [null, ''])[1];
-
-//     return (
-//       '\n\n' + options.fence + language + '\n' +
-//       node.firstChild.textContent +
-//       '\n' + options.fence + '\n\n'
-//     )
-//   }
-// };
-
-// rules.horizontalRule = {
-//   filter: 'hr',
-
-//   replacement: function (content, node, options) {
-//     return '\n\n' + options.hr + '\n\n'
-//   }
-// };
-
 rules.inlineLink = {
     filter: function filter(node, options) {
         return options.linkStyle === 'inlined' && node.nodeName === 'A' && node.getAttribute('href');
@@ -382,52 +318,6 @@ rules.inlineLink = {
         return '[' + linkText + '](' + href + ')';
     }
 };
-
-// rules.referenceLink = {
-//   filter: function (node, options) {
-//     return (
-//       options.linkStyle === 'referenced' &&
-//       node.nodeName === 'A' &&
-//       node.getAttribute('href')
-//     )
-//   },
-
-//   replacement: function (content, node, options) {
-//     var href = node.getAttribute('href');
-//     var title = node.title ? ' "' + node.title + '"' : '';
-//     var replacement;
-//     var reference;
-
-//     switch (options.linkReferenceStyle) {
-//       case 'collapsed':
-//         replacement = '[' + content + '][]';
-//         reference = '[' + content + ']: ' + href + title;
-//         break
-//       case 'shortcut':
-//         replacement = '[' + content + ']';
-//         reference = '[' + content + ']: ' + href + title;
-//         break
-//       default:
-//         var id = this.references.length + 1;
-//         replacement = '[' + content + '][' + id + ']';
-//         reference = '[' + id + ']: ' + href + title;
-//     }
-
-//     this.references.push(reference);
-//     return replacement
-//   },
-
-//   references: [],
-
-//   append: function (options) {
-//     var references = '';
-//     if (this.references.length) {
-//       references = '\n\n' + this.references.join('\n') + '\n\n';
-//       this.references = []; // Reset references
-//     }
-//     return references
-//   }
-// };
 
 rules.emphasis = {
     filter: ['em', 'i'],
@@ -446,31 +336,6 @@ rules.strong = {
         return '' + options.strongDelimiter + strongText + options.strongDelimiter;
     }
 };
-
-// rules.code = {
-//   filter: function (node) {
-//     var hasSiblings = node.previousSibling || node.nextSibling;
-//     var isCodeBlock = node.parentNode.nodeName === 'PRE' && !hasSiblings;
-
-//     return node.nodeName === 'CODE' && !isCodeBlock
-//   },
-
-//   replacement: function (content) {
-//     if (!content.trim()) return ''
-
-//     var delimiter = '`';
-//     var leadingSpace = '';
-//     var trailingSpace = '';
-//     var matches = content.match(/`+/gm);
-//     if (matches) {
-//       if (/^`/.test(content)) leadingSpace = ' ';
-//       if (/`$/.test(content)) trailingSpace = ' ';
-//       while (matches.indexOf(delimiter) !== -1) delimiter = delimiter + '`';
-//     }
-
-//     return delimiter + leadingSpace + content + trailingSpace + delimiter
-//   }
-// };
 
 rules.image = {
     filter: 'img',
@@ -841,10 +706,7 @@ function TurndownService(options) {
         linkReferenceStyle: 'full',
         br: '  ',
         blankReplacement: function blankReplacement(content, node) {
-            // return node.isBlock ? AdaptiveCardHelper.wrap() : AdaptiveCardHelper.createTextBlock();
-        },
-        keepReplacement: function keepReplacement(content, node) {
-            // return node.isBlock ? AdaptiveCardHelper.wrap(node.outerHTML) + '\n\n' : node.outerHTML
+            return null;
         },
         defaultReplacement: function defaultReplacement(content, node) {
             return node.isBlock ? AdaptiveCardHelper.wrap(content) : content;
@@ -938,9 +800,10 @@ TurndownService.prototype = {
     var self = this;
     var currText = '';
     var blocks = reduce.call(parentNode.childNodes, function (output, node) {
+        var replacement = [];
+
         node = new Node(node);
 
-        var replacement = [];
         if (node.nodeType === 3) {
             // text node
             replacement = node.isCode ? node.nodeValue : self.escape(node.nodeValue);
@@ -948,6 +811,8 @@ TurndownService.prototype = {
             // element node
             replacement = replacementForNode.call(self, node);
         }
+
+        replacement = replacement || [];
 
         if (typeof replacement === 'string') {
             // '\n' is output by br tag replacement and is used to indicate
