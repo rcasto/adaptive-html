@@ -37,12 +37,15 @@ rules.list = {
     // content = array of listitem containers
     replacement: function (listItemContainers, node) {
         var isOrdered = node.nodeName === 'OL';
-        var blocks = (listItemContainers || []).map((listItemContainer, i) => {
+        var blocks = (listItemContainers || []).map((listItemContainer, listItemIndex) => {
             var listItemElems = AdaptiveCardHelper.unwrap(listItemContainer);
             var firstListItemElem = listItemElems[0];
             if (firstListItemElem && AdaptiveCardFilter.isTextBlock(firstListItemElem)) {
-                let firstListItemPrefix = isOrdered ? `${i + 1}. ` : `- `;
+                let firstListItemPrefix = isOrdered ? `${listItemIndex + 1}. ` : `- `;
                 firstListItemElem.text = firstListItemPrefix + firstListItemElem.text;
+                if (listItemIndex > 0) {
+                    firstListItemElem.spacing = "small";
+                }
             }
             return listItemElems;
         }).reduce((prevBlocks, listItemBlocks) => {
@@ -84,7 +87,7 @@ rules.listItem = {
         }, []);
 
         if (currText) {
-            blocks.unshift(AdaptiveCardHelper.createTextBlock(currText));
+            blocks.unshift(AdaptiveCardHelper.createTextBlock(currText.trim()));
         }
 
         return AdaptiveCardHelper.wrap(blocks);
