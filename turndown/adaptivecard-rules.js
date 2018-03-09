@@ -18,7 +18,7 @@ rules.lineBreak = {
     filter: 'br',
 
     replacement: function (content, node, options) {
-        return '\n';
+        return '\n\n';
     }
 };
 
@@ -64,14 +64,14 @@ rules.listItem = {
             var cardType = currBlock.type;
             switch (cardType) {
                 case AdaptiveCardFilter.cardTypes.textBlock:
-                        currText += currBlock.text;
+                        currText += currBlock.text.replace(/\n\n/g, '\n\n\t');
                     break;
                 case AdaptiveCardFilter.cardTypes.container:
                     let nestedListElems = AdaptiveCardHelper.unwrap(currBlock);
                     nestedListElems
                         .forEach(nestedListElem => {
                             if (AdaptiveCardFilter.isTextBlock(nestedListElem)) {
-                                currText += '\r\t' + nestedListElem.text.replace(/\r\t/g, '\r\t\t');
+                                currText += '\r\t' + nestedListElem.text.replace(/\r\t/g, '\r\t\t').replace(/\n\n/g, '\n\n\t');
                             } else {
                                 prevBlocks.push(nestedListElem);
                             }

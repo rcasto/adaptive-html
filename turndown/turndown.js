@@ -163,14 +163,7 @@ function process(parentNode) {
         replacement = replacement || [];
 
         if (typeof replacement === 'string') {
-            // '\n' is output by br tag replacement and is used to indicate
-            // separation or a new text block should be constructed
-            if (replacement === '\n') {
-                output.push(AdaptiveCardHelper.createTextBlock(currText));
-                currText = '';
-            } else { // We're still constructing text for same text block, simply add it
-                currText += replacement;
-            }
+            currText += replacement;
             return output;
         }
 
