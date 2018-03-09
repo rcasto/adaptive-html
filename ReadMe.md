@@ -1,7 +1,7 @@
 # AdaptiveHtml
 Convert HTML --> Adaptive Card JSON
 
-The goal of this project is to fit into existing WYSIWYG editors such as [CKEditor](https://ckeditor.com/) and convert their native HTML output to an [Adaptive Card](http://adaptivecards.io/)
+The goal of this project is to fit into existing WYSIWYG editors such as [CKEditor](https://ckeditor.com/) and convert their native HTML output to an [Adaptive Card](https://adaptivecards.io/)
 
 ## Getting Started
 You can either install the npm package or directly use a pre-built version of the library.
@@ -55,8 +55,27 @@ console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
 ```
 
 ## API
-- transform(string | [Node](http://devdocs.io/dom/node))
+- transform(string | [Node](https://devdocs.io/dom/node))
     - Returns a JSON object representing an Adaptive Card
+
+## Known Caveats
+- Images in list steps are pushed to the bottom of that list step
+
+## Currently supported HTML tags
+- p
+- br
+- h1, h2, h3, h4, h5, h6
+- ul, ol
+- li
+- a
+- em, i
+- strong, b
+- img
+
+The default replacement for tags not listed above depends on whether the tag refers to a [block](https://developer.mozilla.org/en-US/docs/Web/HTML/Block-level_elements#Elements) or [inline](https://developer.mozilla.org/en-US/docs/Web/HTML/Inline_elements#Elements) level HTML element.
+
+For block level elements, its contents are processed, and wrapped in a [Container](https://adaptivecards.io/explorer/Container.html).  
+For inline level elements, its contents are processed and simply returned.
 
 ## Building it yourself
 If you wish to build the library yourself then you can follow these steps:  
