@@ -222,13 +222,11 @@ test('can handle simple ordered list', t => {
             }, {
                 type: "TextBlock",
                 text: "2. List item 2",
-                wrap: true,
-                spacing: "small"
+                wrap: true
             }, {
                 type: "TextBlock",
                 text: "3. List item 3",
-                wrap: true,
-                spacing: "small"
+                wrap: true
             }]
         }],
         actions: [],
@@ -255,13 +253,11 @@ test('can handle simple unordered list', t => {
             }, {
                 type: "TextBlock",
                 text: "- List item 2",
-                wrap: true,
-                spacing: "small"
+                wrap: true
             }, {
                 type: "TextBlock",
                 text: "- List item 3",
-                wrap: true,
-                spacing: "small"
+                wrap: true
             }]
         }],
         actions: [],
@@ -294,13 +290,11 @@ test('can handle ordered list with nested list', t => {
             }, {
                 type: "TextBlock",
                 text: "2. List item 2",
-                wrap: true,
-                spacing: "small"
+                wrap: true
             }, {
                 type: "TextBlock",
                 text: "3. List item 3",
-                wrap: true,
-                spacing: "small"
+                wrap: true
             }]
         }],
         actions: [],
@@ -333,13 +327,11 @@ test('can handle unordered list with nested list', t => {
             }, {
                 type: "TextBlock",
                 text: "- List item 2",
-                wrap: true,
-                spacing: "small"
+                wrap: true
             }, {
                 type: "TextBlock",
                 text: "- List item 3",
-                wrap: true,
-                spacing: "small"
+                wrap: true
             }]
         }],
         actions: [],
@@ -405,8 +397,7 @@ test('can handle images in list', t => {
             }, {
                 type: "TextBlock",
                 text: "- List item 2",
-                wrap: true,
-                spacing: "small"
+                wrap: true
             }]
         }],
         actions: [],
@@ -437,8 +428,7 @@ test('can handle line break in list', t => {
             }, {
                 type: "TextBlock",
                 text: "- List item 2",
-                wrap: true,
-                spacing: "small"
+                wrap: true
             }]
         }],
         actions: [],
