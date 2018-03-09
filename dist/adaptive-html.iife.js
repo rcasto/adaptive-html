@@ -236,9 +236,6 @@ rules.list = {
             if (firstListItemElem && AdaptiveCardFilter.isTextBlock(firstListItemElem)) {
                 var firstListItemPrefix = isOrdered ? listItemIndex + 1 + '. ' : '- ';
                 firstListItemElem.text = firstListItemPrefix + firstListItemElem.text;
-                if (listItemIndex > 0) {
-                    firstListItemElem.spacing = "small";
-                }
             }
             return listItemElems;
         }).reduce(function (prevBlocks, listItemBlocks) {
