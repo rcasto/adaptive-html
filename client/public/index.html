@@ -75,6 +75,7 @@
             var adaptiveHtml = adaptiveCard.render();
             // var node = recurseNodeTree(adaptiveHtml.cloneNode(true));
             // console.log(node);
+            console.log(JSON.stringify(adaptiveJson, null, '\t'));
             adaptivePreview.appendChild(adaptiveHtml);
         }, debounceTimeInMs));
     </script>
