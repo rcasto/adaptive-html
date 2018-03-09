@@ -211,7 +211,7 @@ rules.lineBreak = {
     filter: 'br',
 
     replacement: function replacement(content, node, options) {
-        return '\n';
+        return '\n\n';
     }
 };
 
@@ -257,13 +257,13 @@ rules.listItem = {
             var cardType = currBlock.type;
             switch (cardType) {
                 case AdaptiveCardFilter.cardTypes.textBlock:
-                    currText += currBlock.text;
+                    currText += currBlock.text.replace(/\n\n/g, '\n\n\t');
                     break;
                 case AdaptiveCardFilter.cardTypes.container:
                     var nestedListElems = AdaptiveCardHelper.unwrap(currBlock);
                     nestedListElems.forEach(function (nestedListElem) {
                         if (AdaptiveCardFilter.isTextBlock(nestedListElem)) {
-                            currText += '\r\t' + nestedListElem.text.replace(/\r\t/g, '\r\t\t');
+                            currText += '\r\t' + nestedListElem.text.replace(/\r\t/g, '\r\t\t').replace(/\n\n/g, '\n\n\t');
                         } else {
                             prevBlocks.push(nestedListElem);
                         }
@@ -795,15 +795,7 @@ TurndownService.prototype = {
         replacement = replacement || [];
 
         if (typeof replacement === 'string') {
-            // '\n' is output by br tag replacement and is used to indicate
-            // separation or a new text block should be constructed
-            if (replacement === '\n') {
-                output.push(AdaptiveCardHelper.createTextBlock(currText));
-                currText = '';
-            } else {
-                // We're still constructing text for same text block, simply add it
-                currText += replacement;
-            }
+            currText += replacement;
             return output;
         }
 
