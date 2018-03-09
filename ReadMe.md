@@ -8,6 +8,14 @@ You can either install the npm package or directly use a pre-built version of th
 
 ### Via Npm
 `npm install adaptive-html`
+```javascript
+var AdaptiveHtml = require('adaptive-html');
+
+var adaptiveCardJson = AdaptiveHtml.transform(`
+    <p>Turn me into an Adaptive Card</p>
+`);
+console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
+```
 
 ### Using pre-built libraries
 There are [pre-built versions of the library](https://github.com/rcasto/adaptive-html/tree/master/dist) for:
@@ -17,7 +25,7 @@ There are [pre-built versions of the library](https://github.com/rcasto/adaptive
 
 #### Browser
 ```html
-<script src="adaptive-html.iife.min.js"></script>
+<script src="/adaptive-html/dist/adaptive-html.iife.min.js"></script>
 <script>
     var adaptiveCardJson = AdaptiveHtml.transform(`
         <p>Turn me into an Adaptive Card</p>
@@ -28,7 +36,7 @@ There are [pre-built versions of the library](https://github.com/rcasto/adaptive
 
 #### CommonJs
 ```javascript
-var AdaptiveHtml = require('adaptive-html');
+var AdaptiveHtml = require('./adaptive-html/dist/adaptive-html.cjs');
 
 var adaptiveCardJson = AdaptiveHtml.transform(`
     <p>Turn me into an Adaptive Card</p>
@@ -38,7 +46,7 @@ console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
 
 #### ES
 ```javascript
-import AdaptiveHtml from 'adaptive-html';
+import AdaptiveHtml from './adaptive-html/dist/adaptive-html.es';
 
 var adaptiveCardJson = AdaptiveHtml.transform(`
     <p>Turn me into an Adaptive Card</p>
