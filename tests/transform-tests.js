@@ -21,11 +21,7 @@ test('can transform text node with breaks in it', t => {
         type: "AdaptiveCard",
         body: [{
             type: "TextBlock",
-            text: "This is some text",
-            wrap: true
-        }, {
-            type: "TextBlock",
-            text: "with a break in it",
+            text: "This is some text\n\nwith a break in it",
             wrap: true
         }],
         actions: [],
@@ -78,7 +74,7 @@ test('can handle p tags', t => {
     });
 });
 
-test('can handle p tag with breaks in it', t => {
+test('can handle p tag with line breaks in it', t => {
     var result = AdaptiveHtml.transform('<p>This paragraph is<br />breaking up<br />what is happening?</p>');
     t.deepEqual(result, {
         type: "AdaptiveCard",
@@ -86,15 +82,7 @@ test('can handle p tag with breaks in it', t => {
             type: "Container",
             items: [{
                 type: "TextBlock",
-                text: "This paragraph is",
-                wrap: true
-            }, {
-                type: "TextBlock",
-                text: "breaking up",
-                wrap: true
-            }, {
-                type: "TextBlock",
-                text: "what is happening?",
+                text: "This paragraph is\n\nbreaking up\n\nwhat is happening?",
                 wrap: true
             }]
         }],
@@ -354,9 +342,11 @@ test('can handle unordered list with nested list', t => {
 test('can handle nested nested list', t => {
     var result = AdaptiveHtml.transform(`
         <ul>
-            <li>List item 1
+            <li>
+                List item 1
                 <ul>
-                    <li>Nested list item 1
+                    <li>
+                        Nested list item 1
                         <ul>
                             <li>Nested nested list item 1</li>
                         </ul>
@@ -372,6 +362,72 @@ test('can handle nested nested list', t => {
             items: [{
                 type: "TextBlock",
                 text: "- List item 1\r\t- Nested list item 1\r\t\t- Nested nested list item 1",
+                wrap: true
+            }]
+        }],
+        actions: [],
+        version: "1.0"
+    });
+});
+
+test('can handle images in list', t => {
+    var result = AdaptiveHtml.transform(`
+        <ul>
+            <li>
+                List item 1
+                <img src="https://fake-image.com" alt="fake-alt-text" />
+            </li>
+            <li>
+                List item 2
+            </li>
+        </ul>
+    `);
+    t.deepEqual(result, {
+        type: "AdaptiveCard",
+        body: [{
+            type: "Container",
+            items: [{
+                type: "TextBlock",
+                text: "- List item 1",
+                wrap: true
+            }, {
+                type: "Image",
+                url: "https://fake-image.com",
+                altText: "fake-alt-text"
+            }, {
+                type: "TextBlock",
+                text: "- List item 2",
+                wrap: true
+            }]
+        }],
+        actions: [],
+        version: "1.0"
+    });
+});
+
+test('can handle line break in list', t => {
+    var result = AdaptiveHtml.transform(`
+        <ul>
+            <li>
+                List item 1<br />
+                List item 1 continues
+            </li>
+            <li>
+                List item 2
+            </li>
+        </ul>
+    `);
+    t.deepEqual(result, {
+        type: "AdaptiveCard",
+        body: [{
+            type: "Container",
+            items: [{
+                type: "TextBlock",
+                text: "- List item 1\n\n\tList item 1 continues",
+                wrap: true
+            }, {
+                type: "TextBlock",
+                text: "- List item 2",
                 wrap: true
             }]
         }],

@@ -18,7 +18,7 @@ rules.lineBreak = {
     filter: 'br',
 
     replacement: function (content, node, options) {
-        return '\n';
+        return '\n\n';
     }
 };
 
@@ -37,11 +37,11 @@ rules.list = {
     // content = array of listitem containers
     replacement: function (listItemContainers, node) {
         var isOrdered = node.nodeName === 'OL';
-        var blocks = (listItemContainers || []).map((listItemContainer, i) => {
+        var blocks = (listItemContainers || []).map((listItemContainer, listItemIndex) => {
             var listItemElems = AdaptiveCardHelper.unwrap(listItemContainer);
             var firstListItemElem = listItemElems[0];
             if (firstListItemElem && AdaptiveCardFilter.isTextBlock(firstListItemElem)) {
-                let firstListItemPrefix = isOrdered ? `${i + 1}. ` : `- `;
+                let firstListItemPrefix = isOrdered ? `${listItemIndex + 1}. ` : `- `;
                 firstListItemElem.text = firstListItemPrefix + firstListItemElem.text;
             }
             return listItemElems;
@@ -61,14 +61,14 @@ rules.listItem = {
             var cardType = currBlock.type;
             switch (cardType) {
                 case AdaptiveCardFilter.cardTypes.textBlock:
-                        currText += currBlock.text;
+                        currText += currBlock.text.replace(/\n\n/g, '\n\n\t');
                     break;
                 case AdaptiveCardFilter.cardTypes.container:
                     let nestedListElems = AdaptiveCardHelper.unwrap(currBlock);
                     nestedListElems
                         .forEach(nestedListElem => {
                             if (AdaptiveCardFilter.isTextBlock(nestedListElem)) {
-                                currText += '\r\t' + nestedListElem.text.replace(/\r\t/g, '\r\t\t');
+                                currText += '\r\t' + nestedListElem.text.replace(/\r\t/g, '\r\t\t').replace(/\n\n/g, '\n\n\t');
                             } else {
                                 prevBlocks.push(nestedListElem);
                             }
@@ -84,7 +84,7 @@ rules.listItem = {
         }, []);
 
         if (currText) {
-            blocks.unshift(AdaptiveCardHelper.createTextBlock(currText));
+            blocks.unshift(AdaptiveCardHelper.createTextBlock(currText.trim()));
         }
 
         return AdaptiveCardHelper.wrap(blocks);

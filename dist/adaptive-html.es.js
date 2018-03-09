@@ -179,28 +179,6 @@ function unwrap(container) {
     return container.items || [];
 }
 
-// function combineTextBlocks(elements) {
-//     var currTextBlock = createTextBlock();
-//     var textBlocks = elements.reduce((prevElems, currElem) => {
-//         if (AdaptiveCardFilter.isTextBlock(currElem)) {
-//             currTextBlock.text += currElem.text;
-//         } else {
-//             if (currTextBlock.text) {
-//                 prevElems.push(currTextBlock);
-//                 currTextBlock = createTextBlock();
-//             }
-//             prevElems.push(currElem);
-//         }
-//         return prevElems;
-//     }, []);
-
-//     if (currTextBlock.text) {
-//         textBlocks.push(currTextBlock);
-//     }
-
-//     return textBlocks;
-// }
-
 function setOptions(obj, options) {
     Object.keys(options || {}).forEach(function (optionKey) {
         obj[optionKey] = options[optionKey];
@@ -214,7 +192,6 @@ var AdaptiveCardHelper = {
     createCard: createCard,
     wrap: wrap,
     unwrap: unwrap
-    // combineTextBlocks
 };
 
 var rules = {};
@@ -231,7 +208,7 @@ rules.lineBreak = {
     filter: 'br',
 
     replacement: function replacement(content, node, options) {
-        return '\n';
+        return '\n\n';
     }
 };
 
@@ -250,11 +227,11 @@ rules.list = {
     // content = array of listitem containers
     replacement: function replacement(listItemContainers, node) {
         var isOrdered = node.nodeName === 'OL';
-        var blocks = (listItemContainers || []).map(function (listItemContainer, i) {
+        var blocks = (listItemContainers || []).map(function (listItemContainer, listItemIndex) {
             var listItemElems = AdaptiveCardHelper.unwrap(listItemContainer);
             var firstListItemElem = listItemElems[0];
             if (firstListItemElem && AdaptiveCardFilter.isTextBlock(firstListItemElem)) {
-                var firstListItemPrefix = isOrdered ? i + 1 + '. ' : '- ';
+                var firstListItemPrefix = isOrdered ? listItemIndex + 1 + '. ' : '- ';
                 firstListItemElem.text = firstListItemPrefix + firstListItemElem.text;
             }
             return listItemElems;
@@ -274,13 +251,13 @@ rules.listItem = {
             var cardType = currBlock.type;
             switch (cardType) {
                 case AdaptiveCardFilter.cardTypes.textBlock:
-                    currText += currBlock.text;
+                    currText += currBlock.text.replace(/\n\n/g, '\n\n\t');
                     break;
                 case AdaptiveCardFilter.cardTypes.container:
                     var nestedListElems = AdaptiveCardHelper.unwrap(currBlock);
                     nestedListElems.forEach(function (nestedListElem) {
                         if (AdaptiveCardFilter.isTextBlock(nestedListElem)) {
-                            currText += '\r\t' + nestedListElem.text.replace(/\r\t/g, '\r\t\t');
+                            currText += '\r\t' + nestedListElem.text.replace(/\r\t/g, '\r\t\t').replace(/\n\n/g, '\n\n\t');
                         } else {
                             prevBlocks.push(nestedListElem);
                         }
@@ -296,7 +273,7 @@ rules.listItem = {
         }, []);
 
         if (currText) {
-            blocks.unshift(AdaptiveCardHelper.createTextBlock(currText));
+            blocks.unshift(AdaptiveCardHelper.createTextBlock(currText.trim()));
         }
 
         return AdaptiveCardHelper.wrap(blocks);
@@ -812,15 +789,7 @@ TurndownService.prototype = {
         replacement = replacement || [];
 
         if (typeof replacement === 'string') {
-            // '\n' is output by br tag replacement and is used to indicate
-            // separation or a new text block should be constructed
-            if (replacement === '\n') {
-                output.push(AdaptiveCardHelper.createTextBlock(currText));
-                currText = '';
-            } else {
-                // We're still constructing text for same text block, simply add it
-                currText += replacement;
-            }
+            currText += replacement;
             return output;
         }
 

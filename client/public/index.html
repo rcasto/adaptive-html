@@ -4,10 +4,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Test AdaptiveHtml Client</title>
+    <link rel="stylesheet" href="styles/normalize.css">
     <style>
         .adaptive-preview > .ac-container {
             margin-top: 6px;
-            border: 3px solid #E2E2E2;
+            border: 4px solid #E6E6E6;
         }
     </style>
 </head>
@@ -27,6 +28,21 @@
         var parser = new DOMParser();
         var debounceTimeInMs = 500;
         var TextNode = 3;
+
+        adaptiveCard.hostConfig = new AdaptiveCards.HostConfig({
+            fontFamily: 'Segoe UI, Segoe UI Web, Segoe UI Symbol, Helvetica Neue, BBAlpha Sans, S60 Sans, Arial, sans-serif',
+            fontSizes: {
+                default: 15
+            },
+            spacing: {
+                padding: 12
+            },
+            containerStyles: {
+                default: {
+                    backgroundColor: '#ffffff'
+                }
+            }
+        });
 
         function debounce(func, debounceTimeInMs) {
             var debounceId = null;
@@ -74,6 +90,7 @@
             var adaptiveHtml = adaptiveCard.render();
             // var node = recurseNodeTree(adaptiveHtml.cloneNode(true));
             // console.log(node);
+            console.log(JSON.stringify(adaptiveJson, null, '\t'));
             adaptivePreview.appendChild(adaptiveHtml);
         }, debounceTimeInMs));
     </script>
