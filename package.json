@@ -11,7 +11,7 @@
     "build:es": "rollup --config rollup.config.js --output.format es --output.file dist/adaptive-html.es.js",
     "dev": "rollup --config rollup.config.js --watch --output.file client/public/scripts/adaptive-html.js",
     "client": "node ./client/server.js",
-    "test": "npm run build:node && nyc ava",
+    "test": "npm run build:cjs && nyc ava",
     "test:report": "nyc report --reporter=html",
     "prepack": "npm run build"
   },

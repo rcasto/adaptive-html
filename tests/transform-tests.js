@@ -354,9 +354,11 @@ test('can handle unordered list with nested list', t => {
 test('can handle nested nested list', t => {
     var result = AdaptiveHtml.transform(`
         <ul>
-            <li>List item 1
+            <li>
+                List item 1
                 <ul>
-                    <li>Nested list item 1
+                    <li>
+                        Nested list item 1
                         <ul>
                             <li>Nested nested list item 1</li>
                         </ul>
