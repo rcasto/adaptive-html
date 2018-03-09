@@ -182,28 +182,6 @@ function unwrap(container) {
     return container.items || [];
 }
 
-// function combineTextBlocks(elements) {
-//     var currTextBlock = createTextBlock();
-//     var textBlocks = elements.reduce((prevElems, currElem) => {
-//         if (AdaptiveCardFilter.isTextBlock(currElem)) {
-//             currTextBlock.text += currElem.text;
-//         } else {
-//             if (currTextBlock.text) {
-//                 prevElems.push(currTextBlock);
-//                 currTextBlock = createTextBlock();
-//             }
-//             prevElems.push(currElem);
-//         }
-//         return prevElems;
-//     }, []);
-
-//     if (currTextBlock.text) {
-//         textBlocks.push(currTextBlock);
-//     }
-
-//     return textBlocks;
-// }
-
 function setOptions(obj, options) {
     Object.keys(options || {}).forEach(function (optionKey) {
         obj[optionKey] = options[optionKey];
@@ -217,7 +195,6 @@ var AdaptiveCardHelper = {
     createCard: createCard,
     wrap: wrap,
     unwrap: unwrap
-    // combineTextBlocks
 };
 
 var rules = {};
@@ -253,12 +230,15 @@ rules.list = {
     // content = array of listitem containers
     replacement: function replacement(listItemContainers, node) {
         var isOrdered = node.nodeName === 'OL';
-        var blocks = (listItemContainers || []).map(function (listItemContainer, i) {
+        var blocks = (listItemContainers || []).map(function (listItemContainer, listItemIndex) {
             var listItemElems = AdaptiveCardHelper.unwrap(listItemContainer);
             var firstListItemElem = listItemElems[0];
             if (firstListItemElem && AdaptiveCardFilter.isTextBlock(firstListItemElem)) {
-                var firstListItemPrefix = isOrdered ? i + 1 + '. ' : '- ';
+                var firstListItemPrefix = isOrdered ? listItemIndex + 1 + '. ' : '- ';
                 firstListItemElem.text = firstListItemPrefix + firstListItemElem.text;
+                if (listItemIndex > 0) {
+                    firstListItemElem.spacing = "small";
+                }
             }
             return listItemElems;
         }).reduce(function (prevBlocks, listItemBlocks) {
@@ -299,7 +279,7 @@ rules.listItem = {
         }, []);
 
         if (currText) {
-            blocks.unshift(AdaptiveCardHelper.createTextBlock(currText));
+            blocks.unshift(AdaptiveCardHelper.createTextBlock(currText.trim()));
         }
 
         return AdaptiveCardHelper.wrap(blocks);
