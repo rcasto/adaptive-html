@@ -59,7 +59,7 @@ console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
     - Returns a JSON object representing an Adaptive Card
 
 ## Known Caveats
-- Images in list steps are pushed to the bottom of that list step
+- Images in list steps and nested steps are pushed to the bottom of that list step
 
 ## Currently supported HTML tags
 - p
