@@ -234,11 +234,13 @@ test('can handle simple ordered list', t => {
             }, {
                 type: "TextBlock",
                 text: "2. List item 2",
-                wrap: true
+                wrap: true,
+                spacing: "small"
             }, {
                 type: "TextBlock",
                 text: "3. List item 3",
-                wrap: true
+                wrap: true,
+                spacing: "small"
             }]
         }],
         actions: [],
@@ -265,11 +267,13 @@ test('can handle simple unordered list', t => {
             }, {
                 type: "TextBlock",
                 text: "- List item 2",
-                wrap: true
+                wrap: true,
+                spacing: "small"
             }, {
                 type: "TextBlock",
                 text: "- List item 3",
-                wrap: true
+                wrap: true,
+                spacing: "small"
             }]
         }],
         actions: [],
@@ -302,11 +306,13 @@ test('can handle ordered list with nested list', t => {
             }, {
                 type: "TextBlock",
                 text: "2. List item 2",
-                wrap: true
+                wrap: true,
+                spacing: "small"
             }, {
                 type: "TextBlock",
                 text: "3. List item 3",
-                wrap: true
+                wrap: true,
+                spacing: "small"
             }]
         }],
         actions: [],
@@ -339,11 +345,13 @@ test('can handle unordered list with nested list', t => {
             }, {
                 type: "TextBlock",
                 text: "- List item 2",
-                wrap: true
+                wrap: true,
+                spacing: "small"
             }, {
                 type: "TextBlock",
                 text: "- List item 3",
-                wrap: true
+                wrap: true,
+                spacing: "small"
             }]
         }],
         actions: [],
@@ -375,6 +383,42 @@ test('can handle nested nested list', t => {
                 type: "TextBlock",
                 text: "- List item 1\r\t- Nested list item 1\r\t\t- Nested nested list item 1",
                 wrap: true
+            }]
+        }],
+        actions: [],
+        version: "1.0"
+    });
+});
+
+test('can handle images in list', t => {
+    var result = AdaptiveHtml.transform(`
+        <ul>
+            <li>
+                List item 1
+                <img src="https://fake-image.com" alt="fake-alt-text" />
+            </li>
+            <li>
+                List item 2
+            </li>
+        </ul>
+    `);
+    t.deepEqual(result, {
+        type: "AdaptiveCard",
+        body: [{
+            type: "Container",
+            items: [{
+                type: "TextBlock",
+                text: "- List item 1",
+                wrap: true
+            }, {
+                type: "Image",
+                url: "https://fake-image.com",
+                altText: "fake-alt-text"
+            }, {
+                type: "TextBlock",
+                text: "- List item 2",
+                wrap: true,
+                spacing: "small"
             }]
         }],
         actions: [],
