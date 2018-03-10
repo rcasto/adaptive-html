@@ -1,12 +1,26 @@
 import babel from 'rollup-plugin-babel';
 import uglify from 'rollup-plugin-uglify';
+import license from 'rollup-plugin-license';
+import path from 'path';
 
 var buildMinifiedLibrary = shouldMinify(process.argv);
 var plugins = buildMinifiedLibrary ? [
     babel(),
-    uglify()
+    uglify(),
+    license({
+        banner: {
+            file: path.join(__dirname, 'turndown', 'LICENSE.txt'),
+            encoding: 'utf-8'
+        }
+    })
 ] : [
-    babel()
+    babel(),
+    license({
+        banner: {
+            file: path.join(__dirname, 'turndown', 'LICENSE.txt'),
+            encoding: 'utf-8'
+        }
+    })
 ];
 
 function shouldMinify(args) {
