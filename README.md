@@ -79,9 +79,20 @@ For inline level elements, its contents are processed and simply returned.
 
 ## Building it yourself
 If you wish to build the library yourself then you can follow these steps:  
-1. Clone or [download](https://github.com/rcasto/adaptive-html/archive/master.zip) this repository
+1. Clone or download the [repository](https://github.com/rcasto/adaptive-html)
 2. `cd` to the repository directory via the command line/terminal
-3. Run `npm install` to install the necessary dependencies (make sure you have [Node.js](https://nodejs.org/en/) installed)
+3. Run `npm install` to install the necessary dependencies 
+    - Note: Make sure you have [Node.js](https://nodejs.org/en/) installed
 4. Hack away
-5. Next execute the command `npm run build`
+5. Execute the command `npm run build`
 6. You should now be able to view the built libraries under the `dist/` folder within your copy of the repository
+
+### Test Client
+To demonstrate the transformation there is a test client within the repository. To launch it follow these steps:
+1. Execute the command `npm run dev`
+2. Navigate to http://localhost:3000
+
+### Running tests
+You can run tests by executing the command `npm test`.
+
+If you want to generate a code coverage report execute the command `npm run test:report`.  Launch `coverage/index.html` in the browser to view the report.
