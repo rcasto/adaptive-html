@@ -20,8 +20,12 @@
   },
   "keywords": [
     "htmltoadaptivecard",
-    "adaptive cards",
-    "converter"
+    "adaptivecards",
+    "adaptive",
+    "cards",
+    "html",
+    "converter",
+    "wysiwyg"
   ],
   "author": "Richie Casto",
   "license": "MIT",
