@@ -253,7 +253,7 @@ rules.listItem = {
             var cardType = currBlock.type;
             switch (cardType) {
                 case AdaptiveCardFilter.cardTypes.textBlock:
-                    currText += currBlock.text.replace(/\n\n/g, '\n\n\t');
+                    currText += ' ' + currBlock.text.replace(/\n\n/g, '\n\n\t').trim();
                     break;
                 case AdaptiveCardFilter.cardTypes.container:
                     var nestedListElems = AdaptiveCardHelper.unwrap(currBlock);
@@ -773,7 +773,8 @@ TurndownService.prototype = {
      */
 
 };function process$1(parentNode) {
-    var self = this;
+    var _this = this;
+
     var currText = '';
     var blocks = reduce.call(parentNode.childNodes, function (output, node) {
         var replacement = [];
@@ -782,16 +783,19 @@ TurndownService.prototype = {
 
         if (node.nodeType === 3) {
             // text node
-            replacement = node.isCode ? node.nodeValue : self.escape(node.nodeValue);
+            replacement = node.isCode ? node.nodeValue : _this.escape(node.nodeValue);
         } else if (node.nodeType === 1) {
             // element node
-            replacement = replacementForNode.call(self, node);
+            replacement = replacementForNode.call(_this, node);
         }
 
         replacement = replacement || [];
 
         if (typeof replacement === 'string') {
             currText += replacement;
+            if (!node.nextSibling) {
+                output.push(AdaptiveCardHelper.createTextBlock(currText));
+            }
             return output;
         }
 
@@ -803,11 +807,6 @@ TurndownService.prototype = {
 
         return output.concat(UtilityHelper.toArray(replacement));
     }, []);
-
-    // Make sure to add any leftover text as an additional textblock to the block list
-    if (currText) {
-        blocks.push(AdaptiveCardHelper.createTextBlock(currText));
-    }
 
     return blocks;
 }
