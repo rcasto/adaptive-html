@@ -6,6 +6,9 @@
     <title>Test AdaptiveHtml Client</title>
     <link rel="stylesheet" href="styles/normalize.css">
     <style>
+        textarea {
+            display: none;
+        }
         .adaptive-preview > .ac-container {
             margin-top: 6px;
             border: 4px solid #E6E6E6;
@@ -22,7 +25,7 @@
     <script src="//cdn.ckeditor.com/4.8.0/standard/ckeditor.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@8.4.1/dist/markdown-it.min.js"></script>
     <script src="https://unpkg.com/adaptivecards/dist/adaptivecards.js"></script>
-    <script src="scripts/adaptive-html.js"></script>
+    <script src="/adaptive-html.js"></script>
     <script>
         var editor = CKEDITOR.replace('adaptive-ckeditor');
         var adaptivePreview = document.querySelector('.adaptive-preview');
