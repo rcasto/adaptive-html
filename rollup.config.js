@@ -4,16 +4,7 @@ import license from 'rollup-plugin-license';
 import path from 'path';
 
 var buildMinifiedLibrary = shouldMinify(process.argv);
-var plugins = buildMinifiedLibrary ? [
-    babel(),
-    uglify(),
-    license({
-        banner: {
-            file: path.join(__dirname, 'turndown', 'LICENSE.txt'),
-            encoding: 'utf-8'
-        }
-    })
-] : [
+var plugins = [
     babel(),
     license({
         banner: {
@@ -22,6 +13,10 @@ var plugins = buildMinifiedLibrary ? [
         }
     })
 ];
+
+if (buildMinifiedLibrary) {
+    plugins.unshift(uglify());
+}
 
 function shouldMinify(args) {
     return (args || []).indexOf('--minify') > -1;
