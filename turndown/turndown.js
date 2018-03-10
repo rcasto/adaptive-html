@@ -147,23 +147,25 @@ TurndownService.prototype = {
  */
 
 function process(parentNode) {
-    var self = this;
     var currText = '';
-    var blocks = reduce.call(parentNode.childNodes, function (output, node) {
+    var blocks = reduce.call(parentNode.childNodes, (output, node) => {
         var replacement = [];
 
         node = new Node(node);
 
         if (node.nodeType === 3) { // text node
-            replacement = node.isCode ? node.nodeValue : self.escape(node.nodeValue);
+            replacement = node.isCode ? node.nodeValue : this.escape(node.nodeValue);
         } else if (node.nodeType === 1) { // element node
-            replacement = replacementForNode.call(self, node);
+            replacement = replacementForNode.call(this, node);
         }
 
         replacement = replacement || [];
 
         if (typeof replacement === 'string') {
             currText += replacement;
+            if (!node.nextSibling) {
+                output.push(AdaptiveCardHelper.createTextBlock(currText));
+            }
             return output;
         }
 
@@ -175,12 +177,7 @@ function process(parentNode) {
 
         return output.concat(UtilityHelper.toArray(replacement));
     }, []);
-
-    // Make sure to add any leftover text as an additional textblock to the block list
-    if (currText) {
-        blocks.push(AdaptiveCardHelper.createTextBlock(currText));
-    }
-
+    
     return blocks;
 }
 
