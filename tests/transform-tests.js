@@ -376,6 +376,7 @@ test('can handle images in list', t => {
             <li>
                 List item 1
                 <img src="https://fake-image.com" alt="fake-alt-text" />
+                item 1 continues
             </li>
             <li>
                 List item 2
@@ -388,7 +389,7 @@ test('can handle images in list', t => {
             type: "Container",
             items: [{
                 type: "TextBlock",
-                text: "- List item 1",
+                text: "- List item 1 item 1 continues",
                 wrap: true
             }, {
                 type: "Image",

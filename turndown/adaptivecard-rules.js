@@ -61,7 +61,7 @@ rules.listItem = {
             var cardType = currBlock.type;
             switch (cardType) {
                 case AdaptiveCardFilter.cardTypes.textBlock:
-                        currText += currBlock.text.replace(/\n\n/g, '\n\n\t');
+                        currText += ` ${currBlock.text.replace(/\n\n/g, '\n\n\t').trim()}`;
                     break;
                 case AdaptiveCardFilter.cardTypes.container:
                     let nestedListElems = AdaptiveCardHelper.unwrap(currBlock);
