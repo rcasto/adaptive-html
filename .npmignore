@@ -1,2 +1,11 @@
 samples
 client
+.nyc_output
+coverage
+lib
+turndown
+tests
+.babelrc
+.gitignore
+index.js
+rollup.config.js
