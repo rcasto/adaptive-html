@@ -18,7 +18,11 @@
     "postinstall": "cd client && npm install",
     "clean": "rimraf .nyc_output coverage client/public/adaptive-html.js client/node_modules node_modules"
   },
-  "keywords": [],
+  "keywords": [
+    "htmltoadaptivecard",
+    "adaptive cards",
+    "converter"
+  ],
   "author": "Richie Casto",
   "license": "MIT",
   "dependencies": {
