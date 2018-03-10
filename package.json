@@ -11,10 +11,12 @@
     "build:es": "rollup --config rollup.config.js --output.format es --output.file dist/adaptive-html.es.js",
     "dev": "npm-run-all --parallel client client:build",
     "client": "node ./client/server.js",
-    "client:build": "rollup --config rollup.config.js --watch --output.file client/public/scripts/adaptive-html.js",
+    "client:build": "rollup --config rollup.config.js --watch --output.file client/public/adaptive-html.js",
     "test": "npm-run-all build:cjs && nyc ava",
     "test:report": "nyc report --reporter=html",
-    "prepack": "npm-run-all build"
+    "prepack": "npm-run-all build",
+    "postinstall": "cd client && npm install",
+    "clean": "rimraf .nyc_output coverage client/public/adaptive-html.js client/node_modules node_modules"
   },
   "keywords": [],
   "author": "Richie Casto",
@@ -28,6 +30,7 @@
     "babel-preset-env": "^1.6.1",
     "npm-run-all": "^4.1.2",
     "nyc": "^11.4.1",
+    "rimraf": "^2.6.2",
     "rollup": "^0.56.4",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-uglify": "^3.0.0"
