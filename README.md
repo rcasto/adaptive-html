@@ -1,7 +1,9 @@
 # AdaptiveHtml
 Convert HTML --> Adaptive Card JSON
 
-The goal of this project is to fit into existing WYSIWYG editors such as [CKEditor](https://ckeditor.com/) and convert their native HTML output to an [Adaptive Card](https://adaptivecards.io/)
+The goal of this project is to allow integration with existing WYSIWYG editors such as [CKEditor](https://ckeditor.com/) and convert their HTML output to an [Adaptive Card](https://adaptivecards.io/).
+
+Under the hood, this project has taken the [Turndown](https://github.com/domchristie/turndown/) code and repurposed it.
 
 ## Getting Started
 You can either install the npm package or directly use a pre-built version of the library.
