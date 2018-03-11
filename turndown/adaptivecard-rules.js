@@ -15,10 +15,9 @@ rules.lineBreak = {
     filter: 'br',
 
     replacement: function (content, node, options) {
-        return {
-            text: '\n\n',
-            nonText: []
-        };
+        return handleTextEffects(content, function (text) {
+            return '\n\n';
+        });
     }
 };
 
