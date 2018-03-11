@@ -21,11 +21,12 @@ console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
 
 ### Using pre-built libraries
 There are [pre-built versions of the library](https://github.com/rcasto/adaptive-html/tree/master/dist) for:
-- Browser ([iife](https://developer.mozilla.org/en-US/docs/Glossary/IIFE))
-- CommonJs module environments (cjs)
+- Browser (iife)
+- CommonJS module environments (cjs)
 - ES module environments (es)
 
 #### Browser
+The browser version is available in both minified and unminified formats.
 ```html
 <script src="/adaptive-html/dist/adaptive-html.iife.min.js"></script>
 <script>
@@ -36,7 +37,7 @@ There are [pre-built versions of the library](https://github.com/rcasto/adaptive
 </script>
 ```
 
-#### CommonJs
+#### CommonJS
 ```javascript
 var AdaptiveHtml = require('./adaptive-html/dist/adaptive-html.cjs');
 
