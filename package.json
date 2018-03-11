@@ -3,6 +3,10 @@
   "version": "1.1.8",
   "description": "HTML to Adaptive Card JSON converter",
   "main": "dist/adaptive-html.cjs.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rcasto/adaptive-html.git"
+  },
   "scripts": {
     "build": "npm-run-all --parallel build:iife.min build:iife build:cjs build:es",
     "build:iife.min": "rollup --config rollup.config.js --minify",
