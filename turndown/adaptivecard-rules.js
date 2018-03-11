@@ -1,6 +1,3 @@
-import {
-    repeat
-} from './utilities';
 import AdaptiveCardHelper from '../lib/adaptiveCardHelper';
 import AdaptiveCardFilter from '../lib/adaptiveCardFilter';
 
@@ -18,7 +15,10 @@ rules.lineBreak = {
     filter: 'br',
 
     replacement: function (content, node, options) {
-        return '\n\n';
+        return {
+            text: '\n\n',
+            nonText: []
+        };
     }
 };
 
@@ -102,18 +102,19 @@ rules.inlineLink = {
 
     replacement: function (content, node) {
         var href = node.getAttribute('href');
-        var title = node.title ? ' "' + node.title + '"' : '';
-        var linkText = AdaptiveCardFilter.getTextBlocksAsString(content);
-        return `[${linkText}](${href})`;
+        return handleTextEffects(content, function (text) {
+            return `[${text}](${href})`;
+        });
     }
 };
 
 rules.emphasis = {
     filter: ['em', 'i'],
-    // TODO: what elements are valid inside of these elements?
+
     replacement: function (content, node, options) {
-        var emText = AdaptiveCardFilter.getTextBlocksAsString(content);
-        return `${options.emDelimiter}${emText}${options.emDelimiter}`;
+        return handleTextEffects(content, function (text) {
+            return `${options.emDelimiter}${text}${options.emDelimiter}`;
+        });
     }
 };
 
@@ -121,8 +122,9 @@ rules.strong = {
     filter: ['strong', 'b'],
 
     replacement: function (content, node, options) {
-        var strongText = AdaptiveCardFilter.getTextBlocksAsString(content);
-        return `${options.strongDelimiter}${strongText}${options.strongDelimiter}`;
+        return handleTextEffects(content, function (text) {
+            return `${options.strongDelimiter}${text}${options.strongDelimiter}`;
+        });
     }
 };
 
@@ -137,5 +139,17 @@ rules.image = {
         });
     }
 };
+
+function handleTextEffects(contentCollection, markdownFunc, textOptions) {
+    var nonText = AdaptiveCardFilter.getNonTextBlocks(contentCollection) || [];
+    var text = AdaptiveCardFilter.getTextBlocksAsString(contentCollection) || '';
+    if (typeof markdownFunc === 'function') {
+        text = markdownFunc(text);
+    }
+    return {
+        text,
+        nonText
+    };
+}
 
 export default rules;

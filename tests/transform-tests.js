@@ -43,6 +43,24 @@ test('can handle strong/b tags', t => {
     });
 });
 
+test('can handle img in strong/b tags', t => {
+    var result = AdaptiveHtml.transform('<strong>Strong<img alt="some alt text" src="https://fake-image.com" />image</strong>');
+    t.deepEqual(result, {
+        type: "AdaptiveCard",
+        body: [{
+            type: "TextBlock",
+            text: "**Strong image**",
+            wrap: true
+        }, {
+            type: "Image",
+            url: "https://fake-image.com",
+            altText: "some alt text"
+        }],
+        actions: [],
+        version: "1.0"
+    });
+});
+
 test('can handle em/i tags', t => {
     var result = AdaptiveHtml.transform('This is some <em>emphasized</em> text you <i>know</i>');
     t.deepEqual(result, {
@@ -51,6 +69,24 @@ test('can handle em/i tags', t => {
             type: "TextBlock",
             text: "This is some _emphasized_ text you _know_",
             wrap: true
+        }],
+        actions: [],
+        version: "1.0"
+    });
+});
+
+test('can handle img in em/i tags', t => {
+    var result = AdaptiveHtml.transform('<em>Emphasized<img alt="some alt text" src="https://fake-image.com" />image</em>');
+    t.deepEqual(result, {
+        type: "AdaptiveCard",
+        body: [{
+            type: "TextBlock",
+            text: "_Emphasized image_",
+            wrap: true
+        }, {
+            type: "Image",
+            url: "https://fake-image.com",
+            altText: "some alt text"
         }],
         actions: [],
         version: "1.0"
@@ -158,13 +194,31 @@ test('can handle inline links (a tags)', t => {
     });
 });
 
+test('can handle img in inline links (a tags)', t => {
+    var result = AdaptiveHtml.transform('<a href="https://google.com">Link<img alt="some alt text" src="https://fake-image.com" />image</a>');
+    t.deepEqual(result, {
+        type: "AdaptiveCard",
+        body: [{
+            type: "TextBlock",
+            text: "[Link image](https://google.com)",
+            wrap: true
+        }, {
+            type: "Image",
+            url: "https://fake-image.com",
+            altText: "some alt text"
+        }],
+        actions: [],
+        version: "1.0"
+    });
+});
+
 test('can handle img tags', t => {
-    var result = AdaptiveHtml.transform('<img alt="This is some alt text" src="https://images.unsplash.com/photo-1505245208761-ba872912fac0?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=608629c5a6a368d239d44bf9e84956b8&auto=format&fit=crop&w=1500&q=80" />');
+    var result = AdaptiveHtml.transform('<img alt="This is some alt text" src="https://fake-image.com" />');
     t.deepEqual(result, {
         type: "AdaptiveCard",
         body: [{
             type: "Image",
-            url: "https://images.unsplash.com/photo-1505245208761-ba872912fac0?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=608629c5a6a368d239d44bf9e84956b8&auto=format&fit=crop&w=1500&q=80",
+            url: "https://fake-image.com",
             altText: "This is some alt text"
         }],
         actions: [],

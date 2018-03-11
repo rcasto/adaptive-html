@@ -132,30 +132,35 @@ function process(parentNode) {
         node = new Node(node);
 
         if (node.nodeType === 3) { // text node
-            replacement = node.isCode ? node.nodeValue : this.escape(node.nodeValue);
+            let text = node.isCode ? node.nodeValue : this.escape(node.nodeValue);
+            replacement = {
+                text,
+                nonText: []
+            };
         } else if (node.nodeType === 1) { // element node
             replacement = replacementForNode.call(this, node);
         }
-
         replacement = replacement || [];
 
-        if (typeof replacement === 'string') {
-            currText += replacement;
-            if (!node.nextSibling) {
+        // text nodes, em, i, b, strong, a tags will hit this
+        if (typeof replacement === 'object' &&
+            !AdaptiveCardFilter.isCardElement(replacement) &&
+            !Array.isArray(replacement)) {
+            currText += replacement.text;
+            if ((replacement.nonText &&
+                replacement.nonText.length) || 
+                !node.nextSibling) {
                 output.push(AdaptiveCardHelper.createTextBlock(currText));
             }
-            return output;
-        }
-
-        // Make sure to add any leftover text as an additional textblock to the block list
-        if (currText) {
+            replacement = replacement.nonText || [];
+        } else if (currText) { // Collection detected, let's push this textblock first, then clear the text
             output.push(AdaptiveCardHelper.createTextBlock(currText));
             currText = '';
         }
 
         return output.concat(UtilityHelper.toArray(replacement));
     }, []);
-    
+
     return blocks;
 }
 
