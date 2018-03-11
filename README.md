@@ -81,7 +81,7 @@ console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
     ```
 
 ## Known caveats
-- Images in list steps and nested steps are pushed to the bottom of that list step
+- Images in list steps and nested steps are pushed to the bottom of the corresponding list step
 - Headings cannot contain images
 - Lists cannot contain headings
 
