@@ -5,10 +5,10 @@ The goal of this project is to allow integration with existing WYSIWYG editors s
 
 Under the hood, this project has taken the [Turndown](https://github.com/domchristie/turndown/) code and repurposed it.
 
-## Getting Started
+## Getting started
 You can either install the npm package or directly use a pre-built version of the library.
 
-### Via Npm
+### Via npm
 `npm install adaptive-html`
 ```javascript
 var AdaptiveHtml = require('adaptive-html');
@@ -59,8 +59,27 @@ console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
 ## API
 - transform(string | [Node](https://devdocs.io/dom/node))
     - Returns a JSON object representing an Adaptive Card
+    ```json
+    {
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "Container",
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "text": "Turn me into an Adaptive Card",
+                        "wrap": true
+                    }
+                ]
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    }
+    ```
 
-## Known Caveats
+## Known caveats
 - Images in list steps and nested steps are pushed to the bottom of that list step
 - Headings cannot contain images
 - Lists cannot contain headings
