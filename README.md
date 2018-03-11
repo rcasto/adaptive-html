@@ -1,5 +1,5 @@
 # AdaptiveHtml
-Convert HTML --> Adaptive Card JSON
+Convert HTML --> Adaptive Card JSON ([Demo](https://adaptive-editor.azurewebsites.net/))
 
 The goal of this project is to allow integration with existing WYSIWYG editors such as [CKEditor](https://ckeditor.com/) and convert their HTML output to an [Adaptive Card](https://adaptivecards.io/).
 
