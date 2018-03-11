@@ -26,33 +26,6 @@
 var AdaptiveHtml = (function () {
 'use strict';
 
-function extend(destination) {
-    for (var i = 1; i < arguments.length; i++) {
-        var source = arguments[i];
-        for (var key in source) {
-            if (source.hasOwnProperty(key)) destination[key] = source[key];
-        }
-    }
-    return destination;
-}
-
-var blockElements = ['address', 'article', 'aside', 'audio', 'blockquote', 'body', 'canvas', 'center', 'dd', 'dir', 'div', 'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'html', 'isindex', 'li', 'main', 'menu', 'nav', 'noframes', 'noscript', 'ol', 'output', 'p', 'pre', 'section', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'ul'];
-
-function isBlock(node) {
-    return blockElements.indexOf(node.nodeName.toLowerCase()) !== -1;
-}
-
-var voidElements = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
-
-function isVoid(node) {
-    return voidElements.indexOf(node.nodeName.toLowerCase()) !== -1;
-}
-
-var voidSelector = voidElements.join();
-function hasVoid(node) {
-    return node.querySelector && node.querySelector(voidSelector);
-}
-
 function toArray(x) {
     if (Array.isArray(x)) {
         return x;
@@ -97,20 +70,31 @@ function isCard(card) {
     return isCardType(card, cardTypes.adaptiveCard);
 }
 
+function isCardElement(card) {
+    return isTextBlock(card) || isImage(card) || isContainer(card);
+}
+
 function getTextBlocks(cardCollection) {
     return getBlocks(cardCollection, cardTypes.textBlock);
 }
 
-function getTextBlocksAsString(cardCollection) {
-    return getTextBlocks(cardCollection).reduce(function (prevStr, currTextBlock) {
-        return prevStr + currTextBlock.text;
-    }, '');
+function getNonTextBlocks(cardCollection) {
+    return getBlocks(cardCollection, [cardTypes.image, cardTypes.container]);
 }
 
-function getBlocks(cardCollection, type) {
+function getTextBlocksAsString(cardCollection) {
+    return getTextBlocks(cardCollection).map(function (textBlock) {
+        return textBlock.text;
+    }).join(' ');
+}
+
+function getBlocks(cardCollection, types) {
+    types = UtilityHelper.toArray(types);
     cardCollection = UtilityHelper.toArray(cardCollection);
     return cardCollection.filter(function (card) {
-        return isCardType(card, type);
+        return types.some(function (type) {
+            return isCardType(card, type);
+        });
     });
 }
 
@@ -128,8 +112,10 @@ var AdaptiveCardFilter = {
     isContainer: isContainer,
     isImage: isImage,
     isCard: isCard,
+    isCardElement: isCardElement,
     getTextBlocks: getTextBlocks,
     getTextBlocksAsString: getTextBlocksAsString,
+    getNonTextBlocks: getNonTextBlocks,
     cardTypes: cardTypes
 };
 
@@ -236,7 +222,9 @@ rules.lineBreak = {
     filter: 'br',
 
     replacement: function replacement(content, node, options) {
-        return '\n\n';
+        return handleTextEffects(content, function (text) {
+            return '\n\n';
+        });
     }
 };
 
@@ -315,18 +303,19 @@ rules.inlineLink = {
 
     replacement: function replacement(content, node) {
         var href = node.getAttribute('href');
-        var title = node.title ? ' "' + node.title + '"' : '';
-        var linkText = AdaptiveCardFilter.getTextBlocksAsString(content);
-        return '[' + linkText + '](' + href + ')';
+        return handleTextEffects(content, function (text) {
+            return '[' + text + '](' + href + ')';
+        });
     }
 };
 
 rules.emphasis = {
     filter: ['em', 'i'],
-    // TODO: what elements are valid inside of these elements?
+
     replacement: function replacement(content, node, options) {
-        var emText = AdaptiveCardFilter.getTextBlocksAsString(content);
-        return '' + options.emDelimiter + emText + options.emDelimiter;
+        return handleTextEffects(content, function (text) {
+            return '' + options.emDelimiter + text + options.emDelimiter;
+        });
     }
 };
 
@@ -334,8 +323,9 @@ rules.strong = {
     filter: ['strong', 'b'],
 
     replacement: function replacement(content, node, options) {
-        var strongText = AdaptiveCardFilter.getTextBlocksAsString(content);
-        return '' + options.strongDelimiter + strongText + options.strongDelimiter;
+        return handleTextEffects(content, function (text) {
+            return '' + options.strongDelimiter + text + options.strongDelimiter;
+        });
     }
 };
 
@@ -350,6 +340,18 @@ rules.image = {
         });
     }
 };
+
+function handleTextEffects(contentCollection, markdownFunc, textOptions) {
+    var nonText = AdaptiveCardFilter.getNonTextBlocks(contentCollection) || [];
+    var text = AdaptiveCardFilter.getTextBlocksAsString(contentCollection) || '';
+    if (typeof markdownFunc === 'function') {
+        text = markdownFunc(text);
+    }
+    return {
+        text: text,
+        nonText: nonText
+    };
+}
 
 /**
  * Manages a collection of rules used to convert HTML to Markdown
@@ -402,6 +404,33 @@ function filterValue(rule, node, options) {
     } else {
         throw new TypeError('`filter` needs to be a string, array, or function');
     }
+}
+
+function extend(destination) {
+    for (var i = 1; i < arguments.length; i++) {
+        var source = arguments[i];
+        for (var key in source) {
+            if (source.hasOwnProperty(key)) destination[key] = source[key];
+        }
+    }
+    return destination;
+}
+
+var blockElements = ['address', 'article', 'aside', 'audio', 'blockquote', 'body', 'canvas', 'center', 'dd', 'dir', 'div', 'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'html', 'isindex', 'li', 'main', 'menu', 'nav', 'noframes', 'noscript', 'ol', 'output', 'p', 'pre', 'section', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'ul'];
+
+function isBlock(node) {
+    return blockElements.indexOf(node.nodeName.toLowerCase()) !== -1;
+}
+
+var voidElements = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
+
+function isVoid(node) {
+    return voidElements.indexOf(node.nodeName.toLowerCase()) !== -1;
+}
+
+var voidSelector = voidElements.join();
+function hasVoid(node) {
+    return node.querySelector && node.querySelector(voidSelector);
 }
 
 /**
@@ -688,6 +717,8 @@ function isFlankedByWhitespace(side, node) {
     return isFlanked;
 }
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var reduce = Array.prototype.reduce;
 
 function TurndownService(options) {
@@ -807,24 +838,26 @@ TurndownService.prototype = {
 
         if (node.nodeType === 3) {
             // text node
-            replacement = node.isCode ? node.nodeValue : _this.escape(node.nodeValue);
+            var text = node.isCode ? node.nodeValue : _this.escape(node.nodeValue);
+            replacement = {
+                text: text,
+                nonText: []
+            };
         } else if (node.nodeType === 1) {
             // element node
             replacement = replacementForNode.call(_this, node);
         }
-
         replacement = replacement || [];
 
-        if (typeof replacement === 'string') {
-            currText += replacement;
-            if (!node.nextSibling) {
+        // text nodes, em, i, b, strong, a tags will hit this
+        if ((typeof replacement === 'undefined' ? 'undefined' : _typeof(replacement)) === 'object' && !AdaptiveCardFilter.isCardElement(replacement) && !Array.isArray(replacement)) {
+            currText += replacement.text;
+            if (replacement.nonText && replacement.nonText.length || !node.nextSibling) {
                 output.push(AdaptiveCardHelper.createTextBlock(currText));
             }
-            return output;
-        }
-
-        // Make sure to add any leftover text as an additional textblock to the block list
-        if (currText) {
+            replacement = replacement.nonText || [];
+        } else if (currText) {
+            // Collection detected, let's push this textblock first, then clear the text
             output.push(AdaptiveCardHelper.createTextBlock(currText));
             currText = '';
         }
