@@ -69,7 +69,7 @@
             adaptiveHtml = adaptiveCard.render();
             adaptivePreview.textContent = '';
             if (adaptiveHtml) {
-                adaptivePreview.appendChild();
+                adaptivePreview.appendChild(adaptiveHtml);
             }
             console.log(JSON.stringify(adaptiveJson, null, '\t'));
         }, debounceTimeInMs));
