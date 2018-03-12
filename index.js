@@ -3,11 +3,17 @@ import UtilityHelper from './lib/utilityHelper';
 
 var turndownService = new TurndownService();
 
-function transform(input) {
-    var transform = turndownService.turndown(input);
-    return transform;
+function toJSON(htmlStringOrNode) {
+    return turndownService.turndown(htmlStringOrNode);
+}
+
+function toHTML(json) {
+    console.log('This is a stub for now');
 }
 
 export default {
-    transform
+    // maintain original api signature of previous package versions
+    transform: toJSON,
+    toJSON,
+    toHTML
 };
