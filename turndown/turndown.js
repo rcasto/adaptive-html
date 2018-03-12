@@ -55,9 +55,6 @@ TurndownService.prototype = {
                 input + ' is not a string, or an element/document/fragment node.'
             )
         }
-
-        if (input === '') return ''
-
         var cardElems = process.call(this, new RootNode(input));
         return AdaptiveCardHelper.createCard(cardElems);
     },
