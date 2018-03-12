@@ -759,9 +759,6 @@ TurndownService.prototype = {
         if (!canConvert(input)) {
             throw new TypeError(input + ' is not a string, or an element/document/fragment node.');
         }
-
-        if (input === '') return '';
-
         var cardElems = process$1.call(this, new RootNode(input));
         return AdaptiveCardHelper.createCard(cardElems);
     },
