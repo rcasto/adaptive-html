@@ -14,8 +14,6 @@ var leadingNewLinesRegExp = /^\n*/
 var trailingNewLinesRegExp = /\n*$/
 
 export default function TurndownService(options) {
-    if (!(this instanceof TurndownService)) return new TurndownService(options)
-
     var defaults = {
         rules: AdaptiveCardRules,
         headingStyle: 'setext',

@@ -12,6 +12,16 @@ test('can handle empty string', t => {
     });
 });
 
+test('can handle blank tag', t => {
+    var result = AdaptiveHtml.transform('<p> </p>');
+    t.deepEqual(result, {
+        type: "AdaptiveCard",
+        body: [],
+        actions: [],
+        version: "1.0"
+    });
+});
+
 test('can handle non string or node', t => {
     var error = t.throws(() => AdaptiveHtml.transform(null), TypeError);
     t.is(error.message, 'null is not a string, or an element/document/fragment node.');
