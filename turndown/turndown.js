@@ -2,30 +2,16 @@ import AdaptiveCardRules from './adaptivecard-rules';
 import AdaptiveCardHelper from '../lib/adaptiveCardHelper';
 import AdaptiveCardFilter from '../lib/adaptiveCardFilter';
 import UtilityHelper from '../lib/utilityHelper';
-import Rules from './rules'
-import {
-    extend
-} from './utilities'
-import RootNode from './root-node'
-import Node from './node'
+import Rules from './rules';
+import RootNode from './root-node';
+import Node from './node';
 
-var reduce = Array.prototype.reduce
-var leadingNewLinesRegExp = /^\n*/
-var trailingNewLinesRegExp = /\n*$/
-
-export default function TurndownService(options) {
-    var defaults = {
+export default function TurndownService() {
+    this.options = {
         rules: AdaptiveCardRules,
-        headingStyle: 'setext',
-        hr: '* * *',
-        bulletListMarker: '*',
-        codeBlockStyle: 'indented',
-        fence: '```',
         emDelimiter: '_',
         strongDelimiter: '**',
         linkStyle: 'inlined',
-        linkReferenceStyle: 'full',
-        br: '  ',
         blankReplacement: function (content, node) {
             return null;
         },
@@ -33,9 +19,8 @@ export default function TurndownService(options) {
             return node.isBlock ?
                 AdaptiveCardHelper.wrap(content) : content;
         }
-    }
-    this.options = extend({}, defaults, options)
-    this.rules = new Rules(this.options)
+    };
+    this.rules = new Rules(this.options);
 }
 
 TurndownService.prototype = {
@@ -121,7 +106,7 @@ TurndownService.prototype = {
 
 function process(parentNode) {
     var currText = '';
-    var blocks = reduce.call(parentNode.childNodes, (output, node) => {
+    var blocks = Array.prototype.reduce.call(parentNode.childNodes, (output, node) => {
         var replacement = [];
 
         node = new Node(node);

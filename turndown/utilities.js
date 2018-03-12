@@ -1,13 +1,3 @@
-export function extend(destination) {
-    for (var i = 1; i < arguments.length; i++) {
-        var source = arguments[i]
-        for (var key in source) {
-            if (source.hasOwnProperty(key)) destination[key] = source[key]
-        }
-    }
-    return destination
-}
-
 export function repeat(character, count) {
     return Array(count + 1).join(character)
 }
