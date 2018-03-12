@@ -33,18 +33,8 @@ function toArray(x) {
     return x ? [x] : [];
 }
 
-function beautify(obj) {
-    return JSON.stringify(obj, null, '\t');
-}
-
-function prettyPrint(obj) {
-    return console.log(beautify(obj));
-}
-
 var UtilityHelper = {
-    toArray: toArray,
-    beautify: beautify,
-    prettyPrint: prettyPrint
+    toArray: toArray
 };
 
 var cardTypes = Object.freeze({
@@ -722,8 +712,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 var reduce = Array.prototype.reduce;
 
 function TurndownService(options) {
-    if (!(this instanceof TurndownService)) return new TurndownService(options);
-
     var defaults = {
         rules: rules,
         headingStyle: 'setext',
