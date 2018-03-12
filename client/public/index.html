@@ -65,39 +65,16 @@
             };
         }
 
-        function recurseNodeTree(node) {
-            if (!node) {
-                return;
-            }
-            if (node.hasChildNodes()) {
-                Array.prototype.forEach.call(node.childNodes, function (childNode) {
-                    recurseNodeTree(childNode);
-                });
-            }
-            if (node.nodeType === TextNode &&
-                node.textContent !== '\n') {
-                var markdownHtmlString = md.renderInline(node.textContent);
-                var markdownHtml = parser.parseFromString(markdownHtmlString, 'text/html').body.firstChild;
-                if (markdownHtml) {
-                    node.parentNode.replaceChild(markdownHtml, node);
-                }
-            }
-            return node;
-        }
-
         editor.on('change', debounce(function (event) {
             var html = event.editor.getData();
-            if (!html) {
-                return;
-            }
-            var adaptiveJson = AdaptiveHtml.transform(html);
+            var adaptiveJson = AdaptiveHtml.transform(html), adaptiveHtml;
             adaptiveCard.parse(adaptiveJson);
+            adaptiveHtml = adaptiveCard.render();
             adaptivePreview.textContent = '';
-            var adaptiveHtml = adaptiveCard.render();
-            // var node = recurseNodeTree(adaptiveHtml.cloneNode(true));
-            // console.log(node);
+            if (adaptiveHtml) {
+                adaptivePreview.appendChild();
+            }
             console.log(JSON.stringify(adaptiveJson, null, '\t'));
-            adaptivePreview.appendChild(adaptiveHtml);
         }, debounceTimeInMs));
     </script>
 </body>
