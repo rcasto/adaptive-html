@@ -30,10 +30,7 @@
         var editor = CKEDITOR.replace('adaptive-ckeditor');
         var adaptivePreview = document.querySelector('.adaptive-preview');
         var adaptiveCard = new AdaptiveCards.AdaptiveCard();
-        var md = new markdownit();
-        var parser = new DOMParser();
         var debounceTimeInMs = 500;
-        var TextNode = 3;
 
         adaptiveCard.hostConfig = new AdaptiveCards.HostConfig({
             fontFamily: 'Segoe UI, Segoe UI Web, Segoe UI Symbol, Helvetica Neue, BBAlpha Sans, S60 Sans, Arial, sans-serif',
