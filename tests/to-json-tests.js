@@ -3,7 +3,7 @@ var JSDOM = require('jsdom').JSDOM;
 var AdaptiveHtml = require('../dist/adaptive-html.cjs');
 
 test('can handle empty string', t => {
-    var result = AdaptiveHtml.transform('');
+    var result = AdaptiveHtml.toJSON('');
     t.deepEqual(result, {
         type: "AdaptiveCard",
         body: [],
@@ -13,7 +13,7 @@ test('can handle empty string', t => {
 });
 
 test('can handle blank tag', t => {
-    var result = AdaptiveHtml.transform('<p> </p>');
+    var result = AdaptiveHtml.toJSON('<p> </p>');
     t.deepEqual(result, {
         type: "AdaptiveCard",
         body: [],
@@ -23,13 +23,13 @@ test('can handle blank tag', t => {
 });
 
 test('can handle non string or node', t => {
-    var error = t.throws(() => AdaptiveHtml.transform(null), TypeError);
+    var error = t.throws(() => AdaptiveHtml.toJSON(null), TypeError);
     t.is(error.message, 'null is not a string, or an element/document/fragment node.');
 });
 
 test('can handle node input', t => {
     var node = JSDOM.fragment('This is some text');
-    var result = AdaptiveHtml.transform(node);
+    var result = AdaptiveHtml.toJSON(node);
     t.deepEqual(result, {
         type: "AdaptiveCard",
         body: [{
@@ -43,7 +43,7 @@ test('can handle node input', t => {
 });
 
 test('can transform text node', t => {
-    var result = AdaptiveHtml.transform('This is some text');
+    var result = AdaptiveHtml.toJSON('This is some text');
     t.deepEqual(result, {
         type: "AdaptiveCard",
         body: [{
@@ -57,7 +57,7 @@ test('can transform text node', t => {
 });
 
 test('can transform text node with breaks in it', t => {
-    var result = AdaptiveHtml.transform('This is some text<br />with a break in it');
+    var result = AdaptiveHtml.toJSON('This is some text<br />with a break in it');
     t.deepEqual(result, {
         type: "AdaptiveCard",
         body: [{
@@ -71,7 +71,7 @@ test('can transform text node with breaks in it', t => {
 });
 
 test('can handle strong/b tags', t => {
-    var result = AdaptiveHtml.transform('This is some <strong>strong</strong> text you <b>know</b>');
+    var result = AdaptiveHtml.toJSON('This is some <strong>strong</strong> text you <b>know</b>');
     t.deepEqual(result, {
         type: "AdaptiveCard",
         body: [{
@@ -85,7 +85,7 @@ test('can handle strong/b tags', t => {
 });
 
 test('can handle img in strong/b tags', t => {
-    var result = AdaptiveHtml.transform('<strong>Strong<img alt="some alt text" src="https://fake-image.com" />image</strong>');
+    var result = AdaptiveHtml.toJSON('<strong>Strong<img alt="some alt text" src="https://fake-image.com" />image</strong>');
     t.deepEqual(result, {
         type: "AdaptiveCard",
         body: [{
@@ -103,7 +103,7 @@ test('can handle img in strong/b tags', t => {
 });
 
 test('can handle em/i tags', t => {
-    var result = AdaptiveHtml.transform('This is some <em>emphasized</em> text you <i>know</i>');
+    var result = AdaptiveHtml.toJSON('This is some <em>emphasized</em> text you <i>know</i>');
     t.deepEqual(result, {
         type: "AdaptiveCard",
         body: [{
@@ -117,7 +117,7 @@ test('can handle em/i tags', t => {
 });
 
 test('can handle img in em/i tags', t => {
-    var result = AdaptiveHtml.transform('<em>Emphasized<img alt="some alt text" src="https://fake-image.com" />image</em>');
+    var result = AdaptiveHtml.toJSON('<em>Emphasized<img alt="some alt text" src="https://fake-image.com" />image</em>');
     t.deepEqual(result, {
         type: "AdaptiveCard",
         body: [{
@@ -135,7 +135,7 @@ test('can handle img in em/i tags', t => {
 });
 
 test('can handle p tags', t => {
-    var result = AdaptiveHtml.transform('<p>This is a paragraph</p>');
+    var result = AdaptiveHtml.toJSON('<p>This is a paragraph</p>');
     t.deepEqual(result, {
         type: "AdaptiveCard",
         body: [{
@@ -152,7 +152,7 @@ test('can handle p tags', t => {
 });
 
 test('can handle p tag with line breaks in it', t => {
-    var result = AdaptiveHtml.transform('<p>This paragraph is<br />breaking up<br />what is happening?</p>');
+    var result = AdaptiveHtml.toJSON('<p>This paragraph is<br />breaking up<br />what is happening?</p>');
     t.deepEqual(result, {
         type: "AdaptiveCard",
         body: [{
@@ -169,7 +169,7 @@ test('can handle p tag with line breaks in it', t => {
 });
 
 test('can handle heading tags', t => {
-    var result = AdaptiveHtml.transform(`
+    var result = AdaptiveHtml.toJSON(`
         <h1>Heading level 1</h1>
         <h2>Heading level 2</h2>
         <h3>Heading level 3</h3>
@@ -222,7 +222,7 @@ test('can handle heading tags', t => {
 });
 
 test('can handle inline links (a tags)', t => {
-    var result = AdaptiveHtml.transform('This is an <a href="https://support.microsoft.com/">inline link</a>');
+    var result = AdaptiveHtml.toJSON('This is an <a href="https://support.microsoft.com/">inline link</a>');
     t.deepEqual(result, {
         type: "AdaptiveCard",
         body: [{
@@ -236,7 +236,7 @@ test('can handle inline links (a tags)', t => {
 });
 
 test('can handle img in inline links (a tags)', t => {
-    var result = AdaptiveHtml.transform('<a href="https://google.com">Link<img alt="some alt text" src="https://fake-image.com" />image</a>');
+    var result = AdaptiveHtml.toJSON('<a href="https://google.com">Link<img alt="some alt text" src="https://fake-image.com" />image</a>');
     t.deepEqual(result, {
         type: "AdaptiveCard",
         body: [{
@@ -254,7 +254,7 @@ test('can handle img in inline links (a tags)', t => {
 });
 
 test('can handle img tags', t => {
-    var result = AdaptiveHtml.transform('<img alt="This is some alt text" src="https://fake-image.com" />');
+    var result = AdaptiveHtml.toJSON('<img alt="This is some alt text" src="https://fake-image.com" />');
     t.deepEqual(result, {
         type: "AdaptiveCard",
         body: [{
@@ -268,7 +268,7 @@ test('can handle img tags', t => {
 });
 
 test('can handle unsupported block tag', t => {
-    var result = AdaptiveHtml.transform(`<div>Testing div</div>`);
+    var result = AdaptiveHtml.toJSON(`<div>Testing div</div>`);
     t.deepEqual(result, {
         type: "AdaptiveCard",
         body: [{
@@ -285,7 +285,7 @@ test('can handle unsupported block tag', t => {
 });
 
 test('can handle unsupported inline tag', t => {
-    var result = AdaptiveHtml.transform(`<span>Testing span</span>`);
+    var result = AdaptiveHtml.toJSON(`<span>Testing span</span>`);
     t.deepEqual(result, {
         type: "AdaptiveCard",
         body: [{
@@ -299,7 +299,7 @@ test('can handle unsupported inline tag', t => {
 });
 
 test('can handle simple ordered list', t => {
-    var result = AdaptiveHtml.transform(`
+    var result = AdaptiveHtml.toJSON(`
         <ol>
             <li>List item 1</li>
             <li>List item 2</li>
@@ -330,7 +330,7 @@ test('can handle simple ordered list', t => {
 });
 
 test('can handle simple unordered list', t => {
-    var result = AdaptiveHtml.transform(`
+    var result = AdaptiveHtml.toJSON(`
         <ul>
             <li>List item 1</li>
             <li>List item 2</li>
@@ -361,7 +361,7 @@ test('can handle simple unordered list', t => {
 });
 
 test('can handle ordered list with nested list', t => {
-    var result = AdaptiveHtml.transform(`
+    var result = AdaptiveHtml.toJSON(`
         <ol>
             <li>
                 List item 1
@@ -398,7 +398,7 @@ test('can handle ordered list with nested list', t => {
 });
 
 test('can handle unordered list with nested list', t => {
-    var result = AdaptiveHtml.transform(`
+    var result = AdaptiveHtml.toJSON(`
         <ul>
             <li>
                 List item 1
@@ -435,7 +435,7 @@ test('can handle unordered list with nested list', t => {
 });
 
 test('can handle nested nested list', t => {
-    var result = AdaptiveHtml.transform(`
+    var result = AdaptiveHtml.toJSON(`
         <ul>
             <li>
                 List item 1
@@ -466,7 +466,7 @@ test('can handle nested nested list', t => {
 });
 
 test('can handle images in list', t => {
-    var result = AdaptiveHtml.transform(`
+    var result = AdaptiveHtml.toJSON(`
         <ul>
             <li>
                 List item 1
@@ -502,7 +502,7 @@ test('can handle images in list', t => {
 });
 
 test('can handle line break in list', t => {
-    var result = AdaptiveHtml.transform(`
+    var result = AdaptiveHtml.toJSON(`
         <ul>
             <li>
                 List item 1<br />
