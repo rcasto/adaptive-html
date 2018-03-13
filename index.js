@@ -16,8 +16,11 @@ function toJSON(htmlStringOrNode) {
     return turndownService.turndown(htmlStringOrNode);
 }
 
-function toHTML(json) {
-    return AdaptiveHtmlHelper.toHTML(json);
+function toHTML(jsonOrJsonString) {
+    if (typeof jsonOrJsonString === 'string') {
+        jsonOrJsonString = UtilityHelper.tryParseJSON(jsonOrJsonString);
+    }
+    return AdaptiveHtmlHelper.toHTML(jsonOrJsonString);
 }
 
 export default {
