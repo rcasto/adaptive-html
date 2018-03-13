@@ -1,5 +1,6 @@
 import TurndownService from './turndown/turndown';
 import UtilityHelper from './lib/utilityHelper';
+import AdaptiveHtmlHelper from './lib/adaptiveHtmlHelper';
 
 var turndownService = new TurndownService();
 
@@ -16,7 +17,7 @@ function toJSON(htmlStringOrNode) {
 }
 
 function toHTML(json) {
-    console.info('This is a stub for now');
+    return AdaptiveHtmlHelper.toHTML(json);
 }
 
 export default {

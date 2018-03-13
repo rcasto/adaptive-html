@@ -62,9 +62,7 @@ TurndownService.prototype = {
 
     turndown: function (input) {
         if (!canConvert(input)) {
-            throw new TypeError(
-                input + ' is not a string, or an element/document/fragment node.'
-            )
+            throw new TypeError(`${input} is not a string, or an element/document/fragment node.`);
         }
         var cardElems = process.call(this, new RootNode(input));
         return AdaptiveCardHelper.createCard(cardElems);
