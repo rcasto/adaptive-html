@@ -27,7 +27,9 @@
     <script src="https://unpkg.com/adaptivecards/dist/adaptivecards.js"></script>
     <script src="/adaptive-html.js"></script>
     <script>
-        var editor = CKEDITOR.replace('adaptive-ckeditor');
+        var editor = CKEDITOR.replace('adaptive-ckeditor', {
+            extraAllowedContent: 'ol[start]'
+        });
         var adaptivePreview = document.querySelector('.adaptive-preview');
         var adaptiveCard = new AdaptiveCards.AdaptiveCard();
         var debounceTimeInMs = 500;

@@ -12,3 +12,6 @@
 
 ## Images
 - Images as well are wrapped within a div
+
+## Worth taking a look at
+https://docs.ckeditor.com/ckeditor4/latest/guide/dev_allowed_content_rules.html
