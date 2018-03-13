@@ -37,6 +37,7 @@ rules.list = {
     replacement: function (listItemContainers, node) {
         var isOrdered = node.nodeName === 'OL';
         var blocks = (listItemContainers || []).map((listItemContainer, listItemIndex) => {
+            // TODO: check for 'start' attribute on ordered list (adjust listItemIndex)
             var listItemElems = AdaptiveCardHelper.unwrap(listItemContainer);
             var firstListItemElem = listItemElems[0];
             if (firstListItemElem && AdaptiveCardFilter.isTextBlock(firstListItemElem)) {
