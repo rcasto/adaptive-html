@@ -1,9 +1,9 @@
-import collapseWhitespace from './collapse-whitespace'
-import HTMLParser from './html-parser'
+import collapseWhitespace from './collapse-whitespace';
+import HTMLUtil from './html-util';
 import {
     isBlock,
     isVoid
-} from './utilities'
+} from './utilities';
 
 export default function RootNode(input) {
     var root
@@ -28,9 +28,8 @@ export default function RootNode(input) {
     return root
 }
 
-var _htmlParser
-
+var _htmlParser;
 function htmlParser() {
-    _htmlParser = _htmlParser || new HTMLParser()
-    return _htmlParser
+    _htmlParser = _htmlParser || new HTMLUtil.parser();
+    return _htmlParser;
 }

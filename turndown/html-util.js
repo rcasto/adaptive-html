@@ -2,7 +2,8 @@
  * Set up window for Node.js
  */
 
-var root = (typeof window !== 'undefined' ? window : {})
+var root = (typeof window !== 'undefined' ? window : {});
+var parser = canParseHTMLNatively() ? root.DOMParser : createHTMLParser();
 
 /*
  * Parsing HTML strings
@@ -65,4 +66,13 @@ function shouldUseActiveX() {
     return useActiveX
 }
 
-export default canParseHTMLNatively() ? root.DOMParser : createHTMLParser()
+function createDocumentFragment() {
+    if (canParseHTMLNatively()) {
+        return root.document.createDocumentFragment();
+    }
+}
+
+export default {
+    parser,
+    createDocumentFragment
+};
