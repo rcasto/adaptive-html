@@ -8,7 +8,6 @@ var parser = canParseHTMLNatively() ? root.DOMParser : createHTMLParser();
 /*
  * Parsing HTML strings
  */
-
 function canParseHTMLNatively() {
     var Parser = root.DOMParser
     var canParse = false
@@ -48,12 +47,10 @@ function createHTMLParser() {
             }
         }
     } else {
-        var JSDOM = require('jsdom').JSDOM
-        Parser.prototype.parseFromString = function (string) {
-            return new JSDOM(string).window.document
-        }
+        let JSDOM = require('jsdom').JSDOM;
+        Parser.prototype.parseFromString = string => new JSDOM(string).window.document;
     }
-    return Parser
+    return Parser;
 }
 
 function shouldUseActiveX() {
@@ -66,13 +63,23 @@ function shouldUseActiveX() {
     return useActiveX
 }
 
+function createElement(tag) {
+    if (canParseHTMLNatively()) {
+        return root.document.createElement(tag);
+    }
+    let JSDOM = require('jsdom').JSDOM;
+    return JSDOM().window.document.createElement(tag);
+}
+
 function createDocumentFragment() {
     if (canParseHTMLNatively()) {
         return root.document.createDocumentFragment();
     }
+    return require('jsdom').JSDOM.fragment();
 }
 
 export default {
     parser,
+    createElement,
     createDocumentFragment
 };
