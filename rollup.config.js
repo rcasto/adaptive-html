@@ -25,7 +25,10 @@ export default {
     output: {
         format: "iife",
         file:  buildMinifiedLibrary ? "dist/adaptive-html.iife.min.js" : "dist/adaptive-html.iife.js",
-        name: "AdaptiveHtml"
+        name: "AdaptiveHtml",
+        globals: {
+            adaptivecards: 'AdaptiveCards'
+        }
     },
     plugins: plugins,
     watch: {
@@ -34,5 +37,6 @@ export default {
             "index.js",
             "turndown/*.js"
         ]
-    }
+    },
+    external: ['adaptivecards']
 };
