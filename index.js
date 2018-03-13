@@ -3,17 +3,24 @@ import UtilityHelper from './lib/utilityHelper';
 
 var turndownService = new TurndownService();
 
+/**
+ * @deprecated This method will be deprecated.  Use toJSON instead.
+ */
+function transform(htmlStringOrNode) {
+    console.warn('transform(string | Node) will be deprecated. Use toJSON(string | Node) instead.');
+    return toJSON(htmlStringOrNode);
+}
+
 function toJSON(htmlStringOrNode) {
     return turndownService.turndown(htmlStringOrNode);
 }
 
 function toHTML(json) {
-    console.log('This is a stub for now');
+    console.info('This is a stub for now');
 }
 
 export default {
-    // maintain original api signature of previous package versions
-    transform: toJSON,
+    transform, // maintain original api signature of previous package versions
     toJSON,
     toHTML
 };
