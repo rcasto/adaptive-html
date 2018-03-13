@@ -1,3 +1,6 @@
+Code in files within the turndown folder is taken and modified from the Turndown
+project created by Dom Christie
+
 MIT License
 
 Original work Copyright (c) 2017 Dom Christie
