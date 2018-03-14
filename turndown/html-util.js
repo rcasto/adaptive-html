@@ -68,7 +68,7 @@ function createElement(tag) {
         return root.document.createElement(tag);
     }
     let JSDOM = require('jsdom').JSDOM;
-    return JSDOM().window.document.createElement(tag);
+    return new JSDOM().window.document.createElement(tag);
 }
 
 function createDocumentFragment() {
