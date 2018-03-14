@@ -36,12 +36,12 @@ rules.list = {
     // content = array of listitem containers
     replacement: function (listItemContainers, node) {
         var isOrdered = node.nodeName === 'OL';
+        var startIndex = parseInt(node.getAttribute('start'), 10) || 1; // only applicable to ordered lists
         var blocks = (listItemContainers || []).map((listItemContainer, listItemIndex) => {
-            // TODO: check for 'start' attribute on ordered list (adjust listItemIndex)
             var listItemElems = AdaptiveCardHelper.unwrap(listItemContainer);
             var firstListItemElem = listItemElems[0];
             if (firstListItemElem && AdaptiveCardFilter.isTextBlock(firstListItemElem)) {
-                let firstListItemPrefix = isOrdered ? `${listItemIndex + 1}. ` : `- `;
+                let firstListItemPrefix = isOrdered ? `${startIndex + listItemIndex}. ` : `- `;
                 firstListItemElem.text = firstListItemPrefix + firstListItemElem.text;
             }
             return listItemElems;

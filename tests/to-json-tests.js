@@ -531,3 +531,34 @@ test('can handle line break in list', t => {
         version: "1.0"
     });
 });
+
+test('can handle ordered lists that starts from an index other than 1', t => {
+    var result = AdaptiveHtml.toJSON(`
+        <ol start="2">
+            <li>My start index should be 2</li>
+            <li>My start index should be 3</li>
+        </ol>
+    `);
+    t.deepEqual(result, {
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "Container",
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "text": "2. My start index should be 2",
+                        "wrap": true
+                    },
+                    {
+                        "type": "TextBlock",
+                        "text": "3. My start index should be 3",
+                        "wrap": true
+                    }
+                ]
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    });
+});
