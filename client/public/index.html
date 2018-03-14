@@ -82,7 +82,7 @@
 
         editor.on('change', debounce(function (event) {
             var html = event.editor.getData();
-            var adaptiveJson = AdaptiveHtml.transform(html), adaptiveHtml;
+            var adaptiveJson = AdaptiveHtml.toJSON(html), adaptiveHtml;
             adaptiveCard.parse(adaptiveJson);
             adaptiveHtml = adaptiveCard.render();
             adaptivePreview.textContent = '';
@@ -93,4 +93,4 @@
         }, debounceTimeInMs));
     </script>
 </body>
-</html>`
+</html>
