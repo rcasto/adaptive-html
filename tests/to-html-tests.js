@@ -162,6 +162,51 @@ test('can detect and replace p tags representing headings', t => {
     t.deepEqual(result, elem);
 });
 
+test('can remove empty divs from output', t => {
+    var result = toJsdomFragment(AdaptiveHtml.toHTML({
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "Container",
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "text": "testing",
+                        "wrap": true
+                    }
+                ]
+            },
+            {
+                "type": "Container",
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "text": "testing",
+                        "wrap": true
+                    }
+                ]
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    }));
+    var elem = toJsdomFragment(`
+        <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; background-color: rgb(255, 255, 255); box-sizing: border-box; flex: 0 0 auto; padding: 20px;">
+            <div class="ac-container" style="display: flex; flex-direction: column; justify-content: flex-start; box-sizing: border-box; flex: 0 0 auto;">
+                <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(51, 51, 51); font-weight: 400; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
+                    <p style="margin-top: 0px; width: 100%; margin-bottom: 0px;">testing</p>
+                </div>
+            </div>
+            <div class="ac-container" style="display: flex; flex-direction: column; justify-content: flex-start; box-sizing: border-box; flex: 0 0 auto;">
+                <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(51, 51, 51); font-weight: 400; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
+                    <p style="margin-top: 0px; width: 100%; margin-bottom: 0px;">testing</p>
+                </div>
+            </div>
+        </div>
+    `);
+    t.deepEqual(result, elem);
+});
+
 function toJsdomFragment(htmlString) {
     return JSDOM.fragment(htmlString);
 }
