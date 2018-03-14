@@ -27,9 +27,25 @@
     <script src="https://unpkg.com/adaptivecards/dist/adaptivecards.js"></script>
     <script src="/adaptive-html.js"></script>
     <script>
-        var editor = CKEDITOR.replace('adaptive-ckeditor', {
+        var editorConfig = {
+            toolbarGroups: [
+                { name: 'document',    groups: [ 'mode', 'document', 'doctools' ] },
+                { name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
+                { name: 'editing',     groups: [ 'find', 'selection' ] },
+                { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+                { name: 'paragraph',   groups: [ 'list', 'indent', 'align' ] },
+                { name: 'links' },
+                { name: 'styles' },
+                { name: 'insert' }
+            ],
+            customConfig: '',
+            removeButtons: 'Cut,Copy,Paste,Undo,Redo,Anchor,Underline,Strike,Subscript,Superscript,Table,HorizontalRule,Styles',
+            removeDialogTabs: 'link:advanced',
+            resize_enabled: false,
+            removePlugins: 'elementspath',
             extraAllowedContent: 'ol[start]'
-        });
+        };
+        var editor = CKEDITOR.replace('adaptive-ckeditor', editorConfig);
         var adaptivePreview = document.querySelector('.adaptive-preview');
         var adaptiveCard = new AdaptiveCards.AdaptiveCard();
         var debounceTimeInMs = 500;
