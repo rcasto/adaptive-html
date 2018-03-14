@@ -200,13 +200,13 @@ test('can handle heading tags', t => {
         }, {
             type: "TextBlock",
             text: "Heading level 4",
-            weight: "bolder",
-            size: "default",
+            weight: "lighter",
+            size: "medium",
             wrap: true
         }, {
             type: "TextBlock",
             text: "Heading level 5",
-            weight: "lighter",
+            weight: "bolder",
             size: "default",
             wrap: true
         }, {
