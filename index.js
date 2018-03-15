@@ -1,6 +1,6 @@
 import TurndownService from './turndown/turndown';
 import UtilityHelper from './lib/utilityHelper';
-import AdaptiveHtmlHelper from './lib/adaptiveHtmlHelper';
+// import AdaptiveHtmlHelper from './lib/adaptiveHtmlHelper';
 
 var turndownService = new TurndownService();
 

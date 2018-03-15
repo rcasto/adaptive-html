@@ -1,9 +1,5 @@
 'use strict';
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var AdaptiveCards = _interopDefault(require('adaptivecards'));
-
 function toArray(x) {
     if (Array.isArray(x)) {
         return x;
@@ -936,7 +932,7 @@ function canConvert(input) {
     return input != null && (typeof input === 'string' || input.nodeType && (input.nodeType === 1 || input.nodeType === 9 || input.nodeType === 11));
 }
 
-var card = new AdaptiveCards.AdaptiveCard();
+// import AdaptiveHtmlHelper from './lib/adaptiveHtmlHelper';
 
 var turndownService = new TurndownService();
 

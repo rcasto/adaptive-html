@@ -1,7 +1,5 @@
-var AdaptiveHtml = (function (AdaptiveCards) {
+var AdaptiveHtml = (function () {
 'use strict';
-
-AdaptiveCards = AdaptiveCards && AdaptiveCards.hasOwnProperty('default') ? AdaptiveCards['default'] : AdaptiveCards;
 
 function toArray(x) {
     if (Array.isArray(x)) {
@@ -935,7 +933,7 @@ function canConvert(input) {
     return input != null && (typeof input === 'string' || input.nodeType && (input.nodeType === 1 || input.nodeType === 9 || input.nodeType === 11));
 }
 
-var card = new AdaptiveCards.AdaptiveCard();
+// import AdaptiveHtmlHelper from './lib/adaptiveHtmlHelper';
 
 var turndownService = new TurndownService();
 
@@ -966,4 +964,4 @@ var index = (function () {
 
 return index;
 
-}(AdaptiveCards));
+}());
