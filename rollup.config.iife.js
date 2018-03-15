@@ -29,13 +29,8 @@ export default {
         file:  buildMinifiedLibrary ? "dist/adaptive-html.iife.min.js" : "dist/adaptive-html.iife.js",
         name: "AdaptiveHtml",
         globals: {
-            adaptivecards: 'AdaptiveCards'
-        },
-        banner: `
-            (function () {
-                console.log('this is a test')
-            }());
-        `
+            adaptivecards: 'window.AdaptiveCards'
+        }
     },
     plugins: plugins,
     watch: {
