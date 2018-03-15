@@ -1,5 +1,7 @@
-var AdaptiveHtml = (function () {
+var AdaptiveHtml = (function (AdaptiveCards) {
 'use strict';
+
+AdaptiveCards = AdaptiveCards && AdaptiveCards.hasOwnProperty('default') ? AdaptiveCards['default'] : AdaptiveCards;
 
 function toArray(x) {
     if (Array.isArray(x)) {
@@ -8,8 +10,38 @@ function toArray(x) {
     return x ? [x] : [];
 }
 
+function tryParseJSON(jsonString) {
+    try {
+        return JSON.parse(jsonString);
+    } catch (err) {
+        return null;
+    }
+}
+
+// setup globals for node with adaptivecards library
+// TODO: is there a better way to do this?
+function setupNodeAdaptiveCards() {
+    var jsdomInstance = new (require('jsdom').JSDOM)();
+    global.document = jsdomInstance.window.document;
+    global.window = jsdomInstance.window;
+    global.HTMLElement = jsdomInstance.window.HTMLElement;
+}
+
+function hasAccessToBrowserGlobals() {
+    return !!(typeof window !== 'undefined' && window.document && window.HTMLElement);
+}
+
 var UtilityHelper = {
-    toArray: toArray
+    toArray: toArray,
+    tryParseJSON: tryParseJSON,
+    setupNodeAdaptiveCards: setupNodeAdaptiveCards,
+    hasAccessToBrowserGlobals: hasAccessToBrowserGlobals
+};
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 };
 
 var cardTypes = Object.freeze({
@@ -18,6 +50,7 @@ var cardTypes = Object.freeze({
     image: "Image",
     adaptiveCard: "AdaptiveCard"
 });
+var supportedCardVersions = ['1.0'];
 
 function isTextBlock(card) {
     return isCardType(card, cardTypes.textBlock);
@@ -31,12 +64,25 @@ function isImage(card) {
     return isCardType(card, cardTypes.image);
 }
 
-function isCard(card) {
+function isAdaptiveCard(card) {
     return isCardType(card, cardTypes.adaptiveCard);
 }
 
 function isCardElement(card) {
     return isTextBlock(card) || isImage(card) || isContainer(card);
+}
+
+function isCardType(card, type) {
+    if (!card) {
+        return false;
+    }
+    var cardType = (card.type || '').toLowerCase();
+    type = (type || '').toLowerCase();
+    return cardType === type;
+}
+
+function isValidAdaptiveCardJSON(json) {
+    return json && (typeof json === "undefined" ? "undefined" : _typeof(json)) === 'object' && json.type === cardTypes.adaptiveCard && supportedCardVersions.indexOf(json.version) > -1;
 }
 
 function getTextBlocks(cardCollection) {
@@ -63,21 +109,13 @@ function getBlocks(cardCollection, types) {
     });
 }
 
-function isCardType(card, type) {
-    if (!card) {
-        return false;
-    }
-    var cardType = (card.type || '').toLowerCase();
-    type = (type || '').toLowerCase();
-    return cardType === type;
-}
-
 var AdaptiveCardFilter = {
     isTextBlock: isTextBlock,
     isContainer: isContainer,
     isImage: isImage,
-    isCard: isCard,
+    isAdaptiveCard: isAdaptiveCard,
     isCardElement: isCardElement,
+    isValidAdaptiveCardJSON: isValidAdaptiveCardJSON,
     getTextBlocks: getTextBlocks,
     getTextBlocksAsString: getTextBlocksAsString,
     getNonTextBlocks: getNonTextBlocks,
@@ -87,10 +125,15 @@ var AdaptiveCardFilter = {
 function createCard(elements) {
     var card = {
         type: AdaptiveCardFilter.cardTypes.adaptiveCard,
-        body: UtilityHelper.toArray(elements),
+        body: [],
         actions: [],
         version: '1.0'
     };
+    var body = UtilityHelper.toArray(elements);
+    if (Array.isArray(elements) && elements.length === 1 && AdaptiveCardFilter.isContainer(elements[0])) {
+        body = UtilityHelper.toArray(unwrap(elements[0]));
+    }
+    card.body = body;
     return card;
 }
 
@@ -118,6 +161,9 @@ function createHeadingTextBlock(text, depth) {
             size = 'medium';
             break;
         case 4:
+            size = 'medium';
+            weight = 'lighter';
+            break;
         case 5:
             size = 'default';
             break;
@@ -208,11 +254,12 @@ rules.list = {
     // content = array of listitem containers
     replacement: function replacement(listItemContainers, node) {
         var isOrdered = node.nodeName === 'OL';
+        var startIndex = parseInt(node.getAttribute('start'), 10) || 1; // only applicable to ordered lists
         var blocks = (listItemContainers || []).map(function (listItemContainer, listItemIndex) {
             var listItemElems = AdaptiveCardHelper.unwrap(listItemContainer);
             var firstListItemElem = listItemElems[0];
             if (firstListItemElem && AdaptiveCardFilter.isTextBlock(firstListItemElem)) {
-                var firstListItemPrefix = isOrdered ? listItemIndex + 1 + '. ' : '- ';
+                var firstListItemPrefix = isOrdered ? startIndex + listItemIndex + '. ' : '- ';
                 firstListItemElem.text = firstListItemPrefix + firstListItemElem.text;
             }
             return listItemElems;
@@ -371,33 +418,6 @@ function filterValue(rule, node, options) {
     }
 }
 
-function extend(destination) {
-    for (var i = 1; i < arguments.length; i++) {
-        var source = arguments[i];
-        for (var key in source) {
-            if (source.hasOwnProperty(key)) destination[key] = source[key];
-        }
-    }
-    return destination;
-}
-
-var blockElements = ['address', 'article', 'aside', 'audio', 'blockquote', 'body', 'canvas', 'center', 'dd', 'dir', 'div', 'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'html', 'isindex', 'li', 'main', 'menu', 'nav', 'noframes', 'noscript', 'ol', 'output', 'p', 'pre', 'section', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'ul'];
-
-function isBlock(node) {
-    return blockElements.indexOf(node.nodeName.toLowerCase()) !== -1;
-}
-
-var voidElements = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
-
-function isVoid(node) {
-    return voidElements.indexOf(node.nodeName.toLowerCase()) !== -1;
-}
-
-var voidSelector = voidElements.join();
-function hasVoid(node) {
-    return node.querySelector && node.querySelector(voidSelector);
-}
-
 /*!
  * The collapseWhitespace function is adapted from collapse-whitespace
  * by Luc Thevenard.
@@ -532,12 +552,12 @@ function next(prev, current, isPre) {
  * Set up window for Node.js
  */
 
-var root = typeof window !== 'undefined' ? window : {};
+var root = UtilityHelper.hasAccessToBrowserGlobals() ? window : {};
+var parser = canParseHTMLNatively() ? root.DOMParser : createHTMLParser();
 
 /*
  * Parsing HTML strings
  */
-
 function canParseHTMLNatively() {
     var Parser = root.DOMParser;
     var canParse = false;
@@ -595,7 +615,43 @@ function shouldUseActiveX() {
     return useActiveX;
 }
 
-var HTMLParser = canParseHTMLNatively() ? root.DOMParser : createHTMLParser();
+function createElement(tag) {
+    if (canParseHTMLNatively()) {
+        return root.document.createElement(tag);
+    }
+    var JSDOM = require('jsdom').JSDOM;
+    return new JSDOM().window.document.createElement(tag);
+}
+
+function createDocumentFragment() {
+    if (canParseHTMLNatively()) {
+        return root.document.createDocumentFragment();
+    }
+    return require('jsdom').JSDOM.fragment();
+}
+
+var HTMLUtil = {
+    parser: parser,
+    createElement: createElement,
+    createDocumentFragment: createDocumentFragment
+};
+
+var blockElements = ['address', 'article', 'aside', 'audio', 'blockquote', 'body', 'canvas', 'center', 'dd', 'dir', 'div', 'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'html', 'isindex', 'li', 'main', 'menu', 'nav', 'noframes', 'noscript', 'ol', 'output', 'p', 'pre', 'section', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'ul'];
+
+function isBlock(node) {
+    return blockElements.indexOf(node.nodeName.toLowerCase()) !== -1;
+}
+
+var voidElements = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
+
+function isVoid(node) {
+    return voidElements.indexOf(node.nodeName.toLowerCase()) !== -1;
+}
+
+var voidSelector = voidElements.join();
+function hasVoid(node) {
+    return node.querySelector && node.querySelector(voidSelector);
+}
 
 function RootNode(input) {
     var root;
@@ -619,9 +675,8 @@ function RootNode(input) {
 }
 
 var _htmlParser;
-
 function htmlParser() {
-    _htmlParser = _htmlParser || new HTMLParser();
+    _htmlParser = _htmlParser || new HTMLUtil.parser();
     return _htmlParser;
 }
 
@@ -682,11 +737,9 @@ function isFlankedByWhitespace(side, node) {
     return isFlanked;
 }
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 /*!
- * Code in files within the turndown folder are taken and modified from the Turndown
- * project created by Dom Christie
+ * Code in files within the turndown folder is taken and modified from the Turndown
+ * project created by Dom Christie (https://github.com/domchristie/turndown/)
  *
  * MIT License
  *
@@ -712,29 +765,29 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
  * THE SOFTWARE.
  */
 
-var reduce = Array.prototype.reduce;
-
-function TurndownService(options) {
-    var defaults = {
+function TurndownService() {
+    this.options = {
         rules: rules,
-        headingStyle: 'setext',
-        hr: '* * *',
-        bulletListMarker: '*',
-        codeBlockStyle: 'indented',
-        fence: '```',
         emDelimiter: '_',
         strongDelimiter: '**',
         linkStyle: 'inlined',
-        linkReferenceStyle: 'full',
-        br: '  ',
         blankReplacement: function blankReplacement(content, node) {
             return null;
         },
         defaultReplacement: function defaultReplacement(content, node) {
-            return node.isBlock ? AdaptiveCardHelper.wrap(content) : content;
+            if (node.isBlock) {
+                /*
+                    If it's a block level element and the content is just a container already
+                    don't wrap the container in a container
+                */
+                if (Array.isArray(content) && content.length === 1 && AdaptiveCardFilter.isContainer(content[0])) {
+                    return content;
+                }
+                return AdaptiveCardHelper.wrap(content);
+            }
+            return content;
         }
     };
-    this.options = extend({}, defaults, options);
     this.rules = new Rules(this.options);
 }
 
@@ -819,7 +872,7 @@ TurndownService.prototype = {
     var _this = this;
 
     var currText = '';
-    var blocks = reduce.call(parentNode.childNodes, function (output, node) {
+    var blocks = Array.prototype.reduce.call(parentNode.childNodes, function (output, node) {
         var replacement = [];
 
         node = new Node(node);
@@ -882,17 +935,136 @@ function canConvert(input) {
     return input != null && (typeof input === 'string' || input.nodeType && (input.nodeType === 1 || input.nodeType === 9 || input.nodeType === 11));
 }
 
-var turndownService = new TurndownService();
+var card = new AdaptiveCards.AdaptiveCard();
 
-function transform(input) {
-    var transform = turndownService.turndown(input);
-    return transform;
+function toHTML(json) {
+    if (!AdaptiveCardFilter.isValidAdaptiveCardJSON(json)) {
+        throw new TypeError(JSON.stringify(json) + ' is not valid Adaptive Card JSON.');
+    }
+    card.parse(json);
+    var adaptiveHtml = card.render();
+    recurseNodeTree(adaptiveHtml, processNode);
+    return adaptiveHtml;
 }
 
-var index = {
-    transform: transform
+function recurseNodeTree(node, processNodeFunc) {
+    if (!node) {
+        return node;
+    }
+    _recurseNodeTree(node, processNodeFunc);
+    return node;
+}
+
+function _recurseNodeTree(node, processNodeFunc) {
+    if (typeof processNodeFunc === 'function') {
+        processNodeFunc(node);
+    }
+    if (node.hasChildNodes()) {
+        Array.prototype.slice.call(node.childNodes).forEach(function (child) {
+            return recurseNodeTree(child, processNodeFunc);
+        });
+    }
+}
+
+function processNode(node) {
+    var nodeName = node.nodeName;
+    switch (nodeName) {
+        case 'DIV':
+            if (!node.hasChildNodes()) {
+                // remove empty divs from output html
+                node.remove();
+            }
+            var headingLevel = detectHeadingLevel(node);
+            if (headingLevel) {
+                var headingFragment = HTMLUtil.createDocumentFragment();
+                var headingNode = HTMLUtil.createElement('h' + headingLevel);
+                node.querySelectorAll('p').forEach(function (pTag) {
+                    var cloneHeadingNode = headingNode.cloneNode(false);
+                    cloneHeadingNode.innerHTML = pTag.innerHTML;
+                    headingFragment.appendChild(cloneHeadingNode);
+                });
+                node.parentNode.replaceChild(headingFragment, node);
+            }
+            break;
+    }
+}
+
+/*
+    This detection assumes default host config
+    Of course this code is currently in charge of utilizing the adaptivecards layer
+    so this shouldn't be an issue currently
+
+    This currently must stay in sync with the adaptiveCardHelper.createHeadingTextBlock construction
+*/
+function detectHeadingLevel(node) {
+    var fontWeight = node.style.fontWeight;
+    var fontSize = node.style.fontSize;
+    var bolderFontWeight = '600';
+    var lighterFontWeight = '200';
+    var extraLargeFontSize = '26px';
+    var largeFontSize = '21px';
+    var mediumFontSize = '17px';
+    var defaultFontSize = '14px';
+    var smallFontSize = '12px';
+    if (fontSize === extraLargeFontSize && fontWeight === bolderFontWeight) {
+        return 1;
+    }
+    if (fontSize === largeFontSize && fontWeight === bolderFontWeight) {
+        return 2;
+    }
+    if (fontSize === mediumFontSize && fontWeight === bolderFontWeight) {
+        return 3;
+    }
+    if (fontSize === mediumFontSize && fontWeight === lighterFontWeight) {
+        return 4;
+    }
+    if (fontSize === defaultFontSize && fontWeight === bolderFontWeight) {
+        return 5;
+    }
+    if (fontSize === smallFontSize && fontWeight === bolderFontWeight) {
+        return 6;
+    }
+    return null;
+}
+
+var AdaptiveHtmlHelper = {
+    toHTML: toHTML
 };
+
+var turndownService = new TurndownService();
+
+/**
+ * @deprecated This method will be deprecated.  Use toJSON instead.
+ */
+function transform(htmlStringOrNode) {
+    console.warn('transform(string | Node) will be deprecated. Use toJSON(string | Node) instead.');
+    return toJSON(htmlStringOrNode);
+}
+
+function toJSON(htmlStringOrNode) {
+    return turndownService.turndown(htmlStringOrNode);
+}
+
+function toHTML$1(jsonOrJsonString) {
+    if (typeof jsonOrJsonString === 'string') {
+        jsonOrJsonString = UtilityHelper.tryParseJSON(jsonOrJsonString);
+    }
+    return AdaptiveHtmlHelper.toHTML(jsonOrJsonString);
+}
+
+var index = (function () {
+    // check and setup globals for node for 
+    // adaptivecards library if needed
+    if (!UtilityHelper.hasAccessToBrowserGlobals()) {
+        UtilityHelper.setupNodeAdaptiveCards();
+    }
+    return {
+        transform: transform, // maintain original api signature of previous package versions
+        toJSON: toJSON,
+        toHTML: toHTML$1
+    };
+})();
 
 return index;
 
-}());
+}(AdaptiveCards));
