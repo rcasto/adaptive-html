@@ -1,6 +1,6 @@
 var test = require('ava');
-var JSDOM = require('jsdom').JSDOM;
 var AdaptiveHtml = require('../dist/adaptive-html.cjs');
+var jsdomHelper = require('./util/jsdomHelper');
 
 test('can handle non JSON string', t => {
     var error = t.throws(() => AdaptiveHtml.toHTML('This is not json'), TypeError);
@@ -16,7 +16,7 @@ test('can handle invalid Adaptive Card JSON', t => {
 });
 
 test('can handle JSON string', t => {
-    var result = toJsdomFragment(AdaptiveHtml.toHTML(`{
+    var result = jsdomHelper.toFragment(AdaptiveHtml.toHTML(`{
         "type": "AdaptiveCard",
         "body": [
             {
@@ -33,7 +33,7 @@ test('can handle JSON string', t => {
         "actions": [],
         "version": "1.0"
     }`));
-    var elem = toJsdomFragment(`
+    var elem = jsdomHelper.toFragment(`
         <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; background-color: rgb(255, 255, 255); box-sizing: border-box; flex: 0 0 auto; padding: 20px;">
             <div class="ac-container" style="display: flex; flex-direction: column; justify-content: flex-start; box-sizing: border-box; flex: 0 0 auto;">
                 <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(51, 51, 51); font-weight: 400; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
@@ -46,7 +46,7 @@ test('can handle JSON string', t => {
 });
 
 test('can handle JSON', t => {
-    var result = toJsdomFragment(AdaptiveHtml.toHTML({
+    var result = jsdomHelper.toFragment(AdaptiveHtml.toHTML({
         "type": "AdaptiveCard",
         "body": [
             {
@@ -63,7 +63,7 @@ test('can handle JSON', t => {
         "actions": [],
         "version": "1.0"
     }));
-    var elem = toJsdomFragment(`
+    var elem = jsdomHelper.toFragment(`
         <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; background-color: rgb(255, 255, 255); box-sizing: border-box; flex: 0 0 auto; padding: 20px;">
             <div class="ac-container" style="display: flex; flex-direction: column; justify-content: flex-start; box-sizing: border-box; flex: 0 0 auto;">
                 <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(51, 51, 51); font-weight: 400; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
@@ -76,7 +76,7 @@ test('can handle JSON', t => {
 });
 
 test('can detect and replace p tags representing headings', t => {
-    var result = toJsdomFragment(AdaptiveHtml.toHTML({
+    var result = jsdomHelper.toFragment(AdaptiveHtml.toHTML({
         "type": "AdaptiveCard",
         "body": [
             {
@@ -125,7 +125,7 @@ test('can detect and replace p tags representing headings', t => {
         "actions": [],
         "version": "1.0"
     }));
-    var elem = toJsdomFragment(`
+    var elem = jsdomHelper.toFragment(`
         <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; background-color: rgb(255, 255, 255); box-sizing: border-box; flex: 0 0 auto; padding: 20px;">
             <h1>Heading 1</h1>
             <h2>Heading 2</h2>
@@ -139,7 +139,7 @@ test('can detect and replace p tags representing headings', t => {
 });
 
 test('can remove empty divs from output', t => {
-    var result = toJsdomFragment(AdaptiveHtml.toHTML({
+    var result = jsdomHelper.toFragment(AdaptiveHtml.toHTML({
         "type": "AdaptiveCard",
         "body": [
             {
@@ -166,7 +166,7 @@ test('can remove empty divs from output', t => {
         "actions": [],
         "version": "1.0"
     }));
-    var elem = toJsdomFragment(`
+    var elem = jsdomHelper.toFragment(`
         <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; background-color: rgb(255, 255, 255); box-sizing: border-box; flex: 0 0 auto; padding: 20px;">
             <div class="ac-container" style="display: flex; flex-direction: column; justify-content: flex-start; box-sizing: border-box; flex: 0 0 auto;">
                 <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(51, 51, 51); font-weight: 400; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
@@ -182,7 +182,3 @@ test('can remove empty divs from output', t => {
     `);
     t.deepEqual(result, elem);
 });
-
-function toJsdomFragment(htmlString) {
-    return JSDOM.fragment(htmlString);
-}
