@@ -134,29 +134,12 @@ test('can detect and replace p tags representing headings', t => {
     }));
     var elem = toJsdomFragment(`
         <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; background-color: rgb(255, 255, 255); box-sizing: border-box; flex: 0 0 auto; padding: 20px;">
-            <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 26px; line-height: 34.58px; color: rgb(51, 51, 51); font-weight: 600; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
-                <h1>Heading 1</h1>
-            </div>
-            <div style="height: 20px; overflow: hidden; flex: 0 0 auto;"></div>
-            <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 21px; line-height: 27.93px; color: rgb(51, 51, 51); font-weight: 600; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
-                <h2>Heading 2</h2>
-            </div>
-            <div style="height: 20px; overflow: hidden; flex: 0 0 auto;"></div>
-            <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 17px; line-height: 22.61px; color: rgb(51, 51, 51); font-weight: 600; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
-                <h3>Heading 3</h3>
-            </div>
-            <div style="height: 20px; overflow: hidden; flex: 0 0 auto;"></div>
-            <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 17px; line-height: 22.61px; color: rgb(51, 51, 51); font-weight: 200; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
-                <h4>Heading 4</h4>
-            </div>
-            <div style="height: 20px; overflow: hidden; flex: 0 0 auto;"></div>
-            <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(51, 51, 51); font-weight: 600; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
-                <h5>Heading 5</h5>
-            </div>
-            <div style="height: 20px; overflow: hidden; flex: 0 0 auto;"></div>
-            <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 12px; line-height: 15.96px; color: rgb(51, 51, 51); font-weight: 600; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
-                <h6>Heading 6</h6>
-            </div>
+            <h1>Heading 1</h1>
+            <h2>Heading 2</h2>
+            <h3>Heading 3</h3>
+            <h4>Heading 4</h4>
+            <h5>Heading 5</h5>
+            <h6>Heading 6</h6>
         </div>
     `);
     t.deepEqual(result, elem);
