@@ -562,3 +562,30 @@ test('can handle ordered lists that starts from an index other than 1', t => {
         "version": "1.0"
     });
 });
+
+test('does not wrap a container with a container', t => {
+    var result = AdaptiveHtml.toJSON(`
+        <div>
+            <div>
+                <div>test</div>
+            </div>
+        </div>
+    `);
+    t.deepEqual(result, {
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "Container",
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "text": "test",
+                        "wrap": true
+                    }
+                ]
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    });
+});
