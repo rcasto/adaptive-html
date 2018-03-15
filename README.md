@@ -59,6 +59,8 @@ console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
 
 ## API
 - transform(string | [Node](https://devdocs.io/dom/node))
+    - Will be **deprecated**, use toJSON(string | Node) instead
+- toJSON(string | [Node](https://devdocs.io/dom/node))
     - Returns a JSON object representing an Adaptive Card
     ```json
     {
@@ -78,6 +80,19 @@ console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
         "actions": [],
         "version": "1.0"
     }
+    ```
+- toHTML(object | string)
+    - Returns an HTML representation of the passed in Adaptive Card JSON object
+        - Will mainly reconstruct headings (h1 - h6) and remove empty nodes over the standard JSON -> HTML conversion done by the adaptivecards library
+    - **Note**: If you want to use this method in the browser, you must also include the [AdaptiveCards for Javascript library](https://docs.microsoft.com/en-us/adaptive-cards/display/libraries/htmlclient)
+    ```html
+    <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; background-color: rgb(255, 255, 255); box-sizing: border-box; flex: 0 0 auto; padding: 20px;">
+        <div class="ac-container" style="display: flex; flex-direction: column; justify-content: flex-start; box-sizing: border-box; flex: 0 0 auto;">
+            <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(51, 51, 51); font-weight: 400; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
+                <p style="margin-top: 0px; width: 100%; margin-bottom: 0px;">Turn me into an Adaptive Card</p>
+            </div>
+        </div>
+    </div>
     ```
 
 ## Known caveats
