@@ -23,8 +23,15 @@ function toHTML(jsonOrJsonString) {
     return AdaptiveHtmlHelper.toHTML(jsonOrJsonString);
 }
 
-export default {
-    transform, // maintain original api signature of previous package versions
-    toJSON,
-    toHTML
-};
+export default (function () {
+    // check and setup globals for node for 
+    // adaptivecards library if needed
+    if (!UtilityHelper.hasAccessToBrowserGlobals()) {
+        UtilityHelper.setupNodeAdaptiveCards();
+    }
+    return {
+        transform, // maintain original api signature of previous package versions
+        toJSON,
+        toHTML
+    };
+}());

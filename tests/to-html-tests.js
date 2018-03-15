@@ -2,12 +2,6 @@ var test = require('ava');
 var JSDOM = require('jsdom').JSDOM;
 var AdaptiveHtml = require('../dist/adaptive-html.cjs');
 
-// Setup globals for adaptivecards
-var jsdomInstance = new JSDOM();
-global.document = jsdomInstance.window.document;
-global.window = jsdomInstance.window;
-global.HTMLElement = jsdomInstance.window.HTMLElement;
-
 test('can handle non JSON string', t => {
     var error = t.throws(() => AdaptiveHtml.toHTML('This is not json'), TypeError);
     t.is(error.message, 'null is not valid Adaptive Card JSON.');
