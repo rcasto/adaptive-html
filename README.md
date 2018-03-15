@@ -116,6 +116,16 @@ The default replacement for tags not listed above depends on whether the tag ref
 For block level elements, its contents are processed, and wrapped in a [Container](https://adaptivecards.io/explorer/Container.html).  
 For inline level elements, its contents are processed and simply returned.
 
+## Integration with CKEditor
+If you wish to integrate this with CKEditor it should for the most part work out of the box.  However, if you are utilizing the toHTML(object | string) function to take an Adaptive Card JSON and prepopulate the CKEditor instance then you will need [one extra configuration setting](https://docs.ckeditor.com/ckeditor4/latest/api/CKEDITOR_config.html#cfg-extraAllowedContent)
+```javascript
+var editorConfig = {
+    ...,
+    extraAllowedContent: 'ol[start]'
+}
+```
+The reason this is necessary is such that ordered lists are reconstructed with the correct starting index.
+
 ## Building it yourself
 If you wish to build the library yourself then you can follow these steps:  
 1. Clone or download the [repository](https://github.com/rcasto/adaptive-html)
