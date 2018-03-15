@@ -33,6 +33,7 @@
   "author": "Richie Casto",
   "license": "MIT",
   "dependencies": {
+    "adaptivecards": "^1.0.0",
     "jsdom": "^11.6.2"
   },
   "devDependencies": {
