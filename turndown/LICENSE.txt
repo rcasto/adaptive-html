@@ -1,5 +1,5 @@
 Code in files within the turndown folder is taken and modified from the Turndown
-project created by Dom Christie
+project created by Dom Christie (https://github.com/domchristie/turndown/)
 
 MIT License
 

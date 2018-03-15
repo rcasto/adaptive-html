@@ -7,8 +7,8 @@ import RootNode from './root-node';
 import Node from './node';
 
 /*!
- * Code in files within the turndown folder are taken and modified from the Turndown
- * project created by Dom Christie
+ * Code in files within the turndown folder is taken and modified from the Turndown
+ * project created by Dom Christie (https://github.com/domchristie/turndown/)
  *
  * MIT License
  *
