@@ -2,9 +2,8 @@ var test = require('ava');
 var JSDOM = require('jsdom').JSDOM;
 var AdaptiveHtml = require('../dist/adaptive-html.cjs');
 
-var jsdomInstance = new JSDOM();
-
 // Setup globals for adaptivecards
+var jsdomInstance = new JSDOM();
 global.document = jsdomInstance.window.document;
 global.window = jsdomInstance.window;
 global.HTMLElement = jsdomInstance.window.HTMLElement;
