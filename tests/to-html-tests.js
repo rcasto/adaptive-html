@@ -2,12 +2,12 @@ var test = require('ava');
 var JSDOM = require('jsdom').JSDOM;
 var AdaptiveHtml = require('../dist/adaptive-html.cjs');
 
-test('can handle non JSON string', t => {
+test.skip('can handle non JSON string', t => {
     var error = t.throws(() => AdaptiveHtml.toHTML('This is not json'), TypeError);
     t.is(error.message, 'null is not valid Adaptive Card JSON.');
 });
 
-test('can handle invalid Adaptive Card JSON', t => {
+test.skip('can handle invalid Adaptive Card JSON', t => {
     var fakeCardJson = {
         blah: 'This is not an adaptive card'
     };
@@ -15,7 +15,7 @@ test('can handle invalid Adaptive Card JSON', t => {
     t.is(error.message, `${JSON.stringify(fakeCardJson)} is not valid Adaptive Card JSON.`);
 });
 
-test('can handle JSON string', t => {
+test.skip('can handle JSON string', t => {
     var result = toJsdomFragment(AdaptiveHtml.toHTML(`{
         "type": "AdaptiveCard",
         "body": [
@@ -45,7 +45,7 @@ test('can handle JSON string', t => {
     t.deepEqual(result, elem);
 });
 
-test('can handle JSON', t => {
+test.skip('can handle JSON', t => {
     var result = toJsdomFragment(AdaptiveHtml.toHTML({
         "type": "AdaptiveCard",
         "body": [
@@ -75,7 +75,7 @@ test('can handle JSON', t => {
     t.deepEqual(result, elem);
 });
 
-test('can detect and replace p tags representing headings', t => {
+test.skip('can detect and replace p tags representing headings', t => {
     var result = toJsdomFragment(AdaptiveHtml.toHTML({
         "type": "AdaptiveCard",
         "body": [
@@ -138,7 +138,7 @@ test('can detect and replace p tags representing headings', t => {
     t.deepEqual(result, elem);
 });
 
-test('can remove empty divs from output', t => {
+test.skip('can remove empty divs from output', t => {
     var result = toJsdomFragment(AdaptiveHtml.toHTML({
         "type": "AdaptiveCard",
         "body": [

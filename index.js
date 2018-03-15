@@ -31,7 +31,7 @@ export default (function () {
     }
     return {
         transform, // maintain original api signature of previous package versions
-        toJSON,
-        toHTML
+        toJSON
+        // toHTML
     };
 }());
