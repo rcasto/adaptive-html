@@ -3,7 +3,9 @@ import uglify from 'rollup-plugin-uglify';
 
 var buildMinifiedLibrary = shouldMinify(process.argv);
 var plugins = [
-    babel()
+    babel({
+        exclude: 'node_modules/**' // only transpile our source code
+    })
 ];
 
 if (buildMinifiedLibrary) {
