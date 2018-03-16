@@ -936,6 +936,23 @@ function canConvert(input) {
     return input != null && (typeof input === 'string' || input.nodeType && (input.nodeType === 1 || input.nodeType === 9 || input.nodeType === 11));
 }
 
+// Setting this host config explicitly to try and protect from
+// changes within the adaptivecards library for defaults
+var defaultHostConfig = {
+    fontSizes: {
+        small: 12,
+        default: 14,
+        medium: 17,
+        large: 21,
+        extraLarge: 26
+    },
+    fontWeights: {
+        lighter: 200,
+        default: 400,
+        bolder: 600
+    }
+};
+
 function toHTML(json) {
     if (!AdaptiveCardFilter.isValidAdaptiveCardJSON(json)) {
         throw new TypeError(JSON.stringify(json) + ' is not valid Adaptive Card JSON.');
@@ -944,6 +961,7 @@ function toHTML(json) {
         throw new ReferenceError('AdaptiveCards is not available.  Make sure you are using the adaptivecards library if you want to utilize the toHTML(object | string) method');
     }
     var card = new AdaptiveCards.AdaptiveCard();
+    card.hostConfig = new AdaptiveCards.HostConfig(defaultHostConfig);
     card.parse(json);
     var adaptiveHtml = card.render();
     recurseNodeTree(adaptiveHtml, processNode);
@@ -952,13 +970,8 @@ function toHTML(json) {
 
 function recurseNodeTree(node, processNodeFunc) {
     if (!node) {
-        return node;
+        return;
     }
-    _recurseNodeTree(node, processNodeFunc);
-    return node;
-}
-
-function _recurseNodeTree(node, processNodeFunc) {
     if (typeof processNodeFunc === 'function') {
         processNodeFunc(node);
     }
@@ -979,52 +992,48 @@ function processNode(node) {
             }
             var headingLevel = detectHeadingLevel(node);
             if (headingLevel) {
-                var headingFragment = HTMLUtil.createDocumentFragment();
                 var headingNode = HTMLUtil.createElement('h' + headingLevel);
-                node.querySelectorAll('p').forEach(function (pTag) {
-                    var cloneHeadingNode = headingNode.cloneNode(false);
-                    cloneHeadingNode.innerHTML = pTag.innerHTML;
-                    headingFragment.appendChild(cloneHeadingNode);
-                });
-                node.parentNode.replaceChild(headingFragment, node);
+                var paragraphs = node.querySelectorAll('p');
+                if (paragraphs.length) {
+                    // Below assumes markdown-it is used to compile TextBlocks to HTML
+                    var headingFragment = HTMLUtil.createDocumentFragment();
+                    paragraphs.forEach(function (pTag) {
+                        var cloneHeadingNode = headingNode.cloneNode(false);
+                        cloneHeadingNode.innerHTML = pTag.innerHTML;
+                        headingFragment.appendChild(cloneHeadingNode);
+                    });
+                    node.parentNode.replaceChild(headingFragment, node);
+                } else {
+                    headingNode.innerHTML = node.innerHTML;
+                    node.parentNode.replaceChild(headingNode, node);
+                }
             }
             break;
     }
 }
 
 /*
-    This detection assumes default host config
-    Of course this code is currently in charge of utilizing the adaptivecards layer
-    so this shouldn't be an issue currently
-
     This currently must stay in sync with the adaptiveCardHelper.createHeadingTextBlock construction
 */
 function detectHeadingLevel(node) {
     var fontWeight = node.style.fontWeight;
     var fontSize = node.style.fontSize;
-    var bolderFontWeight = '600';
-    var lighterFontWeight = '200';
-    var extraLargeFontSize = '26px';
-    var largeFontSize = '21px';
-    var mediumFontSize = '17px';
-    var defaultFontSize = '14px';
-    var smallFontSize = '12px';
-    if (fontSize === extraLargeFontSize && fontWeight === bolderFontWeight) {
+    if (fontSize === defaultHostConfig.fontSizes.extraLarge + 'px' && fontWeight == defaultHostConfig.fontWeights.bolder) {
         return 1;
     }
-    if (fontSize === largeFontSize && fontWeight === bolderFontWeight) {
+    if (fontSize === defaultHostConfig.fontSizes.large + 'px' && fontWeight == defaultHostConfig.fontWeights.bolder) {
         return 2;
     }
-    if (fontSize === mediumFontSize && fontWeight === bolderFontWeight) {
+    if (fontSize === defaultHostConfig.fontSizes.medium + 'px' && fontWeight == defaultHostConfig.fontWeights.bolder) {
         return 3;
     }
-    if (fontSize === mediumFontSize && fontWeight === lighterFontWeight) {
+    if (fontSize === defaultHostConfig.fontSizes.medium + 'px' && fontWeight == defaultHostConfig.fontWeights.lighter) {
         return 4;
     }
-    if (fontSize === defaultFontSize && fontWeight === bolderFontWeight) {
+    if (fontSize === defaultHostConfig.fontSizes.default + 'px' && fontWeight == defaultHostConfig.fontWeights.bolder) {
         return 5;
     }
-    if (fontSize === smallFontSize && fontWeight === bolderFontWeight) {
+    if (fontSize === defaultHostConfig.fontSizes.small + 'px' && fontWeight == defaultHostConfig.fontWeights.bolder) {
         return 6;
     }
     return null;
@@ -1038,16 +1047,24 @@ var turndownService = new TurndownService();
 
 /**
  * @deprecated This method will be deprecated.  Use toJSON instead.
+ * @param {(string|Node)} htmlStringOrNode
+ * @returns {object}
  */
 function transform(htmlStringOrNode) {
     console.warn('transform(string | Node) will be deprecated. Use toJSON(string | Node) instead.');
     return toJSON(htmlStringOrNode);
 }
-
+/**
+ * @param {(string|Node)} htmlStringOrNode
+ * @returns {object}
+ */
 function toJSON(htmlStringOrNode) {
     return turndownService.turndown(htmlStringOrNode);
 }
-
+/**
+ * @param {(string|object)} jsonOrJsonString
+ * @returns {Node}
+ */
 function toHTML$1(jsonOrJsonString) {
     if (typeof jsonOrJsonString === 'string') {
         jsonOrJsonString = UtilityHelper.tryParseJSON(jsonOrJsonString);
