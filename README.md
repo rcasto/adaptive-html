@@ -84,7 +84,7 @@ console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
     }
     ```
 - toHTML(object | string) => [Node](https://devdocs.io/dom/node)
-    - Will mainly reconstruct headings (h1 - h6) and remove empty nodes on top of the standard JSON -> HTML conversion done by the adaptivecards library
+    - Reconstructs headings (h1 - h6) and removes empty nodes on top of the standard JSON to HTML conversion done by the adaptivecards library
     - **Note**: If you want to use this method in the browser, you must also include the [AdaptiveCards for Javascript library](https://docs.microsoft.com/en-us/adaptive-cards/display/libraries/htmlclient)
     ```html
     <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; background-color: rgb(255, 255, 255); box-sizing: border-box; flex: 0 0 auto; padding: 20px;">
