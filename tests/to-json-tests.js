@@ -1,6 +1,6 @@
 var test = require('ava');
-var JSDOM = require('jsdom').JSDOM;
 var AdaptiveHtml = require('../dist/adaptive-html.cjs');
+var jsdomHelper = require('./util/jsdomHelper');
 
 test('can handle empty string', t => {
     var result = AdaptiveHtml.toJSON('');
@@ -28,7 +28,7 @@ test('can handle non string or node', t => {
 });
 
 test('can handle node input', t => {
-    var node = JSDOM.fragment('This is some text');
+    var node = jsdomHelper.toFragment('This is some text');
     var result = AdaptiveHtml.toJSON(node);
     t.deepEqual(result, {
         type: "AdaptiveCard",
@@ -138,14 +138,13 @@ test('can handle p tags', t => {
     var result = AdaptiveHtml.toJSON('<p>This is a paragraph</p>');
     t.deepEqual(result, {
         type: "AdaptiveCard",
-        body: [{
-            type: "Container",
-            items: [{
+        body: [
+            {
                 type: "TextBlock",
                 text: "This is a paragraph",
                 wrap: true
-            }]
-        }],
+            }
+        ],
         actions: [],
         version: "1.0"
     });
@@ -155,14 +154,13 @@ test('can handle p tag with line breaks in it', t => {
     var result = AdaptiveHtml.toJSON('<p>This paragraph is<br />breaking up<br />what is happening?</p>');
     t.deepEqual(result, {
         type: "AdaptiveCard",
-        body: [{
-            type: "Container",
-            items: [{
+        body: [
+            {
                 type: "TextBlock",
                 text: "This paragraph is\n\nbreaking up\n\nwhat is happening?",
                 wrap: true
-            }]
-        }],
+            }
+        ],
         actions: [],
         version: "1.0"
     });
@@ -271,14 +269,13 @@ test('can handle unsupported block tag', t => {
     var result = AdaptiveHtml.toJSON(`<div>Testing div</div>`);
     t.deepEqual(result, {
         type: "AdaptiveCard",
-        body: [{
-            type: "Container",
-            items: [{
+        body: [
+            {
                 type: "TextBlock",
                 text: "Testing div",
                 wrap: true
-            }]
-        }],
+            }
+        ],
         actions: [],
         version: "1.0"
     });
@@ -308,9 +305,8 @@ test('can handle simple ordered list', t => {
     `);
     t.deepEqual(result, {
         type: "AdaptiveCard",
-        body: [{
-            type: "Container",
-            items: [{
+        body: [
+            {
                 type: "TextBlock",
                 text: "1. List item 1",
                 wrap: true
@@ -322,8 +318,8 @@ test('can handle simple ordered list', t => {
                 type: "TextBlock",
                 text: "3. List item 3",
                 wrap: true
-            }]
-        }],
+            }
+        ],
         actions: [],
         version: "1.0"
     });
@@ -339,9 +335,8 @@ test('can handle simple unordered list', t => {
     `);
     t.deepEqual(result, {
         type: "AdaptiveCard",
-        body: [{
-            type: "Container",
-            items: [{
+        body: [
+            {
                 type: "TextBlock",
                 text: "- List item 1",
                 wrap: true
@@ -353,8 +348,8 @@ test('can handle simple unordered list', t => {
                 type: "TextBlock",
                 text: "- List item 3",
                 wrap: true
-            }]
-        }],
+            }
+        ],
         actions: [],
         version: "1.0"
     });
@@ -376,9 +371,8 @@ test('can handle ordered list with nested list', t => {
     `);
     t.deepEqual(result, {
         type: "AdaptiveCard",
-        body: [{
-            type: "Container",
-            items: [{
+        body: [
+            {
                 type: "TextBlock",
                 text: "1. List item 1\r\t1. Nested list item 1\r\t2. Nested list item 2",
                 wrap: true
@@ -390,8 +384,8 @@ test('can handle ordered list with nested list', t => {
                 type: "TextBlock",
                 text: "3. List item 3",
                 wrap: true
-            }]
-        }],
+            }
+        ],
         actions: [],
         version: "1.0"
     });
@@ -413,9 +407,8 @@ test('can handle unordered list with nested list', t => {
     `);
     t.deepEqual(result, {
         type: "AdaptiveCard",
-        body: [{
-            type: "Container",
-            items: [{
+        body: [
+            {
                 type: "TextBlock",
                 text: "- List item 1\r\t- Nested list item 1\r\t- Nested list item 2",
                 wrap: true
@@ -427,8 +420,8 @@ test('can handle unordered list with nested list', t => {
                 type: "TextBlock",
                 text: "- List item 3",
                 wrap: true
-            }]
-        }],
+            }
+        ],
         actions: [],
         version: "1.0"
     });
@@ -452,14 +445,13 @@ test('can handle nested nested list', t => {
     `);
     t.deepEqual(result, {
         type: "AdaptiveCard",
-        body: [{
-            type: "Container",
-            items: [{
+        body: [
+            {
                 type: "TextBlock",
                 text: "- List item 1\r\t- Nested list item 1\r\t\t- Nested nested list item 1",
                 wrap: true
-            }]
-        }],
+            }
+        ],
         actions: [],
         version: "1.0"
     });
@@ -480,9 +472,8 @@ test('can handle images in list', t => {
     `);
     t.deepEqual(result, {
         type: "AdaptiveCard",
-        body: [{
-            type: "Container",
-            items: [{
+        body: [
+            {
                 type: "TextBlock",
                 text: "- List item 1 item 1 continues",
                 wrap: true
@@ -494,8 +485,8 @@ test('can handle images in list', t => {
                 type: "TextBlock",
                 text: "- List item 2",
                 wrap: true
-            }]
-        }],
+            }
+        ],
         actions: [],
         version: "1.0"
     });
@@ -515,9 +506,8 @@ test('can handle line break in list', t => {
     `);
     t.deepEqual(result, {
         type: "AdaptiveCard",
-        body: [{
-            type: "Container",
-            items: [{
+        body: [
+            {
                 type: "TextBlock",
                 text: "- List item 1\n\n\tList item 1 continues",
                 wrap: true
@@ -525,8 +515,8 @@ test('can handle line break in list', t => {
                 type: "TextBlock",
                 text: "- List item 2",
                 wrap: true
-            }]
-        }],
+            }
+        ],
         actions: [],
         version: "1.0"
     });
@@ -543,19 +533,74 @@ test('can handle ordered lists that starts from an index other than 1', t => {
         "type": "AdaptiveCard",
         "body": [
             {
+                "type": "TextBlock",
+                "text": "2. My start index should be 2",
+                "wrap": true
+            },
+            {
+                "type": "TextBlock",
+                "text": "3. My start index should be 3",
+                "wrap": true
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    });
+});
+
+test('does not wrap a container with a container', t => {
+    var result = AdaptiveHtml.toJSON(`
+        <div>
+            <div>
+                <div>test</div>
+            </div>
+        </div>
+        <p>test</p>
+    `);
+    t.deepEqual(result, {
+        "type": "AdaptiveCard",
+        "body": [
+            {
                 "type": "Container",
                 "items": [
                     {
                         "type": "TextBlock",
-                        "text": "2. My start index should be 2",
-                        "wrap": true
-                    },
-                    {
-                        "type": "TextBlock",
-                        "text": "3. My start index should be 3",
+                        "text": "test",
                         "wrap": true
                     }
                 ]
+            },
+            {
+                "type": "Container",
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "text": "test",
+                        "wrap": true
+                    }
+                ]
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    });
+});
+
+test('does not assign only container as body of card, it unwraps it', t => {
+    var result = AdaptiveHtml.toJSON(`
+        <div>
+            <div>
+                <div>test</div>
+            </div>
+        </div>
+    `);
+    t.deepEqual(result, {
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "TextBlock",
+                "text": "test",
+                "wrap": true
             }
         ],
         "actions": [],

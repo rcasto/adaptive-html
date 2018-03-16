@@ -1,6 +1,6 @@
 {
   "name": "adaptive-html",
-  "version": "1.1.12",
+  "version": "1.2.6",
   "description": "HTML to Adaptive Card JSON converter",
   "main": "dist/adaptive-html.cjs.js",
   "repository": {
@@ -9,12 +9,12 @@
   },
   "scripts": {
     "build": "npm-run-all --parallel build:iife.min build:iife build:cjs build:es",
-    "build:iife.min": "rollup --config rollup.config.js --minify",
-    "build:iife": "rollup --config rollup.config.js",
-    "build:cjs": "rollup --config rollup.config.js --output.format cjs --output.file dist/adaptive-html.cjs.js",
-    "build:es": "rollup --config rollup.config.js --output.format es --output.file dist/adaptive-html.es.js",
+    "build:iife.min": "rollup --config rollup/rollup.config.iife.js --minify",
+    "build:iife": "rollup --config rollup/rollup.config.iife.js",
+    "build:cjs": "rollup --config rollup/rollup.config.cjs.js",
+    "build:es": "rollup --config rollup/rollup.config.es.js",
     "client": "node ./client/server.js",
-    "client:build": "rollup --config rollup.config.js --watch --output.file client/public/adaptive-html.js",
+    "client:build": "rollup --config rollup/rollup.config.iife.js --watch --output.file client/public/adaptive-html.js",
     "test": "npm-run-all build:cjs && nyc ava",
     "test:report": "nyc report --reporter=html",
     "prepack": "npm-run-all test build",

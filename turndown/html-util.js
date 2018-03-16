@@ -1,8 +1,10 @@
+import UtilityHelper from '../lib/utilityHelper';
+
 /*
  * Set up window for Node.js
  */
 
-var root = (typeof window !== 'undefined' ? window : {});
+var root = UtilityHelper.hasAccessToBrowserGlobals() ? window : {};
 var parser = canParseHTMLNatively() ? root.DOMParser : createHTMLParser();
 
 /*

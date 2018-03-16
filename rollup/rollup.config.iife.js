@@ -3,7 +3,9 @@ import uglify from 'rollup-plugin-uglify';
 
 var buildMinifiedLibrary = shouldMinify(process.argv);
 var plugins = [
-    babel()
+    babel({
+        exclude: 'node_modules/**' // only transpile our source code
+    })
 ];
 
 if (buildMinifiedLibrary) {
@@ -27,7 +29,7 @@ export default {
         file:  buildMinifiedLibrary ? "dist/adaptive-html.iife.min.js" : "dist/adaptive-html.iife.js",
         name: "AdaptiveHtml",
         globals: {
-            adaptivecards: 'AdaptiveCards'
+            adaptivecards: 'window.AdaptiveCards'
         }
     },
     plugins: plugins,

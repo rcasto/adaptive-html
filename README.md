@@ -5,6 +5,14 @@ The goal of this project is to allow integration with existing WYSIWYG editors s
 
 Under the hood, this project has taken the [Turndown](https://github.com/domchristie/turndown/) code and repurposed it.
 
+## Table of contents
+- [Getting started](#getting-started)
+- [API](#api)
+- [Currently supported HTML tags](#currently-supported-html-tags)
+- [Known caveats](#known-caveats)
+- [Integrating with CKEditor](#integrating-with-ckeditor)
+- [Building it yourself](#building-it-yourself)
+
 ## Getting started
 You can either install the npm package or directly use a pre-built version of the library.
 
@@ -58,32 +66,35 @@ console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
 ```
 
 ## API
-- transform(string | [Node](https://devdocs.io/dom/node))
-    - Returns a JSON object representing an Adaptive Card
+- transform(string | [Node](https://devdocs.io/dom/node)) => Adaptive Card JSON
+    - Will be **deprecated**, use [toJSON(string | Node)](#to-json) instead
+- <a name="to-json"></a>toJSON(string | [Node](https://devdocs.io/dom/node)) => Adaptive Card JSON
     ```json
     {
         "type": "AdaptiveCard",
         "body": [
             {
-                "type": "Container",
-                "items": [
-                    {
-                        "type": "TextBlock",
-                        "text": "Turn me into an Adaptive Card",
-                        "wrap": true
-                    }
-                ]
+                "type": "TextBlock",
+                "text": "Turn me into an Adaptive Card",
+                "wrap": true
             }
         ],
         "actions": [],
         "version": "1.0"
     }
     ```
-
-## Known caveats
-- Images in list steps and nested steps are pushed to the bottom of the corresponding list step
-- Headings cannot contain images
-- Lists cannot contain headings
+- toHTML(object | string) => [Node](https://devdocs.io/dom/node)
+    - Reconstructs headings (h1 - h6) and removes empty nodes on top of the standard JSON to HTML conversion done by the adaptivecards library
+    - **Note**: If you want to use this method in the browser, you must also include the [AdaptiveCards for Javascript library](https://docs.microsoft.com/en-us/adaptive-cards/display/libraries/htmlclient)
+    ```html
+    <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; background-color: rgb(255, 255, 255); box-sizing: border-box; flex: 0 0 auto; padding: 20px;">
+        <div class="ac-container" style="display: flex; flex-direction: column; justify-content: flex-start; box-sizing: border-box; flex: 0 0 auto;">
+            <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(51, 51, 51); font-weight: 400; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
+                <p style="margin-top: 0px; width: 100%; margin-bottom: 0px;">Turn me into an Adaptive Card</p>
+            </div>
+        </div>
+    </div>
+    ```
 
 ## Currently supported HTML tags
 - p
@@ -100,6 +111,21 @@ The default replacement for tags not listed above depends on whether the tag ref
 
 For block level elements, its contents are processed, and wrapped in a [Container](https://adaptivecards.io/explorer/Container.html).  
 For inline level elements, its contents are processed and simply returned.
+
+## Known caveats
+- Images in list steps and nested steps are pushed to the bottom of the corresponding list step
+- Headings cannot contain images
+- Lists cannot contain headings
+
+## Integrating with CKEditor
+If you wish to integrate this with CKEditor it should for the most part work out of the box.  However, if you are utilizing the toHTML(object | string) function to take an Adaptive Card JSON and prepopulate the CKEditor instance then you will need [one extra configuration setting](https://docs.ckeditor.com/ckeditor4/latest/api/CKEDITOR_config.html#cfg-extraAllowedContent).
+```javascript
+var editorConfig = {
+    ...,
+    extraAllowedContent: 'ol[start]'
+}
+```
+The reason this is necessary is such that ordered lists are reconstructed with the correct starting index.
 
 ## Building it yourself
 If you wish to build the library yourself then you can follow these steps:  

@@ -7,8 +7,8 @@ import RootNode from './root-node';
 import Node from './node';
 
 /*!
- * Code in files within the turndown folder are taken and modified from the Turndown
- * project created by Dom Christie
+ * Code in files within the turndown folder is taken and modified from the Turndown
+ * project created by Dom Christie (https://github.com/domchristie/turndown/)
  *
  * MIT License
  *
@@ -44,8 +44,19 @@ export default function TurndownService() {
             return null;
         },
         defaultReplacement: function (content, node) {
-            return node.isBlock ?
-                AdaptiveCardHelper.wrap(content) : content;
+            if (node.isBlock) {
+                /*
+                    If it's a block level element and the content is just a container already
+                    don't wrap the container in a container
+                */
+                if (Array.isArray(content) &&
+                    content.length === 1 &&
+                    AdaptiveCardFilter.isContainer(content[0])) {
+                    return content;
+                }
+                return AdaptiveCardHelper.wrap(content);
+            }
+            return content;
         }
     };
     this.rules = new Rules(this.options);
