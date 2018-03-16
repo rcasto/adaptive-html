@@ -58,32 +58,25 @@ console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
 ```
 
 ## API
-- transform(string | [Node](https://devdocs.io/dom/node))
+- transform(string | [Node](https://devdocs.io/dom/node)) => Adaptive Card JSON
     - Will be **deprecated**, use toJSON(string | Node) instead
-- toJSON(string | [Node](https://devdocs.io/dom/node))
-    - Returns a JSON object representing an Adaptive Card
+- toJSON(string | [Node](https://devdocs.io/dom/node)) => Adaptive Card JSON
     ```json
     {
         "type": "AdaptiveCard",
         "body": [
             {
-                "type": "Container",
-                "items": [
-                    {
-                        "type": "TextBlock",
-                        "text": "Turn me into an Adaptive Card",
-                        "wrap": true
-                    }
-                ]
+                "type": "TextBlock",
+                "text": "Turn me into an Adaptive Card",
+                "wrap": true
             }
         ],
         "actions": [],
         "version": "1.0"
     }
     ```
-- toHTML(object | string)
-    - Returns an HTML representation of the passed in Adaptive Card JSON object
-        - Will mainly reconstruct headings (h1 - h6) and remove empty nodes over the standard JSON -> HTML conversion done by the adaptivecards library
+- toHTML(object | string) => [Node](https://devdocs.io/dom/node)
+    - Will mainly reconstruct headings (h1 - h6) and remove empty nodes on top of the standard JSON -> HTML conversion done by the adaptivecards library
     - **Note**: If you want to use this method in the browser, you must also include the [AdaptiveCards for Javascript library](https://docs.microsoft.com/en-us/adaptive-cards/display/libraries/htmlclient)
     ```html
     <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; background-color: rgb(255, 255, 255); box-sizing: border-box; flex: 0 0 auto; padding: 20px;">
@@ -117,7 +110,7 @@ For block level elements, its contents are processed, and wrapped in a [Containe
 For inline level elements, its contents are processed and simply returned.
 
 ## Integration with CKEditor
-If you wish to integrate this with CKEditor it should for the most part work out of the box.  However, if you are utilizing the toHTML(object | string) function to take an Adaptive Card JSON and prepopulate the CKEditor instance then you will need [one extra configuration setting](https://docs.ckeditor.com/ckeditor4/latest/api/CKEDITOR_config.html#cfg-extraAllowedContent)
+If you wish to integrate this with CKEditor it should for the most part work out of the box.  However, if you are utilizing the toHTML(object | string) function to take an Adaptive Card JSON and prepopulate the CKEditor instance then you will need [one extra configuration setting](https://docs.ckeditor.com/ckeditor4/latest/api/CKEDITOR_config.html#cfg-extraAllowedContent).
 ```javascript
 var editorConfig = {
     ...,
