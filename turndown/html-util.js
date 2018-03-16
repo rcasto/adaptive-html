@@ -70,14 +70,14 @@ function createElement(tag) {
         return root.document.createElement(tag);
     }
     let JSDOM = require('jsdom').JSDOM;
-    return new JSDOM().window.document.createElement(tag);
+    return (new JSDOM()).window.document.createElement(tag);
 }
 
 function createDocumentFragment() {
     if (canParseHTMLNatively()) {
         return root.document.createDocumentFragment();
     }
-    return require('jsdom').JSDOM.fragment();
+    return (require('jsdom')).JSDOM.fragment();
 }
 
 export default {
