@@ -5,6 +5,14 @@ The goal of this project is to allow integration with existing WYSIWYG editors s
 
 Under the hood, this project has taken the [Turndown](https://github.com/domchristie/turndown/) code and repurposed it.
 
+## Table of contents
+- [Getting started](#getting-started)
+- [API](#api)
+- [Currently supported HTML tags](#currently-supported-html-tags)
+- [Known caveats](#known-caveats)
+- [Integrating with CKEditor](#integration-with-ckeditor)
+- [Building it yourself](#building-it-yourself)
+
 ## Getting started
 You can either install the npm package or directly use a pre-built version of the library.
 
@@ -59,8 +67,8 @@ console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
 
 ## API
 - transform(string | [Node](https://devdocs.io/dom/node)) => Adaptive Card JSON
-    - Will be **deprecated**, use toJSON(string | Node) instead
-- toJSON(string | [Node](https://devdocs.io/dom/node)) => Adaptive Card JSON
+    - Will be **deprecated**, use [toJSON(string | Node)](#to-json) instead
+- toJSON(string | [Node](https://devdocs.io/dom/node)) => Adaptive Card JSON <a name="to-json"></a>
     ```json
     {
         "type": "AdaptiveCard",
@@ -88,11 +96,6 @@ console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
     </div>
     ```
 
-## Known caveats
-- Images in list steps and nested steps are pushed to the bottom of the corresponding list step
-- Headings cannot contain images
-- Lists cannot contain headings
-
 ## Currently supported HTML tags
 - p
 - br
@@ -109,7 +112,12 @@ The default replacement for tags not listed above depends on whether the tag ref
 For block level elements, its contents are processed, and wrapped in a [Container](https://adaptivecards.io/explorer/Container.html).  
 For inline level elements, its contents are processed and simply returned.
 
-## Integration with CKEditor
+## Known caveats
+- Images in list steps and nested steps are pushed to the bottom of the corresponding list step
+- Headings cannot contain images
+- Lists cannot contain headings
+
+## Integrating with CKEditor
 If you wish to integrate this with CKEditor it should for the most part work out of the box.  However, if you are utilizing the toHTML(object | string) function to take an Adaptive Card JSON and prepopulate the CKEditor instance then you will need [one extra configuration setting](https://docs.ckeditor.com/ckeditor4/latest/api/CKEDITOR_config.html#cfg-extraAllowedContent).
 ```javascript
 var editorConfig = {
