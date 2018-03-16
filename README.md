@@ -10,7 +10,7 @@ Under the hood, this project has taken the [Turndown](https://github.com/domchri
 - [API](#api)
 - [Currently supported HTML tags](#currently-supported-html-tags)
 - [Known caveats](#known-caveats)
-- [Integrating with CKEditor](#integration-with-ckeditor)
+- [Integrating with CKEditor](#integrating-with-ckeditor)
 - [Building it yourself](#building-it-yourself)
 
 ## Getting started
@@ -68,7 +68,7 @@ console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
 ## API
 - transform(string | [Node](https://devdocs.io/dom/node)) => Adaptive Card JSON
     - Will be **deprecated**, use [toJSON(string | Node)](#to-json) instead
-- toJSON(string | [Node](https://devdocs.io/dom/node)) => Adaptive Card JSON <a name="to-json"></a>
+- <a name="to-json"></a>toJSON(string | [Node](https://devdocs.io/dom/node)) => Adaptive Card JSON
     ```json
     {
         "type": "AdaptiveCard",
