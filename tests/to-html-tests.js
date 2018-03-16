@@ -1,6 +1,5 @@
 var test = require('ava');
 var AdaptiveHtml = require('../dist/adaptive-html.cjs');
-var jsdomHelper = require('./util/jsdomHelper');
 
 test('can handle non JSON string', t => {
     var error = t.throws(() => AdaptiveHtml.toHTML('This is not json'), TypeError);
@@ -16,67 +15,41 @@ test('can handle invalid Adaptive Card JSON', t => {
 });
 
 test('can handle JSON string', t => {
-    var result = jsdomHelper.toFragment(AdaptiveHtml.toHTML(`{
+    var result = AdaptiveHtml.toHTML(`{
         "type": "AdaptiveCard",
         "body": [
             {
-                "type": "Container",
-                "items": [
-                    {
-                        "type": "TextBlock",
-                        "text": "testing",
-                        "wrap": true
-                    }
-                ]
+                "type": "TextBlock",
+                "text": "testing",
+                "wrap": true
             }
         ],
         "actions": [],
         "version": "1.0"
-    }`));
-    var elem = jsdomHelper.toFragment(`
-        <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; background-color: rgb(255, 255, 255); box-sizing: border-box; flex: 0 0 auto; padding: 20px;">
-            <div class="ac-container" style="display: flex; flex-direction: column; justify-content: flex-start; box-sizing: border-box; flex: 0 0 auto;">
-                <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(51, 51, 51); font-weight: 400; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
-                    <p style="margin-top: 0px; width: 100%; margin-bottom: 0px;">testing</p>
-                </div>
-            </div>
-        </div>
-    `);
-    t.deepEqual(result, elem);
+    }`);
+    var html = `<div class="ac-container" style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;" tabindex="0"><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(0, 0, 0); font-weight: 400; word-wrap: break-word; box-sizing: border-box;">testing</div></div>`;
+    t.deepEqual(result.outerHTML, html);
 });
 
 test('can handle JSON', t => {
-    var result = jsdomHelper.toFragment(AdaptiveHtml.toHTML({
+    var result = AdaptiveHtml.toHTML({
         "type": "AdaptiveCard",
         "body": [
             {
-                "type": "Container",
-                "items": [
-                    {
-                        "type": "TextBlock",
-                        "text": "testing",
-                        "wrap": true
-                    }
-                ]
+                "type": "TextBlock",
+                "text": "testing",
+                "wrap": true
             }
         ],
         "actions": [],
         "version": "1.0"
-    }));
-    var elem = jsdomHelper.toFragment(`
-        <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; background-color: rgb(255, 255, 255); box-sizing: border-box; flex: 0 0 auto; padding: 20px;">
-            <div class="ac-container" style="display: flex; flex-direction: column; justify-content: flex-start; box-sizing: border-box; flex: 0 0 auto;">
-                <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(51, 51, 51); font-weight: 400; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
-                    <p style="margin-top: 0px; width: 100%; margin-bottom: 0px;">testing</p>
-                </div>
-            </div>
-        </div>
-    `);
-    t.deepEqual(result, elem);
+    });
+    var html = `<div class="ac-container" style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;" tabindex="0"><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(0, 0, 0); font-weight: 400; word-wrap: break-word; box-sizing: border-box;">testing</div></div>`;
+    t.is(result.outerHTML, html);
 });
 
 test('can detect and replace p tags representing headings', t => {
-    var result = jsdomHelper.toFragment(AdaptiveHtml.toHTML({
+    var result = AdaptiveHtml.toHTML({
         "type": "AdaptiveCard",
         "body": [
             {
@@ -124,22 +97,13 @@ test('can detect and replace p tags representing headings', t => {
         ],
         "actions": [],
         "version": "1.0"
-    }));
-    var elem = jsdomHelper.toFragment(`
-        <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; background-color: rgb(255, 255, 255); box-sizing: border-box; flex: 0 0 auto; padding: 20px;">
-            <h1>Heading 1</h1>
-            <h2>Heading 2</h2>
-            <h3>Heading 3</h3>
-            <h4>Heading 4</h4>
-            <h5>Heading 5</h5>
-            <h6>Heading 6</h6>
-        </div>
-    `);
-    t.deepEqual(result, elem);
+    });
+    var html = `<div class="ac-container" style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;" tabindex="0"><h1>Heading 1</h1><h2>Heading 2</h2><h3>Heading 3</h3><h4>Heading 4</h4><h5>Heading 5</h5><h6>Heading 6</h6></div>`;
+    t.is(result.outerHTML, html);
 });
 
 test('can remove empty divs from output', t => {
-    var result = jsdomHelper.toFragment(AdaptiveHtml.toHTML({
+    var result = AdaptiveHtml.toHTML({
         "type": "AdaptiveCard",
         "body": [
             {
@@ -165,20 +129,7 @@ test('can remove empty divs from output', t => {
         ],
         "actions": [],
         "version": "1.0"
-    }));
-    var elem = jsdomHelper.toFragment(`
-        <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; background-color: rgb(255, 255, 255); box-sizing: border-box; flex: 0 0 auto; padding: 20px;">
-            <div class="ac-container" style="display: flex; flex-direction: column; justify-content: flex-start; box-sizing: border-box; flex: 0 0 auto;">
-                <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(51, 51, 51); font-weight: 400; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
-                    <p style="margin-top: 0px; width: 100%; margin-bottom: 0px;">testing</p>
-                </div>
-            </div>
-            <div class="ac-container" style="display: flex; flex-direction: column; justify-content: flex-start; box-sizing: border-box; flex: 0 0 auto;">
-                <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(51, 51, 51); font-weight: 400; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
-                    <p style="margin-top: 0px; width: 100%; margin-bottom: 0px;">testing</p>
-                </div>
-            </div>
-        </div>
-    `);
-    t.deepEqual(result, elem);
+    });
+    var html = `<div class="ac-container" style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;" tabindex="0"><div class="ac-container" style="display: flex; box-sizing: border-box;"><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(0, 0, 0); font-weight: 400; word-wrap: break-word; box-sizing: border-box;">testing</div></div><div class="ac-container" style="display: flex; box-sizing: border-box;"><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(0, 0, 0); font-weight: 400; word-wrap: break-word; box-sizing: border-box;">testing</div></div></div>`;
+    t.is(result.outerHTML, html);
 });
