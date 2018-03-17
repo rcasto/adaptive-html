@@ -22,14 +22,11 @@ function toJSON(htmlStringOrElem) {
 }
 /**
  * @param {(string | object)} jsonOrJsonString
- * @param {function(string): string=} processMarkdown
+ * @param {object=} options
  * @returns {HTMLElement} Adaptive Card HTMLElement
  */
-function toHTML(jsonOrJsonString, processMarkdown) {
-    if (typeof jsonOrJsonString === 'string') {
-        jsonOrJsonString = UtilityHelper.tryParseJSON(jsonOrJsonString);
-    }
-    return AdaptiveHtmlHelper.toHTML(jsonOrJsonString, processMarkdown);
+function toHTML(jsonOrJsonString, options = {}) {
+    return AdaptiveHtmlHelper.toHTML(jsonOrJsonString, options);
 }
 
 export default (function () {
