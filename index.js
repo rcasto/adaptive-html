@@ -6,24 +6,24 @@ var turndownService = new TurndownService();
 
 /**
  * @deprecated This method will be deprecated.  Use toJSON instead.
- * @param {(string | Node)} htmlStringOrNode
- * @returns {object}
+ * @param {(string | HTMLElement)} htmlStringOrNode
+ * @returns {object} Adaptive Card JSON
  */
 function transform(htmlStringOrNode) {
     console.warn('transform(string | Node) will be deprecated. Use toJSON(string | Node) instead.');
     return toJSON(htmlStringOrNode);
 }
 /**
- * @param {(string | Node)} htmlStringOrNode
- * @returns {object}
+ * @param {(string | HTMLElement)} htmlStringOrNode
+ * @returns {object} Adaptive Card JSON
  */
 function toJSON(htmlStringOrNode) {
     return turndownService.turndown(htmlStringOrNode);
 }
 /**
  * @param {(string | object)} jsonOrJsonString
- * @param {function(string): string} processMarkdown
- * @returns {Node}
+ * @param {function(string): string=} processMarkdown
+ * @returns {HTMLElement} Adaptive Card HTMLElement
  */
 function toHTML(jsonOrJsonString, processMarkdown) {
     if (typeof jsonOrJsonString === 'string') {
