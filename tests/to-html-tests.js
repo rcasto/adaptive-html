@@ -133,3 +133,20 @@ test('can remove empty divs from output', t => {
     var html = `<div class="ac-container" style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;" tabindex="0"><div class="ac-container" style="display: flex; box-sizing: border-box;"><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(0, 0, 0); font-weight: 400; word-wrap: break-word; box-sizing: border-box;">testing</div></div><div class="ac-container" style="display: flex; box-sizing: border-box;"><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(0, 0, 0); font-weight: 400; word-wrap: break-word; box-sizing: border-box;">testing</div></div></div>`;
     t.is(result.outerHTML, html);
 });
+
+test('can utilize passed in processMarkdown function', t => {
+    var result = AdaptiveHtml.toHTML(`{
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "TextBlock",
+                "text": "testing",
+                "wrap": true
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    }`, (text) => 'fake-markdown-processing');
+    var html = `<div class="ac-container" style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;" tabindex="0"><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(0, 0, 0); font-weight: 400; word-wrap: break-word; box-sizing: border-box;">fake-markdown-processing</div></div>`;
+    t.is(result.outerHTML, html);
+});

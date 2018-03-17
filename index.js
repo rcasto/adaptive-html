@@ -6,7 +6,7 @@ var turndownService = new TurndownService();
 
 /**
  * @deprecated This method will be deprecated.  Use toJSON instead.
- * @param {(string|Node)} htmlStringOrNode
+ * @param {(string | Node)} htmlStringOrNode
  * @returns {object}
  */
 function transform(htmlStringOrNode) {
@@ -14,21 +14,22 @@ function transform(htmlStringOrNode) {
     return toJSON(htmlStringOrNode);
 }
 /**
- * @param {(string|Node)} htmlStringOrNode
+ * @param {(string | Node)} htmlStringOrNode
  * @returns {object}
  */
 function toJSON(htmlStringOrNode) {
     return turndownService.turndown(htmlStringOrNode);
 }
 /**
- * @param {(string|object)} jsonOrJsonString
+ * @param {(string | object)} jsonOrJsonString
+ * @param {function(string): string} processMarkdown
  * @returns {Node}
  */
-function toHTML(jsonOrJsonString) {
+function toHTML(jsonOrJsonString, processMarkdown) {
     if (typeof jsonOrJsonString === 'string') {
         jsonOrJsonString = UtilityHelper.tryParseJSON(jsonOrJsonString);
     }
-    return AdaptiveHtmlHelper.toHTML(jsonOrJsonString);
+    return AdaptiveHtmlHelper.toHTML(jsonOrJsonString, processMarkdown);
 }
 
 export default (function () {
