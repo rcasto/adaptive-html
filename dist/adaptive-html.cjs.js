@@ -826,9 +826,9 @@ TurndownService.prototype = {
         .replace(/^(#{1,6} )/gm, '\\$1')
 
         // Escape hr
-        .replace(/^([-*_] *){3,}$/gm, function (match, character) {
-            return match.split(character).join('\\' + character);
-        })
+        // .replace(/^([-*_] *){3,}$/gm, function (match, character) {
+        //     return match.split(character).join('\\' + character)
+        // })
 
         // Escape ol bullet points
         .replace(/^(\W* {0,3})(\d+)\. /gm, '$1$2\\. ')
@@ -842,14 +842,14 @@ TurndownService.prototype = {
         .replace(/^(\W* {0,3})> /gm, '$1\\> ')
 
         // Escape em/strong *
-        .replace(/\*+(?![*\s\W]).+?\*+/g, function (match) {
-            return match.replace(/\*/g, '\\*');
-        })
+        // .replace(/\*+(?![*\s\W]).+?\*+/g, function (match) {
+        //     return match.replace(/\*/g, '\\*')
+        // })
 
         // Escape em/strong _
-        .replace(/_+(?![_\s\W]).+?_+/g, function (match) {
-            return match.replace(/_/g, '\\_');
-        })
+        // .replace(/_+(?![_\s\W]).+?_+/g, function (match) {
+        //     return match.replace(/_/g, '\\_')
+        // })
 
         // Escape code _
         .replace(/`+(?![`\s\W]).+?`+/g, function (match) {
