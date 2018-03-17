@@ -18,14 +18,6 @@ You can either install the npm package or directly use a pre-built version of th
 
 ### Via npm
 `npm install adaptive-html`
-```javascript
-var AdaptiveHtml = require('adaptive-html');
-
-var adaptiveCardJson = AdaptiveHtml.transform(`
-    <p>Turn me into an Adaptive Card</p>
-`);
-console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
-```
 
 ### Using pre-built libraries
 There are [pre-built versions of the library](https://github.com/rcasto/adaptive-html/tree/master/dist) for:
@@ -37,63 +29,71 @@ There are [pre-built versions of the library](https://github.com/rcasto/adaptive
 The browser version is available in both minified and unminified formats.
 ```html
 <script src="/adaptive-html/dist/adaptive-html.iife.min.js"></script>
-<script>
-    var adaptiveCardJson = AdaptiveHtml.transform(`
-        <p>Turn me into an Adaptive Card</p>
-    `);
-    console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
-</script>
 ```
 
 #### CommonJS
 ```javascript
 var AdaptiveHtml = require('./adaptive-html/dist/adaptive-html.cjs');
-
-var adaptiveCardJson = AdaptiveHtml.transform(`
-    <p>Turn me into an Adaptive Card</p>
-`);
-console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
 ```
 
 #### ES
 ```javascript
 import AdaptiveHtml from './adaptive-html/dist/adaptive-html.es';
-
-var adaptiveCardJson = AdaptiveHtml.transform(`
-    <p>Turn me into an Adaptive Card</p>
-`);
-console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
 ```
 
 ## API
-- transform(string | [Node](https://devdocs.io/dom/node)) => Adaptive Card JSON
+- transform(string|[Node](https://devdocs.io/dom/node)) => Adaptive Card JSON
     - Will be **deprecated**, use [toJSON(string | Node)](#to-json) instead
-- <a name="to-json"></a>toJSON(string | [Node](https://devdocs.io/dom/node)) => Adaptive Card JSON
-    ```json
-    {
-        "type": "AdaptiveCard",
-        "body": [
-            {
-                "type": "TextBlock",
-                "text": "Turn me into an Adaptive Card",
-                "wrap": true
-            }
-        ],
-        "actions": [],
-        "version": "1.0"
-    }
+- <a name="to-json"></a>toJSON(string|[Node](https://devdocs.io/dom/node)) => Adaptive Card JSON
+    ```javascript
+    var adaptiveCardJson = AdaptiveHtml.toJSON(`
+        <p>Turn me into an Adaptive Card</p>
+    `);
+    console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
+    /*
+        JSON returned
+
+        {
+            "type": "AdaptiveCard",
+            "body": [
+                {
+                    "type": "TextBlock",
+                    "text": "Turn me into an Adaptive Card",
+                    "wrap": true
+                }
+            ],
+            "actions": [],
+            "version": "1.0"
+        }
+    */
     ```
-- toHTML(object | string) => [Node](https://devdocs.io/dom/node)
+- toHTML(object|string, function: (string) => string) => [Node](https://devdocs.io/dom/node)
     - Reconstructs headings (h1 - h6) and removes empty nodes on top of the standard JSON to HTML conversion done by the adaptivecards library
+    - The second parameter is optional, but allows you to pass in a function to process markdown within TextBlocks.  The function is passed one parameter.  The text which it should process markdown for and is expected to a return a string.
     - **Note**: If you want to use this method in the browser, you must also include the [AdaptiveCards for Javascript library](https://docs.microsoft.com/en-us/adaptive-cards/display/libraries/htmlclient)
-    ```html
-    <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; background-color: rgb(255, 255, 255); box-sizing: border-box; flex: 0 0 auto; padding: 20px;">
-        <div class="ac-container" style="display: flex; flex-direction: column; justify-content: flex-start; box-sizing: border-box; flex: 0 0 auto;">
-            <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(51, 51, 51); font-weight: 400; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
-                <p style="margin-top: 0px; width: 100%; margin-bottom: 0px;">Turn me into an Adaptive Card</p>
+    ```javascript
+    var adaptiveCardHtml = AdaptiveHtml.toHTML({
+            "type": "AdaptiveCard",
+            "body": [
+                {
+                    "type": "TextBlock",
+                    "text": "Turn me into an Adaptive Card",
+                    "wrap": true
+                }
+            ],
+            "actions": [],
+            "version": "1.0"
+        });
+    console.log(adaptiveCardHtml.outerHTML);
+    /*
+        HTML returned
+
+        <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; box-sizing: border-box; flex: 0 0 auto; padding: 15px;">
+            <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;, Segoe, &quot;Segoe WP&quot;, &quot;Helvetica Neue&quot;, Helvetica, sans-serif; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(0, 0, 0); font-weight: 400; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
+                Turn me into an Adaptive Card
             </div>
         </div>
-    </div>
+    */
     ```
 
 ## Currently supported HTML tags
