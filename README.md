@@ -42,9 +42,9 @@ import AdaptiveHtml from './adaptive-html/dist/adaptive-html.es';
 ```
 
 ## API
-- transform(string | [Node](https://devdocs.io/dom/node)) => Adaptive Card JSON
-    - Will be **deprecated**, use [toJSON(string | Node)](#to-json) instead
-- <a name="to-json"></a>toJSON(string | [Node](https://devdocs.io/dom/node)) => Adaptive Card JSON
+- transform(string | [HTMLElement](https://devdocs.io/dom/htmlelement)) => Adaptive Card JSON
+    - Will be **deprecated**, use [toJSON(string | HTMLElement)](#to-json) instead
+- <a name="to-json"></a>toJSON(string | [HTMLElement](https://devdocs.io/dom/htmlelement)) => Adaptive Card JSON
     ```javascript
     var adaptiveCardJson = AdaptiveHtml.toJSON(`
         <p>Turn me into an Adaptive Card</p>
@@ -67,7 +67,7 @@ import AdaptiveHtml from './adaptive-html/dist/adaptive-html.es';
         }
     */
     ```
-- toHTML(object | string, function: (string) => string) => [Node](https://devdocs.io/dom/node)
+- toHTML(object | string, function: (string) => string) => [HTMLElement](https://devdocs.io/dom/htmlelement)
     - Reconstructs headings (h1 - h6) and removes empty nodes on top of the standard JSON to HTML conversion done by the adaptivecards library
     - The second parameter is optional, but allows you to pass in a function to process markdown within TextBlocks.  The function is passed one parameter.  The text which it should process markdown for and is expected to a return a string.
     - **Note**: If you want to use this method in the browser, you must also include the [AdaptiveCards for Javascript library](https://docs.microsoft.com/en-us/adaptive-cards/display/libraries/htmlclient)

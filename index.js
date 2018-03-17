@@ -6,19 +6,19 @@ var turndownService = new TurndownService();
 
 /**
  * @deprecated This method will be deprecated.  Use toJSON instead.
- * @param {(string | HTMLElement)} htmlStringOrNode
+ * @param {(string | HTMLElement)} htmlStringOrElem
  * @returns {object} Adaptive Card JSON
  */
-function transform(htmlStringOrNode) {
-    console.warn('transform(string | Node) will be deprecated. Use toJSON(string | Node) instead.');
-    return toJSON(htmlStringOrNode);
+function transform(htmlStringOrElem) {
+    console.warn('transform(string | HTMLElement) will be deprecated. Use toJSON(string | HTMLElement) instead.');
+    return toJSON(htmlStringOrElem);
 }
 /**
- * @param {(string | HTMLElement)} htmlStringOrNode
+ * @param {(string | HTMLElement)} htmlStringOrElem
  * @returns {object} Adaptive Card JSON
  */
-function toJSON(htmlStringOrNode) {
-    return turndownService.turndown(htmlStringOrNode);
+function toJSON(htmlStringOrElem) {
+    return turndownService.turndown(htmlStringOrElem);
 }
 /**
  * @param {(string | object)} jsonOrJsonString
@@ -33,7 +33,7 @@ function toHTML(jsonOrJsonString, processMarkdown) {
 }
 
 export default (function () {
-    // check and setup globals for node for 
+    // check and setup globals for node.js for 
     // adaptivecards library if needed
     if (!UtilityHelper.hasAccessToBrowserGlobals()) {
         UtilityHelper.setupNodeAdaptiveCards();
