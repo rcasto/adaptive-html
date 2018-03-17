@@ -953,12 +953,15 @@ var defaultHostConfig = {
     }
 };
 
-function toHTML(json) {
+function toHTML(json, processMarkdown) {
     if (!AdaptiveCardFilter.isValidAdaptiveCardJSON(json)) {
         throw new TypeError(JSON.stringify(json) + ' is not valid Adaptive Card JSON.');
     }
     if (!AdaptiveCards) {
         throw new ReferenceError('AdaptiveCards is not available.  Make sure you are using the adaptivecards library if you want to utilize the toHTML(object | string) method');
+    }
+    if (typeof processMarkdown === 'function') {
+        AdaptiveCards.AdaptiveCard.processMarkdown = processMarkdown;
     }
     var card = new AdaptiveCards.AdaptiveCard();
     card.hostConfig = new AdaptiveCards.HostConfig(defaultHostConfig);
@@ -1047,7 +1050,7 @@ var turndownService = new TurndownService();
 
 /**
  * @deprecated This method will be deprecated.  Use toJSON instead.
- * @param {(string|Node)} htmlStringOrNode
+ * @param {(string | Node)} htmlStringOrNode
  * @returns {object}
  */
 function transform(htmlStringOrNode) {
@@ -1055,21 +1058,22 @@ function transform(htmlStringOrNode) {
     return toJSON(htmlStringOrNode);
 }
 /**
- * @param {(string|Node)} htmlStringOrNode
+ * @param {(string | Node)} htmlStringOrNode
  * @returns {object}
  */
 function toJSON(htmlStringOrNode) {
     return turndownService.turndown(htmlStringOrNode);
 }
 /**
- * @param {(string|object)} jsonOrJsonString
+ * @param {(string | object)} jsonOrJsonString
+ * @param {function(string): string} processMarkdown
  * @returns {Node}
  */
-function toHTML$1(jsonOrJsonString) {
+function toHTML$1(jsonOrJsonString, processMarkdown) {
     if (typeof jsonOrJsonString === 'string') {
         jsonOrJsonString = UtilityHelper.tryParseJSON(jsonOrJsonString);
     }
-    return AdaptiveHtmlHelper.toHTML(jsonOrJsonString);
+    return AdaptiveHtmlHelper.toHTML(jsonOrJsonString, processMarkdown);
 }
 
 var index = (function () {
