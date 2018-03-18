@@ -895,28 +895,40 @@ function processNode(node, options) {
             if (!node.hasChildNodes()) {
                 // remove empty divs from output html
                 node.remove();
+                return;
             }
-            if (options.reconstructHeadings) {
-                var headingLevel = detectHeadingLevel(node, options.hostConfig);
-                if (headingLevel) {
-                    var headingNode = HTMLUtil.createElement('h' + headingLevel);
-                    var paragraphs = node.querySelectorAll('p');
-                    if (paragraphs.length) {
-                        // Below assumes markdown-it is used to compile TextBlocks to HTML
-                        paragraphs.forEach(function (pTag) {
-                            var cloneHeadingNode = headingNode.cloneNode(false);
-                            cloneHeadingNode.innerHTML = pTag.innerHTML;
-                            node.appendChild(cloneHeadingNode);
-                            pTag.remove();
-                        });
-                    } else {
-                        headingNode.innerHTML = node.innerHTML;
-                        node.innerHTML = '';
-                        node.appendChild(headingNode);
-                    }
+            var headingLevel = detectHeadingLevel(node, options.hostConfig);
+            if (headingLevel) {
+                var headingNode = HTMLUtil.createElement('h' + headingLevel);
+                var paragraphs = node.querySelectorAll('p');
+                if (paragraphs.length) {
+                    // Below assumes markdown-it is used to compile TextBlocks to HTML
+                    paragraphs.forEach(function (pTag) {
+                        var cloneHeadingNode = headingNode.cloneNode(false);
+                        cloneHeadingNode.innerHTML = pTag.innerHTML;
+                        node.appendChild(cloneHeadingNode);
+                        pTag.remove();
+                    });
+                } else {
+                    headingNode.innerHTML = node.innerHTML;
+                    node.innerHTML = '';
+                    node.appendChild(headingNode);
                 }
             }
             break;
+    }
+    removeAttributes(node);
+}
+
+function removeAttributes(node) {
+    var attributes = node.attributes;
+    if (attributes) {
+        /* Remove all attributes from nodes */
+        Array.prototype.map.call(attributes, function (attribute) {
+            return attribute.name;
+        }).forEach(function (attributeName) {
+            node.removeAttribute(attributeName);
+        });
     }
 }
 
