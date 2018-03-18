@@ -168,6 +168,7 @@ function process(parentNode) {
                 replacement.nonText.length) || 
                 !node.nextSibling) {
                 output.push(AdaptiveCardHelper.createTextBlock(currText));
+                currText = '';
             }
             replacement = replacement.nonText || [];
         } else if (currText) { // Collection detected, let's push this textblock first, then clear the text
