@@ -3,10 +3,20 @@ import AdaptiveCardFilter from '../lib/adaptiveCardFilter';
 
 var rules = {};
 
+rules.text = {
+    filter: function (node) {
+        return node.nodeType === 3;
+    },
+    replacement: function (content, node) {
+        return handleTextEffects(content, function () {
+            return node.nodeValue;
+        });
+    }
+};
+
 rules.lineBreak = {
     filter: 'br',
-
-    replacement: function (content, node, options) {
+    replacement: function (content) {
         return handleTextEffects(content, function (text) {
             return '\n\n';
         });
@@ -15,8 +25,7 @@ rules.lineBreak = {
 
 rules.heading = {
     filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-
-    replacement: function (content, node, options) {
+    replacement: function (content, node) {
         var hLevel = Number(node.nodeName.charAt(1));
         var hText = AdaptiveCardFilter.getTextBlocksAsString(content);
         var hNonText = AdaptiveCardFilter.getNonTextBlocks(content);
@@ -49,8 +58,7 @@ rules.list = {
 
 rules.listItem = {
     filter: 'li',
-
-    replacement: function (content, node, options) {
+    replacement: function (content) {
         var currText = '';
         var blocks = (content || []).reduce((prevBlocks, currBlock) => {
             var cardType = currBlock.type;
@@ -94,7 +102,6 @@ rules.inlineLink = {
             node.getAttribute('href')
         )
     },
-
     replacement: function (content, node) {
         var href = node.getAttribute('href');
         return handleTextEffects(content, function (text) {
@@ -105,7 +112,6 @@ rules.inlineLink = {
 
 rules.emphasis = {
     filter: ['em', 'i'],
-
     replacement: function (content, node, options) {
         return handleTextEffects(content, function (text) {
             return `${options.emDelimiter}${text}${options.emDelimiter}`;
@@ -115,7 +121,6 @@ rules.emphasis = {
 
 rules.strong = {
     filter: ['strong', 'b'],
-
     replacement: function (content, node, options) {
         return handleTextEffects(content, function (text) {
             return `${options.strongDelimiter}${text}${options.strongDelimiter}`;
@@ -125,7 +130,6 @@ rules.strong = {
 
 rules.image = {
     filter: 'img',
-
     replacement: function (content, node) {
         var alt = node.alt || '';
         var src = node.getAttribute('src') || '';
@@ -135,11 +139,11 @@ rules.image = {
     }
 };
 
-function handleTextEffects(contentCollection, markdownFunc, textOptions) {
+function handleTextEffects(contentCollection, textFunc) {
     var nonText = AdaptiveCardFilter.getNonTextBlocks(contentCollection) || [];
     var text = AdaptiveCardFilter.getTextBlocksAsString(contentCollection) || '';
-    if (typeof markdownFunc === 'function') {
-        text = markdownFunc(text);
+    if (typeof textFunc === 'function') {
+        text = textFunc(text);
     }
     return {
         text,

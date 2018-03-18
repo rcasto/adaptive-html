@@ -86,12 +86,7 @@ function process(parentNode) {
 
         node = new Node(node);
 
-        if (node.nodeType === 3) { // text node
-            replacement = {
-                text: node.nodeValue,
-                nonText: []
-            };
-        } else if (node.nodeType === 1) { // element node
+        if (isValidNodetype(node)) {
             replacement = replacementForNode.call(this, node);
         }
         replacement = replacement || [];
@@ -150,4 +145,8 @@ function canConvert(input) {
             ))
         )
     )
+}
+
+function isValidNodetype(node) {
+    return !!(node && (node.nodeType === 3 || node.nodeType === 1));
 }
