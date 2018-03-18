@@ -222,7 +222,7 @@ test('can handle heading tags', t => {
                         "text": "Heading level 4",
                         "wrap": true,
                         "size": "medium",
-                        "weight": "lighter"
+                        "weight": "default"
                     }
                 ]
             },
