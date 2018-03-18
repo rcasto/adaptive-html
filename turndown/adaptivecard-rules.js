@@ -3,14 +3,6 @@ import AdaptiveCardFilter from '../lib/adaptiveCardFilter';
 
 var rules = {};
 
-rules.paragraph = {
-    filter: 'p',
-
-    replacement: function (content) {
-        return AdaptiveCardHelper.wrap(content);
-    }
-};
-
 rules.lineBreak = {
     filter: 'br',
 
