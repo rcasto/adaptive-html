@@ -96,7 +96,7 @@ function getNonTextBlocks(cardCollection) {
 function getTextBlocksAsString(cardCollection) {
     return getTextBlocks(cardCollection).map(function (textBlock) {
         return textBlock.text;
-    }).join(' ');
+    }).join(' ').replace(/\s+/g, ' ').trim();
 }
 
 function getBlocks(cardCollection, types) {
@@ -221,14 +221,6 @@ var AdaptiveCardHelper = {
 
 var rules = {};
 
-rules.paragraph = {
-    filter: 'p',
-
-    replacement: function replacement(content) {
-        return AdaptiveCardHelper.wrap(content);
-    }
-};
-
 rules.lineBreak = {
     filter: 'br',
 
@@ -245,7 +237,8 @@ rules.heading = {
     replacement: function replacement(content, node, options) {
         var hLevel = Number(node.nodeName.charAt(1));
         var hText = AdaptiveCardFilter.getTextBlocksAsString(content);
-        return AdaptiveCardHelper.createHeadingTextBlock(hText, hLevel);
+        var hNonText = AdaptiveCardFilter.getNonTextBlocks(content);
+        return AdaptiveCardHelper.wrap([AdaptiveCardHelper.createHeadingTextBlock(hText, hLevel)].concat(hNonText));
     }
 };
 
@@ -887,6 +880,7 @@ TurndownService.prototype = {
             currText += replacement.text;
             if (replacement.nonText && replacement.nonText.length || !node.nextSibling) {
                 output.push(AdaptiveCardHelper.createTextBlock(currText));
+                currText = '';
             }
             replacement = replacement.nonText || [];
         } else if (currText) {
