@@ -19,7 +19,10 @@ rules.heading = {
     replacement: function (content, node, options) {
         var hLevel = Number(node.nodeName.charAt(1));
         var hText = AdaptiveCardFilter.getTextBlocksAsString(content);
-        return AdaptiveCardHelper.createHeadingTextBlock(hText, hLevel);
+        var hNonText = AdaptiveCardFilter.getNonTextBlocks(content);
+        return AdaptiveCardHelper.wrap([
+            AdaptiveCardHelper.createHeadingTextBlock(hText, hLevel)
+        ].concat(hNonText));
     }
 };
 

@@ -176,46 +176,83 @@ test('can handle heading tags', t => {
         <h6>Heading level 6</h6>
     `);
     t.deepEqual(result, {
-        type: "AdaptiveCard",
-        body: [{
-            type: "TextBlock",
-            text: "Heading level 1",
-            weight: "bolder",
-            size: "extraLarge",
-            wrap: true
-        }, {
-            type: "TextBlock",
-            text: "Heading level 2",
-            weight: "bolder",
-            size: "large",
-            wrap: true
-        }, {
-            type: "TextBlock",
-            text: "Heading level 3",
-            weight: "bolder",
-            size: "medium",
-            wrap: true
-        }, {
-            type: "TextBlock",
-            text: "Heading level 4",
-            weight: "lighter",
-            size: "medium",
-            wrap: true
-        }, {
-            type: "TextBlock",
-            text: "Heading level 5",
-            weight: "bolder",
-            size: "default",
-            wrap: true
-        }, {
-            type: "TextBlock",
-            text: "Heading level 6",
-            weight: "bolder",
-            size: "small",
-            wrap: true
-        }],
-        actions: [],
-        version: "1.0"
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "Container",
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "text": "Heading level 1",
+                        "wrap": true,
+                        "size": "extraLarge",
+                        "weight": "bolder"
+                    }
+                ]
+            },
+            {
+                "type": "Container",
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "text": "Heading level 2",
+                        "wrap": true,
+                        "size": "large",
+                        "weight": "bolder"
+                    }
+                ]
+            },
+            {
+                "type": "Container",
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "text": "Heading level 3",
+                        "wrap": true,
+                        "size": "medium",
+                        "weight": "bolder"
+                    }
+                ]
+            },
+            {
+                "type": "Container",
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "text": "Heading level 4",
+                        "wrap": true,
+                        "size": "medium",
+                        "weight": "lighter"
+                    }
+                ]
+            },
+            {
+                "type": "Container",
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "text": "Heading level 5",
+                        "wrap": true,
+                        "size": "default",
+                        "weight": "bolder"
+                    }
+                ]
+            },
+            {
+                "type": "Container",
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "text": "Heading level 6",
+                        "wrap": true,
+                        "size": "small",
+                        "weight": "bolder"
+                    }
+                ]
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
     });
 });
 
@@ -637,6 +674,35 @@ test('can handle non-text then more text (reset text)', t => {
                         "text": "Now a span",
                         "wrap": true
                 }
+        ],
+        "actions": [],
+        "version": "1.0"
+    });
+});
+
+test('can handle images in heading', t => {
+    var result = AdaptiveHtml.toJSON(`
+        <h1>
+            Heading 1
+            <img src="https://fake-image.com" />
+            <span>Now a span</span>
+        </h1>
+    `);    
+    t.deepEqual(result, {
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                type: "TextBlock",
+                text: "Heading 1 Now a span",
+                weight: "bolder",
+                size: "extraLarge",
+                wrap: true
+            },
+            {
+                type: "Image",
+                url: "https://fake-image.com",
+                altText: ""
+            }
         ],
         "actions": [],
         "version": "1.0"
