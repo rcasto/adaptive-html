@@ -55,7 +55,7 @@ export default function TurndownService() {
 
 TurndownService.prototype = {
     /**
-     * The entry point for converting a string or DOM node to Markdown
+     * The entry point for converting a string or DOM node to JSON
      * @public
      * @param {String|HTMLElement} input The string or DOM node to convert
      * @returns A Markdown representation of the input
@@ -68,67 +68,14 @@ TurndownService.prototype = {
         }
         var cardElems = process.call(this, new RootNode(input));
         return AdaptiveCardHelper.createCard(cardElems);
-    },
-
-    /**
-     * Escapes Markdown syntax
-     * @public
-     * @param {String} string The string to escape
-     * @returns A string with Markdown syntax escaped
-     * @type String
-     */
-
-    escape: function (string) {
-        return (
-            string
-                // Escape backslash escapes!
-                .replace(/\\(\S)/g, '\\\\$1')
-
-                // Escape headings
-                .replace(/^(#{1,6} )/gm, '\\$1')
-
-                // Escape hr
-                // .replace(/^([-*_] *){3,}$/gm, function (match, character) {
-                //     return match.split(character).join('\\' + character)
-                // })
-
-                // Escape ol bullet points
-                .replace(/^(\W* {0,3})(\d+)\. /gm, '$1$2\\. ')
-
-                // Escape ul bullet points
-                .replace(/^([^\\\w]*)[*+-] /gm, function (match) {
-                    return match.replace(/([*+-])/g, '\\$1')
-                })
-
-                // Escape blockquote indents
-                .replace(/^(\W* {0,3})> /gm, '$1\\> ')
-
-                // Escape em/strong *
-                // .replace(/\*+(?![*\s\W]).+?\*+/g, function (match) {
-                //     return match.replace(/\*/g, '\\*')
-                // })
-
-                // Escape em/strong _
-                // .replace(/_+(?![_\s\W]).+?_+/g, function (match) {
-                //     return match.replace(/_/g, '\\_')
-                // })
-
-                // Escape code _
-                .replace(/`+(?![`\s\W]).+?`+/g, function (match) {
-                    return match.replace(/`/g, '\\`')
-                })
-
-                // Escape link brackets
-                .replace(/[\[\]]/g, '\\$&') // eslint-disable-line no-useless-escape
-        )
     }
 }
 
 /**
- * Reduces a DOM node down to its Markdown string equivalent
+ * Reduces a DOM node down to its Adaptive Card equivalent
  * @private
  * @param {HTMLElement} parentNode The node to convert
- * @returns A Markdown representation of the node
+ * @returns An Adaptive Card representation of the node
  * @type String
  */
 
@@ -140,9 +87,8 @@ function process(parentNode) {
         node = new Node(node);
 
         if (node.nodeType === 3) { // text node
-            let text = node.isCode ? node.nodeValue : this.escape(node.nodeValue);
             replacement = {
-                text,
+                text: node.nodeValue,
                 nonText: []
             };
         } else if (node.nodeType === 1) { // element node
@@ -174,10 +120,10 @@ function process(parentNode) {
 }
 
 /**
- * Converts an element node to its Markdown equivalent
+ * Converts an element node to its Adaptive Card equivalent
  * @private
  * @param {HTMLElement} node The node to convert
- * @returns A Markdown representation of the node
+ * @returns An Adaptive Card representation of the node
  * @type String
  */
 
