@@ -607,3 +607,38 @@ test('does not assign only container as body of card, it unwraps it', t => {
         "version": "1.0"
     });
 });
+
+test('can handle non-text then more text (reset text)', t => {
+    var result = AdaptiveHtml.toJSON(`
+        <p>
+            <em>
+                Emphasis
+                <img src="https://fake-image.com" />
+                More emphasis
+            </em
+            <span>Now a span</span>
+        </p>
+    `);    
+    t.deepEqual(result, {
+        "type": "AdaptiveCard",
+        "body": [
+                {
+                        "type": "TextBlock",
+                        "text": "_Emphasis More emphasis_",
+                        "wrap": true
+                },
+                {
+                        "type": "Image",
+                        "url": "https://fake-image.com",
+                        "altText": ""
+                },
+                {
+                        "type": "TextBlock",
+                        "text": "Now a span",
+                        "wrap": true
+                }
+        ],
+        "actions": [],
+        "version": "1.0"
+    });
+});
