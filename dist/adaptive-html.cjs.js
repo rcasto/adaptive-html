@@ -624,17 +624,9 @@ function createElement(tag) {
     return new JSDOM().window.document.createElement(tag);
 }
 
-function createDocumentFragment() {
-    if (canParseHTMLNatively()) {
-        return root.document.createDocumentFragment();
-    }
-    return require('jsdom').JSDOM.fragment();
-}
-
 var HTMLUtil = {
     parser: parser,
-    createElement: createElement,
-    createDocumentFragment: createDocumentFragment
+    createElement: createElement
 };
 
 var blockElements = ['address', 'article', 'aside', 'audio', 'blockquote', 'body', 'canvas', 'center', 'dd', 'dir', 'div', 'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'html', 'isindex', 'li', 'main', 'menu', 'nav', 'noframes', 'noscript', 'ol', 'output', 'p', 'pre', 'section', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'ul'];
@@ -936,8 +928,12 @@ function canConvert(input) {
     return input != null && (typeof input === 'string' || input.nodeType && (input.nodeType === 1 || input.nodeType === 9 || input.nodeType === 11));
 }
 
-// Setting this host config explicitly to try and protect from
-// changes within the adaptivecards library for defaults
+/*
+ Setting this host config explicitly to try and protect from
+ changes within the adaptivecards library for defaults +
+ the adaptivecards library currently has no way to get the 
+ default hostConfig programmatically
+*/
 var defaultHostConfig = {
     fontSizes: {
         small: 12,
@@ -952,40 +948,58 @@ var defaultHostConfig = {
         bolder: 600
     }
 };
+var defaultProcessMarkdown = AdaptiveCards.AdaptiveCard.processMarkdown;
 
-function toHTML(json, processMarkdown) {
+function toHTML(json, options) {
+    if (typeof json === 'string') {
+        json = UtilityHelper.tryParseJSON(json);
+    }
     if (!AdaptiveCardFilter.isValidAdaptiveCardJSON(json)) {
         throw new TypeError(JSON.stringify(json) + ' is not valid Adaptive Card JSON.');
     }
     if (!AdaptiveCards) {
         throw new ReferenceError('AdaptiveCards is not available.  Make sure you are using the adaptivecards library if you want to utilize the toHTML(object | string) method');
     }
-    if (typeof processMarkdown === 'function') {
-        AdaptiveCards.AdaptiveCard.processMarkdown = processMarkdown;
+    if (!options || (typeof options === 'undefined' ? 'undefined' : _typeof(options)) !== 'object') {
+        options = {};
+    }
+    if (typeof options.processMarkdown === 'function') {
+        AdaptiveCards.AdaptiveCard.processMarkdown = options.processMarkdown;
+    } else {
+        AdaptiveCards.AdaptiveCard.processMarkdown = defaultProcessMarkdown;
+    }
+    if (typeof options.processNode !== 'function') {
+        options.processNode = processNode;
+    }
+    if (!options.hostConfig || _typeof(options.hostConfig) !== 'object') {
+        options.hostConfig = defaultHostConfig;
+    }
+    if (typeof options.reconstructHeadings === 'undefined') {
+        options.reconstructHeadings = true;
     }
     var card = new AdaptiveCards.AdaptiveCard();
-    card.hostConfig = new AdaptiveCards.HostConfig(defaultHostConfig);
+    card.hostConfig = new AdaptiveCards.HostConfig(options.hostConfig);
     card.parse(json);
     var adaptiveHtml = card.render();
-    recurseNodeTree(adaptiveHtml, processNode);
+    recurseNodeTree(adaptiveHtml, options);
     return adaptiveHtml;
 }
 
-function recurseNodeTree(node, processNodeFunc) {
+function recurseNodeTree(node, options) {
     if (!node) {
         return;
     }
-    if (typeof processNodeFunc === 'function') {
-        processNodeFunc(node);
+    if (typeof options.processNode === 'function') {
+        options.processNode(node, options);
     }
     if (node.hasChildNodes()) {
         Array.prototype.slice.call(node.childNodes).forEach(function (child) {
-            return recurseNodeTree(child, processNodeFunc);
+            return recurseNodeTree(child, options);
         });
     }
 }
 
-function processNode(node) {
+function processNode(node, options) {
     var nodeName = node.nodeName;
     switch (nodeName) {
         case 'DIV':
@@ -993,22 +1007,24 @@ function processNode(node) {
                 // remove empty divs from output html
                 node.remove();
             }
-            var headingLevel = detectHeadingLevel(node);
-            if (headingLevel) {
-                var headingNode = HTMLUtil.createElement('h' + headingLevel);
-                var paragraphs = node.querySelectorAll('p');
-                if (paragraphs.length) {
-                    // Below assumes markdown-it is used to compile TextBlocks to HTML
-                    var headingFragment = HTMLUtil.createDocumentFragment();
-                    paragraphs.forEach(function (pTag) {
-                        var cloneHeadingNode = headingNode.cloneNode(false);
-                        cloneHeadingNode.innerHTML = pTag.innerHTML;
-                        headingFragment.appendChild(cloneHeadingNode);
-                    });
-                    node.parentNode.replaceChild(headingFragment, node);
-                } else {
-                    headingNode.innerHTML = node.innerHTML;
-                    node.parentNode.replaceChild(headingNode, node);
+            if (options.reconstructHeadings) {
+                var headingLevel = detectHeadingLevel(node, options.hostConfig);
+                if (headingLevel) {
+                    var headingNode = HTMLUtil.createElement('h' + headingLevel);
+                    var paragraphs = node.querySelectorAll('p');
+                    if (paragraphs.length) {
+                        // Below assumes markdown-it is used to compile TextBlocks to HTML
+                        paragraphs.forEach(function (pTag) {
+                            var cloneHeadingNode = headingNode.cloneNode(false);
+                            cloneHeadingNode.innerHTML = pTag.innerHTML;
+                            node.appendChild(cloneHeadingNode);
+                            pTag.remove();
+                        });
+                    } else {
+                        headingNode.innerHTML = node.innerHTML;
+                        node.innerHTML = '';
+                        node.appendChild(headingNode);
+                    }
                 }
             }
             break;
@@ -1018,25 +1034,25 @@ function processNode(node) {
 /*
     This currently must stay in sync with the adaptiveCardHelper.createHeadingTextBlock construction
 */
-function detectHeadingLevel(node) {
+function detectHeadingLevel(node, hostConfig) {
     var fontWeight = node.style.fontWeight;
     var fontSize = node.style.fontSize;
-    if (fontSize === defaultHostConfig.fontSizes.extraLarge + 'px' && fontWeight == defaultHostConfig.fontWeights.bolder) {
+    if (fontSize === hostConfig.fontSizes.extraLarge + 'px' && fontWeight == hostConfig.fontWeights.bolder) {
         return 1;
     }
-    if (fontSize === defaultHostConfig.fontSizes.large + 'px' && fontWeight == defaultHostConfig.fontWeights.bolder) {
+    if (fontSize === hostConfig.fontSizes.large + 'px' && fontWeight == hostConfig.fontWeights.bolder) {
         return 2;
     }
-    if (fontSize === defaultHostConfig.fontSizes.medium + 'px' && fontWeight == defaultHostConfig.fontWeights.bolder) {
+    if (fontSize === hostConfig.fontSizes.medium + 'px' && fontWeight == hostConfig.fontWeights.bolder) {
         return 3;
     }
-    if (fontSize === defaultHostConfig.fontSizes.medium + 'px' && fontWeight == defaultHostConfig.fontWeights.lighter) {
+    if (fontSize === hostConfig.fontSizes.medium + 'px' && fontWeight == hostConfig.fontWeights.lighter) {
         return 4;
     }
-    if (fontSize === defaultHostConfig.fontSizes.default + 'px' && fontWeight == defaultHostConfig.fontWeights.bolder) {
+    if (fontSize === hostConfig.fontSizes.default + 'px' && fontWeight == hostConfig.fontWeights.bolder) {
         return 5;
     }
-    if (fontSize === defaultHostConfig.fontSizes.small + 'px' && fontWeight == defaultHostConfig.fontWeights.bolder) {
+    if (fontSize === hostConfig.fontSizes.small + 'px' && fontWeight == hostConfig.fontWeights.bolder) {
         return 6;
     }
     return null;
@@ -1050,34 +1066,33 @@ var turndownService = new TurndownService();
 
 /**
  * @deprecated This method will be deprecated.  Use toJSON instead.
- * @param {(string | HTMLElement)} htmlStringOrNode
+ * @param {(string | HTMLElement)} htmlStringOrElem
  * @returns {object} Adaptive Card JSON
  */
-function transform(htmlStringOrNode) {
-    console.warn('transform(string | Node) will be deprecated. Use toJSON(string | Node) instead.');
-    return toJSON(htmlStringOrNode);
+function transform(htmlStringOrElem) {
+    console.warn('transform(string | HTMLElement) will be deprecated. Use toJSON(string | HTMLElement) instead.');
+    return toJSON(htmlStringOrElem);
 }
 /**
- * @param {(string | HTMLElement)} htmlStringOrNode
+ * @param {(string | HTMLElement)} htmlStringOrElem
  * @returns {object} Adaptive Card JSON
  */
-function toJSON(htmlStringOrNode) {
-    return turndownService.turndown(htmlStringOrNode);
+function toJSON(htmlStringOrElem) {
+    return turndownService.turndown(htmlStringOrElem);
 }
 /**
  * @param {(string | object)} jsonOrJsonString
- * @param {function(string): string=} processMarkdown
+ * @param {object=} options
  * @returns {HTMLElement} Adaptive Card HTMLElement
  */
-function toHTML$1(jsonOrJsonString, processMarkdown) {
-    if (typeof jsonOrJsonString === 'string') {
-        jsonOrJsonString = UtilityHelper.tryParseJSON(jsonOrJsonString);
-    }
-    return AdaptiveHtmlHelper.toHTML(jsonOrJsonString, processMarkdown);
+function toHTML$1(jsonOrJsonString) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    return AdaptiveHtmlHelper.toHTML(jsonOrJsonString, options);
 }
 
 var index = (function () {
-    // check and setup globals for node for 
+    // check and setup globals for node.js for 
     // adaptivecards library if needed
     if (!UtilityHelper.hasAccessToBrowserGlobals()) {
         UtilityHelper.setupNodeAdaptiveCards();
