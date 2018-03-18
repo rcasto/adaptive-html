@@ -45,15 +45,6 @@ export default function TurndownService() {
         },
         defaultReplacement: function (content, node) {
             if (node.isBlock) {
-                /*
-                    If it's a block level element and the content is just a container already
-                    don't wrap the container in a container
-                */
-                if (Array.isArray(content) &&
-                    content.length === 1 &&
-                    AdaptiveCardFilter.isContainer(content[0])) {
-                    return content;
-                }
                 return AdaptiveCardHelper.wrap(content);
             }
             return content;
