@@ -842,6 +842,7 @@ var defaultHostConfig = {
     }
 };
 var defaultProcessMarkdown = AdaptiveCards.AdaptiveCard.processMarkdown;
+var attributeWhiteList = ['start'];
 
 function toHTML(json, options) {
     if (typeof json === 'string') {
@@ -930,6 +931,8 @@ function removeAttributes(node) {
         /* Remove all attributes from nodes */
         Array.prototype.map.call(attributes, function (attribute) {
             return attribute.name;
+        }).filter(function (attributeName) {
+            return attributeWhiteList.indexOf(attributeName) === -1;
         }).forEach(function (attributeName) {
             node.removeAttribute(attributeName);
         });
