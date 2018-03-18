@@ -163,7 +163,7 @@ function createHeadingTextBlock(text, depth) {
             break;
         case 4:
             size = 'medium';
-            weight = 'lighter';
+            weight = 'default';
             break;
         case 5:
             size = 'default';
@@ -189,9 +189,14 @@ function createImage(url, options) {
 
 // Wrap adaptive card elements in a container
 function wrap(elements) {
+    elements = UtilityHelper.toArray(elements);
+    /* Don't wrap only a container in a container */
+    if (elements.length === 1 && AdaptiveCardFilter.isContainer(elements[0])) {
+        return elements[0];
+    }
     var container = {
         type: AdaptiveCardFilter.cardTypes.container,
-        items: UtilityHelper.toArray(elements)
+        items: elements
     };
     return container;
 }
@@ -222,10 +227,20 @@ var AdaptiveCardHelper = {
 
 var rules = {};
 
+rules.text = {
+    filter: function filter(node) {
+        return node.nodeType === 3;
+    },
+    replacement: function replacement(content, node) {
+        return handleTextEffects(content, function () {
+            return node.nodeValue;
+        });
+    }
+};
+
 rules.lineBreak = {
     filter: 'br',
-
-    replacement: function replacement(content, node, options) {
+    replacement: function replacement(content) {
         return handleTextEffects(content, function (text) {
             return '\n\n';
         });
@@ -234,8 +249,7 @@ rules.lineBreak = {
 
 rules.heading = {
     filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-
-    replacement: function replacement(content, node, options) {
+    replacement: function replacement(content, node) {
         var hLevel = Number(node.nodeName.charAt(1));
         var hText = AdaptiveCardFilter.getTextBlocksAsString(content);
         var hNonText = AdaptiveCardFilter.getNonTextBlocks(content);
@@ -266,8 +280,7 @@ rules.list = {
 
 rules.listItem = {
     filter: 'li',
-
-    replacement: function replacement(content, node, options) {
+    replacement: function replacement(content) {
         var currText = '';
         var blocks = (content || []).reduce(function (prevBlocks, currBlock) {
             var cardType = currBlock.type;
@@ -306,7 +319,6 @@ rules.inlineLink = {
     filter: function filter(node, options) {
         return options.linkStyle === 'inlined' && node.nodeName === 'A' && node.getAttribute('href');
     },
-
     replacement: function replacement(content, node) {
         var href = node.getAttribute('href');
         return handleTextEffects(content, function (text) {
@@ -317,7 +329,6 @@ rules.inlineLink = {
 
 rules.emphasis = {
     filter: ['em', 'i'],
-
     replacement: function replacement(content, node, options) {
         return handleTextEffects(content, function (text) {
             return '' + options.emDelimiter + text + options.emDelimiter;
@@ -327,7 +338,6 @@ rules.emphasis = {
 
 rules.strong = {
     filter: ['strong', 'b'],
-
     replacement: function replacement(content, node, options) {
         return handleTextEffects(content, function (text) {
             return '' + options.strongDelimiter + text + options.strongDelimiter;
@@ -337,7 +347,6 @@ rules.strong = {
 
 rules.image = {
     filter: 'img',
-
     replacement: function replacement(content, node) {
         var alt = node.alt || '';
         var src = node.getAttribute('src') || '';
@@ -347,11 +356,11 @@ rules.image = {
     }
 };
 
-function handleTextEffects(contentCollection, markdownFunc, textOptions) {
+function handleTextEffects(contentCollection, textFunc) {
     var nonText = AdaptiveCardFilter.getNonTextBlocks(contentCollection) || [];
     var text = AdaptiveCardFilter.getTextBlocksAsString(contentCollection) || '';
-    if (typeof markdownFunc === 'function') {
-        text = markdownFunc(text);
+    if (typeof textFunc === 'function') {
+        text = textFunc(text);
     }
     return {
         text: text,
@@ -668,59 +677,12 @@ function htmlParser() {
 
 function Node(node) {
     node.isBlock = isBlock(node);
-    node.isCode = node.nodeName.toLowerCase() === 'code' || node.parentNode.isCode;
     node.isBlank = isBlank(node);
-    node.flankingWhitespace = flankingWhitespace(node);
     return node;
 }
 
 function isBlank(node) {
     return ['A', 'TH', 'TD'].indexOf(node.nodeName) === -1 && /^\s*$/i.test(node.textContent) && !isVoid(node) && !hasVoid(node);
-}
-
-function flankingWhitespace(node) {
-    var leading = '';
-    var trailing = '';
-
-    if (!node.isBlock) {
-        var hasLeading = /^[ \r\n\t]/.test(node.textContent);
-        var hasTrailing = /[ \r\n\t]$/.test(node.textContent);
-
-        if (hasLeading && !isFlankedByWhitespace('left', node)) {
-            leading = ' ';
-        }
-        if (hasTrailing && !isFlankedByWhitespace('right', node)) {
-            trailing = ' ';
-        }
-    }
-
-    return {
-        leading: leading,
-        trailing: trailing
-    };
-}
-
-function isFlankedByWhitespace(side, node) {
-    var sibling;
-    var regExp;
-    var isFlanked;
-
-    if (side === 'left') {
-        sibling = node.previousSibling;
-        regExp = / $/;
-    } else {
-        sibling = node.nextSibling;
-        regExp = /^ /;
-    }
-
-    if (sibling) {
-        if (sibling.nodeType === 3) {
-            isFlanked = regExp.test(sibling.nodeValue);
-        } else if (sibling.nodeType === 1 && !isBlock(sibling)) {
-            isFlanked = regExp.test(sibling.textContent);
-        }
-    }
-    return isFlanked;
 }
 
 /*!
@@ -762,13 +724,6 @@ function TurndownService() {
         },
         defaultReplacement: function defaultReplacement(content, node) {
             if (node.isBlock) {
-                /*
-                    If it's a block level element and the content is just a container already
-                    don't wrap the container in a container
-                */
-                if (Array.isArray(content) && content.length === 1 && AdaptiveCardFilter.isContainer(content[0])) {
-                    return content;
-                }
                 return AdaptiveCardHelper.wrap(content);
             }
             return content;
@@ -779,7 +734,7 @@ function TurndownService() {
 
 TurndownService.prototype = {
     /**
-     * The entry point for converting a string or DOM node to Markdown
+     * The entry point for converting a string or DOM node to JSON
      * @public
      * @param {String|HTMLElement} input The string or DOM node to convert
      * @returns A Markdown representation of the input
@@ -792,65 +747,13 @@ TurndownService.prototype = {
         }
         var cardElems = process$1.call(this, new RootNode(input));
         return AdaptiveCardHelper.createCard(cardElems);
-    },
-
-    /**
-     * Escapes Markdown syntax
-     * @public
-     * @param {String} string The string to escape
-     * @returns A string with Markdown syntax escaped
-     * @type String
-     */
-
-    escape: function escape(string) {
-        return string
-        // Escape backslash escapes!
-        .replace(/\\(\S)/g, '\\\\$1')
-
-        // Escape headings
-        .replace(/^(#{1,6} )/gm, '\\$1')
-
-        // Escape hr
-        // .replace(/^([-*_] *){3,}$/gm, function (match, character) {
-        //     return match.split(character).join('\\' + character)
-        // })
-
-        // Escape ol bullet points
-        .replace(/^(\W* {0,3})(\d+)\. /gm, '$1$2\\. ')
-
-        // Escape ul bullet points
-        .replace(/^([^\\\w]*)[*+-] /gm, function (match) {
-            return match.replace(/([*+-])/g, '\\$1');
-        })
-
-        // Escape blockquote indents
-        .replace(/^(\W* {0,3})> /gm, '$1\\> ')
-
-        // Escape em/strong *
-        // .replace(/\*+(?![*\s\W]).+?\*+/g, function (match) {
-        //     return match.replace(/\*/g, '\\*')
-        // })
-
-        // Escape em/strong _
-        // .replace(/_+(?![_\s\W]).+?_+/g, function (match) {
-        //     return match.replace(/_/g, '\\_')
-        // })
-
-        // Escape code _
-        .replace(/`+(?![`\s\W]).+?`+/g, function (match) {
-            return match.replace(/`/g, '\\`');
-        })
-
-        // Escape link brackets
-        .replace(/[\[\]]/g, '\\$&') // eslint-disable-line no-useless-escape
-        ;
     }
 
     /**
-     * Reduces a DOM node down to its Markdown string equivalent
+     * Reduces a DOM node down to its Adaptive Card equivalent
      * @private
      * @param {HTMLElement} parentNode The node to convert
-     * @returns A Markdown representation of the node
+     * @returns An Adaptive Card representation of the node
      * @type String
      */
 
@@ -863,15 +766,7 @@ TurndownService.prototype = {
 
         node = new Node(node);
 
-        if (node.nodeType === 3) {
-            // text node
-            var text = node.isCode ? node.nodeValue : _this.escape(node.nodeValue);
-            replacement = {
-                text: text,
-                nonText: []
-            };
-        } else if (node.nodeType === 1) {
-            // element node
+        if (isValidNodetype(node)) {
             replacement = replacementForNode.call(_this, node);
         }
         replacement = replacement || [];
@@ -897,10 +792,10 @@ TurndownService.prototype = {
 }
 
 /**
- * Converts an element node to its Markdown equivalent
+ * Converts an element node to its Adaptive Card equivalent
  * @private
  * @param {HTMLElement} node The node to convert
- * @returns A Markdown representation of the node
+ * @returns An Adaptive Card representation of the node
  * @type String
  */
 
@@ -920,6 +815,10 @@ function replacementForNode(node) {
 
 function canConvert(input) {
     return input != null && (typeof input === 'string' || input.nodeType && (input.nodeType === 1 || input.nodeType === 9 || input.nodeType === 11));
+}
+
+function isValidNodetype(node) {
+    return !!(node && (node.nodeType === 3 || node.nodeType === 1));
 }
 
 /*
@@ -1040,7 +939,7 @@ function detectHeadingLevel(node, hostConfig) {
     if (fontSize === hostConfig.fontSizes.medium + 'px' && fontWeight == hostConfig.fontWeights.bolder) {
         return 3;
     }
-    if (fontSize === hostConfig.fontSizes.medium + 'px' && fontWeight == hostConfig.fontWeights.lighter) {
+    if (fontSize === hostConfig.fontSizes.medium + 'px' && fontWeight == hostConfig.fontWeights.default) {
         return 4;
     }
     if (fontSize === hostConfig.fontSizes.default + 'px' && fontWeight == hostConfig.fontWeights.bolder) {
