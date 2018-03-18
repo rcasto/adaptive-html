@@ -5,15 +5,6 @@ import AdaptiveHtmlHelper from './lib/adaptiveHtmlHelper';
 var turndownService = new TurndownService();
 
 /**
- * @deprecated This method will be deprecated.  Use toJSON instead.
- * @param {(string | HTMLElement)} htmlStringOrElem
- * @returns {object} Adaptive Card JSON
- */
-function transform(htmlStringOrElem) {
-    console.warn('transform(string | HTMLElement) will be deprecated. Use toJSON(string | HTMLElement) instead.');
-    return toJSON(htmlStringOrElem);
-}
-/**
  * @param {(string | HTMLElement)} htmlStringOrElem
  * @returns {object} Adaptive Card JSON
  */
@@ -36,7 +27,6 @@ export default (function () {
         UtilityHelper.setupNodeAdaptiveCards();
     }
     return {
-        transform, // maintain original api signature of previous package versions
         toJSON,
         toHTML
     };
