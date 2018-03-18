@@ -42,9 +42,7 @@ import AdaptiveHtml from './adaptive-html/dist/adaptive-html.es';
 ```
 
 ## API
-- transform(string | [HTMLElement](https://devdocs.io/dom/htmlelement)) => Adaptive Card JSON
-    - Will be **deprecated**, use [toJSON(string | HTMLElement)](#to-json) instead
-- <a name="to-json"></a>toJSON(string | [HTMLElement](https://devdocs.io/dom/htmlelement)) => Adaptive Card JSON
+- toJSON(string | [HTMLElement](https://devdocs.io/dom/htmlelement)) => Adaptive Card JSON
     ```javascript
     var adaptiveCardJson = AdaptiveHtml.toJSON(`
         <p>Turn me into an Adaptive Card</p>
