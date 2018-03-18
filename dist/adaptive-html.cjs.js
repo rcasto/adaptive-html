@@ -97,7 +97,7 @@ function getNonTextBlocks(cardCollection) {
 function getTextBlocksAsString(cardCollection) {
     return getTextBlocks(cardCollection).map(function (textBlock) {
         return textBlock.text;
-    }).join(' ').replace(/\s+/g, ' ').trim();
+    }).join(' ').replace(/ +/g, ' ').trim();
 }
 
 function getBlocks(cardCollection, types) {
@@ -958,15 +958,6 @@ var AdaptiveHtmlHelper = {
 var turndownService = new TurndownService();
 
 /**
- * @deprecated This method will be deprecated.  Use toJSON instead.
- * @param {(string | HTMLElement)} htmlStringOrElem
- * @returns {object} Adaptive Card JSON
- */
-function transform(htmlStringOrElem) {
-    console.warn('transform(string | HTMLElement) will be deprecated. Use toJSON(string | HTMLElement) instead.');
-    return toJSON(htmlStringOrElem);
-}
-/**
  * @param {(string | HTMLElement)} htmlStringOrElem
  * @returns {object} Adaptive Card JSON
  */
@@ -991,7 +982,6 @@ var index = (function () {
         UtilityHelper.setupNodeAdaptiveCards();
     }
     return {
-        transform: transform, // maintain original api signature of previous package versions
         toJSON: toJSON,
         toHTML: toHTML$1
     };
