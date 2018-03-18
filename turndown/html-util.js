@@ -73,15 +73,7 @@ function createElement(tag) {
     return (new JSDOM()).window.document.createElement(tag);
 }
 
-function createDocumentFragment() {
-    if (canParseHTMLNatively()) {
-        return root.document.createDocumentFragment();
-    }
-    return (require('jsdom')).JSDOM.fragment();
-}
-
 export default {
     parser,
-    createElement,
-    createDocumentFragment
+    createElement
 };

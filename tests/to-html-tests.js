@@ -98,7 +98,7 @@ test('can detect and replace p tags representing headings', t => {
         "actions": [],
         "version": "1.0"
     });
-    var html = `<div class="ac-container" style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;" tabindex="0"><h1>Heading 1</h1><h2>Heading 2</h2><h3>Heading 3</h3><h4>Heading 4</h4><h5>Heading 5</h5><h6>Heading 6</h6></div>`;
+    var html = `<div class="ac-container" style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;" tabindex="0"><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 26px; line-height: 34.58px; color: rgb(0, 0, 0); font-weight: 600; word-wrap: break-word; box-sizing: border-box;"><h1>Heading 1</h1></div><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 21px; line-height: 27.93px; color: rgb(0, 0, 0); font-weight: 600; word-wrap: break-word; box-sizing: border-box;"><h2>Heading 2</h2></div><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 17px; line-height: 22.61px; color: rgb(0, 0, 0); font-weight: 600; word-wrap: break-word; box-sizing: border-box;"><h3>Heading 3</h3></div><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 17px; line-height: 22.61px; color: rgb(0, 0, 0); font-weight: 200; word-wrap: break-word; box-sizing: border-box;"><h4>Heading 4</h4></div><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(0, 0, 0); font-weight: 600; word-wrap: break-word; box-sizing: border-box;"><h5>Heading 5</h5></div><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 12px; line-height: 15.96px; color: rgb(0, 0, 0); font-weight: 600; word-wrap: break-word; box-sizing: border-box;"><h6>Heading 6</h6></div></div>`;
     t.is(result.outerHTML, html);
 });
 
@@ -134,8 +134,8 @@ test('can remove empty divs from output', t => {
     t.is(result.outerHTML, html);
 });
 
-test('can utilize passed in processMarkdown function', t => {
-    var result = AdaptiveHtml.toHTML(`{
+test('can utilize passed in processMarkdown function in options object', t => {
+    var result = AdaptiveHtml.toHTML({
         "type": "AdaptiveCard",
         "body": [
             {
@@ -146,7 +146,87 @@ test('can utilize passed in processMarkdown function', t => {
         ],
         "actions": [],
         "version": "1.0"
-    }`, (text) => 'fake-markdown-processing');
+    }, {
+        processMarkdown: (text) => 'fake-markdown-processing'
+    });
     var html = `<div class="ac-container" style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;" tabindex="0"><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(0, 0, 0); font-weight: 400; word-wrap: break-word; box-sizing: border-box;">fake-markdown-processing</div></div>`;
+    t.is(result.outerHTML, html);
+});
+
+test('can utilize processNode override through options object', t => {
+    var result = AdaptiveHtml.toHTML({
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "TextBlock",
+                "text": "hey",
+                "wrap": true,
+                "size": "extraLarge",
+                "weight": "bolder"
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    }, {
+        // doesn't do anything, should result in default adaptivecards library output
+        processNode: (node) => undefined
+    });
+    var html = `<div class="ac-container" style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;" tabindex="0"><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 26px; line-height: 34.58px; color: rgb(0, 0, 0); font-weight: 600; word-wrap: break-word; box-sizing: border-box;">hey</div></div>`;
+    t.is(result.outerHTML, html);
+});
+
+test('can utilize custom host config pass through options object', t => {
+    var customHostConfig = {
+        fontSizes: {
+            small: 12,
+            default: 15,
+            medium: 17,
+            large: 21,
+            extraLarge: 22
+        },
+        fontWeights: {
+            lighter: 100,
+            default: 300,
+            bolder: 700
+        }
+    };
+    var result = AdaptiveHtml.toHTML({
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "TextBlock",
+                "text": "hey",
+                "wrap": true,
+                "size": "extraLarge",
+                "weight": "bolder"
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    }, {
+        hostConfig: customHostConfig
+    });
+    var html = `<div class="ac-container" style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;" tabindex="0"><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 22px; line-height: 29.26px; color: rgb(0, 0, 0); font-weight: 700; word-wrap: break-word; box-sizing: border-box;"><h1>hey</h1></div></div>`;
+    t.is(result.outerHTML, html);
+});
+
+test('can indicate whether headings should be reconstructed or not through options object', t => {
+    var result = AdaptiveHtml.toHTML({
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "TextBlock",
+                "text": "hey",
+                "wrap": true,
+                "size": "extraLarge",
+                "weight": "bolder"
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    }, {
+        reconstructHeadings: false
+    });
+    var html = `<div class="ac-container" style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;" tabindex="0"><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 26px; line-height: 34.58px; color: rgb(0, 0, 0); font-weight: 600; word-wrap: break-word; box-sizing: border-box;">hey</div></div>`;
     t.is(result.outerHTML, html);
 });
