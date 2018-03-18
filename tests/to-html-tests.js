@@ -209,3 +209,37 @@ test('can utilize custom host config pass through options object', t => {
     var html = `<div><div><h1>hey</h1></div></div>`;
     t.is(result.outerHTML, html);
 });
+
+test('can preserve start attribute for ordered lists', t => {
+    var result = AdaptiveHtml.toHTML({
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "Container",
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "text": "1. hey",
+                        "wrap": true
+                    }
+                ]
+            },
+            {
+                "type": "Container",
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "text": "1. blah",
+                        "wrap": true
+                    }
+                ]
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    }, {
+        processMarkdown: text => `<ol start="2"><li>${text}</li></ol>`
+    });
+    var html = `<div><div><div><ol start="2"><li>1. hey</li></ol></div></div><div><div><ol start="2"><li>1. blah</li></ol></div></div></div>`;
+    t.is(result.outerHTML, html);
+});
