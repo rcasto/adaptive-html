@@ -66,14 +66,17 @@ import AdaptiveHtml from './adaptive-html/dist/adaptive-html.es';
     */
     ```
 - toHTML(object | string, object) => [HTMLElement](https://devdocs.io/dom/htmlelement)
-    - Reconstructs headings (h1 - h6) and removes empty nodes on top of the standard JSON to HTML conversion done by the adaptivecards library
+    - Reconstructs headings (h1 - h6), removes empty nodes, and removes attributes from nodes on top of the standard JSON to HTML conversion done by the adaptivecards library
     - The second parameter is optional, but allows you to pass in a few options:
         - processMarkdown - A function accepting a string parameter and returning a string.  Will be called for each [TextBlock](http://adaptivecards.io/explorer/TextBlock.html) to process it's text and is expected to output compiled markdown or the text itself if no markdown is present
-        - processNode - A function accepting an [HTMLElement](https://devdocs.io/dom/htmlelement) as the first parameter and the options object itself as the second parameter. It is not expected to return anything.  Will be called for each element in the HTML output from the adaptivecards library.  Allows you to manipulate the HTML output if desired
+        - processNode - A function accepting an [HTMLElement](https://devdocs.io/dom/htmlelement) as the first parameter and the options object itself as the second parameter. It is not expected to return anything.  Will be called for each element in the HTML output from the adaptivecards library.  Allows you to manipulate the HTML output if desired.  Will override the default HTML transformations done
         - hostConfig - An object specifying a [HostConfig](https://docs.microsoft.com/en-us/adaptive-cards/display/hostconfig) you desire to use when converting the Adaptive Card JSON to HTML
-        - reconstructHeadings - A boolean by default true, that will as it states reconstruct heading tags in the HTML output if enabled.  Headings are not something suppored natively by Adaptive Cards
     - **Note**: If you want to use this method in the browser, you must also include the [AdaptiveCards for Javascript library](https://docs.microsoft.com/en-us/adaptive-cards/display/libraries/htmlclient)
     ```javascript
+    var adaptiveHtmlOptions = {
+        /* No-op override, don't modify HTML output */
+        processNode:  function (node, options) {}
+    };
     var adaptiveCardHtml = AdaptiveHtml.toHTML({
             "type": "AdaptiveCard",
             "body": [
@@ -85,7 +88,7 @@ import AdaptiveHtml from './adaptive-html/dist/adaptive-html.es';
             ],
             "actions": [],
             "version": "1.0"
-        });
+        }, adaptiveHtmlOptions);
     console.log(adaptiveCardHtml.outerHTML);
     /*
         HTML returned
