@@ -243,3 +243,39 @@ test('can preserve start attribute for ordered lists', t => {
     var html = `<div><div><div><ol start="2"><li>1. hey</li></ol></div></div><div><div><ol start="2"><li>1. blah</li></ol></div></div></div>`;
     t.is(result.outerHTML, html);
 });
+
+test('can preserve href for a tag', t => {
+    var result = AdaptiveHtml.toHTML({
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "TextBlock",
+                "text": "test",
+                "wrap": true
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    }, {
+        processMarkdown: text => `<a href="https://fake-site.com">${text}</a>`
+    });
+    var html = `<div><div><a href="https://fake-site.com">test</a></div></div>`;
+    t.is(result.outerHTML, html);
+});
+
+test('can preserve src and alt for img tag', t => {
+    var result = AdaptiveHtml.toHTML({
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "Image",
+                "url": "https://fake-image.com",
+                "altText": "Some alt text"
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    });
+    var html = `<div><div><img src="https://fake-image.com" alt="Some alt text"></div></div>`;
+    t.is(result.outerHTML, html);
+});
