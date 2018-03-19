@@ -841,7 +841,7 @@ var defaultHostConfig = {
     }
 };
 var defaultProcessMarkdown = AdaptiveCards.AdaptiveCard.processMarkdown;
-var attributeWhiteList = ['start'];
+var attributeWhiteList = ['start', 'src', 'href', 'alt'];
 
 function toHTML(json, options) {
     if (typeof json === 'string') {
