@@ -98,7 +98,7 @@ test('can detect and replace p tags representing headings', t => {
         "actions": [],
         "version": "1.0"
     });
-    var html = `<div><div><h1>Heading 1</h1></div><div><h2>Heading 2</h2></div><div><h3>Heading 3</h3></div><div><h4>Heading 4</h4></div><div><h5>Heading 5</h5></div><div><h6>Heading 6</h6></div></div>`;
+    var html = `<div><h1>Heading 1</h1><h2>Heading 2</h2><h3>Heading 3</h3><h4>Heading 4</h4><h5>Heading 5</h5><h6>Heading 6</h6></div>`;
     t.is(result.outerHTML, html);
 });
 
@@ -130,7 +130,7 @@ test('can remove empty divs from output', t => {
         "actions": [],
         "version": "1.0"
     });
-    var html = `<div><div><div>testing</div></div><div><div>testing</div></div></div>`;
+    var html = `<div><div>testing</div><div>testing</div></div>`;
     t.is(result.outerHTML, html);
 });
 
@@ -206,7 +206,7 @@ test('can utilize custom host config pass through options object', t => {
     }, {
         hostConfig: customHostConfig
     });
-    var html = `<div><div><h1>hey</h1></div></div>`;
+    var html = `<div><h1>hey</h1></div>`;
     t.is(result.outerHTML, html);
 });
 
@@ -240,7 +240,7 @@ test('can preserve start attribute for ordered lists', t => {
     }, {
         processMarkdown: text => `<ol start="2"><li>${text}</li></ol>`
     });
-    var html = `<div><div><div><ol start="2"><li>1. hey</li></ol></div></div><div><div><ol start="2"><li>1. blah</li></ol></div></div></div>`;
+    var html = `<div><ol start="2"><li>1. hey</li></ol><ol start="2"><li>1. blah</li></ol></div>`;
     t.is(result.outerHTML, html);
 });
 
@@ -259,7 +259,7 @@ test('can preserve href for a tag', t => {
     }, {
         processMarkdown: text => `<a href="https://fake-site.com">${text}</a>`
     });
-    var html = `<div><div><a href="https://fake-site.com">test</a></div></div>`;
+    var html = `<div><a href="https://fake-site.com">test</a></div>`;
     t.is(result.outerHTML, html);
 });
 
@@ -276,6 +276,6 @@ test('can preserve src and alt for img tag', t => {
         "actions": [],
         "version": "1.0"
     });
-    var html = `<div><div><img src="https://fake-image.com" alt="Some alt text"></div></div>`;
+    var html = `<div><img src="https://fake-image.com" alt="Some alt text"></div>`;
     t.is(result.outerHTML, html);
 });
