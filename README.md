@@ -80,9 +80,9 @@ import AdaptiveHtml from './adaptive-html/dist/adaptive-html.es';
     ```javascript
     var adaptiveHtmlOptions = {
         /* No-op override, don't modify HTML output */
-        processNode:  function (node, options) {}
+        processNode:  function (node, root, options) {}
     };
-    var adaptiveCardHtml = AdaptiveHtml.toHTML({
+    var adaptiveCardElem = AdaptiveHtml.toHTML({
             "type": "AdaptiveCard",
             "body": [
                 {
@@ -94,7 +94,7 @@ import AdaptiveHtml from './adaptive-html/dist/adaptive-html.es';
             "actions": [],
             "version": "1.0"
         }, adaptiveHtmlOptions);
-    console.log(adaptiveCardHtml.outerHTML);
+    console.log(adaptiveCardElem.outerHTML);
     /*
         HTML returned
 
