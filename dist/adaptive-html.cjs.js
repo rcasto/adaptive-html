@@ -868,6 +868,8 @@ function toHTML(json, options) {
             container.innerHTML = htmlString;
             paragraphs = container.querySelectorAll('p');
             if (paragraphs.length) {
+                // This is assuming markdown-it is used
+                // This is the default markdown library supported by adaptivecards
                 htmlString = '';
                 paragraphs.forEach(function (paragraph) {
                     htmlString = htmlString + ' ' + paragraph.innerHTML;
@@ -928,8 +930,10 @@ function processNode(node, root, options) {
                 node.parentNode.replaceChild(headingNode, node);
             } else if (node.children.length === 1 && node.parentNode) {
                 // Div only has 1 child element, and this div
-                // has a parent.  Replace the div with the element it contains
-                node.parentNode.insertBefore(node.children[0], node);
+                // has a parent.  Add child nodes to parent
+                Array.prototype.slice.call(node.childNodes).forEach(function (child) {
+                    return node.parentNode.insertBefore(child, node);
+                });
                 node.remove();
             }
             break;
