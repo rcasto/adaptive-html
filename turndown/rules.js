@@ -5,10 +5,6 @@
 export default function Rules(options) {
     this.options = options
 
-    this.blankRule = {
-        replacement: options.blankReplacement
-    }
-
     this.defaultRule = {
         replacement: options.defaultReplacement
     }
@@ -19,7 +15,6 @@ export default function Rules(options) {
 
 Rules.prototype = {
     forNode: function (node) {
-        if (node.isBlank) return this.blankRule
         var rule;
 
         if ((rule = findRule(this.array, node, this.options))) return rule

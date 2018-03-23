@@ -40,9 +40,6 @@ export default function TurndownService() {
         emDelimiter: '_',
         strongDelimiter: '**',
         linkStyle: 'inlined',
-        blankReplacement: function (content, node) {
-            return null;
-        },
         defaultReplacement: function (content, node) {
             if (node.isBlock) {
                 return AdaptiveCardHelper.wrap(content);

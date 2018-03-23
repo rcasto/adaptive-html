@@ -1,7 +1,30 @@
 import AdaptiveCardHelper from '../lib/adaptiveCardHelper';
 import AdaptiveCardFilter from '../lib/adaptiveCardFilter';
+import {
+    isVoid,
+    hasVoid
+} from './utilities';
 
 var rules = {};
+
+rules.blank = {
+    filter: function (node) {
+        return (
+            ['A', 'TH', 'TD'].indexOf(node.nodeName) === -1 &&
+            /^\s*$/i.test(node.textContent) &&
+            !isVoid(node) &&
+            !hasVoid(node)
+        );
+    },
+    replacement: function (content, node) {
+        if (node.textContent) {
+            return handleTextEffects(content, function () {
+                return node.textContent;
+            });
+        }
+        return null;
+    }
+};
 
 rules.text = {
     filter: function (node) {
