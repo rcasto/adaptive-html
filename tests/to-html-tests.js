@@ -299,6 +299,6 @@ test('can handle container with only one element and text nodes', t => {
     }, {
         processMarkdown: (text) => text
     });
-    var html = `<div>This is a <strong>test</strong> how did we do</div>`;
+    var html = `<div><div>This is a <strong>test</strong> how did we do</div></div>`;
     t.is(result.outerHTML, html);
 });
