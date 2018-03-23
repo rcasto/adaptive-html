@@ -924,15 +924,18 @@ function processNode(node, root, options) {
                 var headingNode = HTMLUtil.createElement('h' + headingLevel);
                 headingNode.innerHTML = node.innerHTML;
                 node.parentNode.replaceChild(headingNode, node);
-            } else if (node.children.length === 1 && node.parentNode) {
-                // Div only has 1 child element, and this div
-                // has a parent.  Add child nodes to parent
-                Array.prototype.slice.call(node.childNodes).forEach(function (child) {
-                    return node.parentNode.insertBefore(child, node);
-                });
+            } else if (node.childNodes.length === 1 && node.children.length === 1 && node.parentNode) {
+                // Div only has 1 child node thats an element, and this div
+                // has a parent.  Replace parent with child node
+                node.parentNode.replaceChild(node.children[0], node);
                 node.remove();
             }
             break;
+    }
+    // remove empty text nodes
+    if (node.nodeType === 3 && node.textContent === '') {
+        node.remove();
+        return;
     }
     // Strip non whitelisted attributes from node
     // this is done for all nodes
