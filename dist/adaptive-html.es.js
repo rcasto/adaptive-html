@@ -221,7 +221,38 @@ var AdaptiveCardHelper = {
     unwrap: unwrap
 };
 
+var blockElements = ['address', 'article', 'aside', 'audio', 'blockquote', 'body', 'canvas', 'center', 'dd', 'dir', 'div', 'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'html', 'isindex', 'li', 'main', 'menu', 'nav', 'noframes', 'noscript', 'ol', 'output', 'p', 'pre', 'section', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'ul'];
+
+function isBlock(node) {
+    return blockElements.indexOf(node.nodeName.toLowerCase()) !== -1;
+}
+
+var voidElements = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
+
+function isVoid(node) {
+    return voidElements.indexOf(node.nodeName.toLowerCase()) !== -1;
+}
+
+var voidSelector = voidElements.join();
+function hasVoid(node) {
+    return node.querySelector && node.querySelector(voidSelector);
+}
+
 var rules = {};
+
+rules.blank = {
+    filter: function filter(node) {
+        return ['A', 'TH', 'TD'].indexOf(node.nodeName) === -1 && /^\s*$/i.test(node.textContent) && !isVoid(node) && !hasVoid(node);
+    },
+    replacement: function replacement(content, node) {
+        if (node.textContent) {
+            return handleTextEffects(content, function () {
+                return node.textContent;
+            });
+        }
+        return null;
+    }
+};
 
 rules.text = {
     filter: function filter(node) {
@@ -371,10 +402,6 @@ function handleTextEffects(contentCollection, textFunc) {
 function Rules(options) {
     this.options = options;
 
-    this.blankRule = {
-        replacement: options.blankReplacement
-    };
-
     this.defaultRule = {
         replacement: options.defaultReplacement
     };
@@ -387,7 +414,6 @@ function Rules(options) {
 
 Rules.prototype = {
     forNode: function forNode(node) {
-        if (node.isBlank) return this.blankRule;
         var rule;
 
         if (rule = findRule(this.array, node, this.options)) return rule;
@@ -627,23 +653,6 @@ var HTMLUtil = {
     createElement: createElement
 };
 
-var blockElements = ['address', 'article', 'aside', 'audio', 'blockquote', 'body', 'canvas', 'center', 'dd', 'dir', 'div', 'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'html', 'isindex', 'li', 'main', 'menu', 'nav', 'noframes', 'noscript', 'ol', 'output', 'p', 'pre', 'section', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'ul'];
-
-function isBlock(node) {
-    return blockElements.indexOf(node.nodeName.toLowerCase()) !== -1;
-}
-
-var voidElements = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
-
-function isVoid(node) {
-    return voidElements.indexOf(node.nodeName.toLowerCase()) !== -1;
-}
-
-var voidSelector = voidElements.join();
-function hasVoid(node) {
-    return node.querySelector && node.querySelector(voidSelector);
-}
-
 function RootNode(input) {
     var root;
     if (typeof input === 'string') {
@@ -673,12 +682,7 @@ function htmlParser() {
 
 function Node(node) {
     node.isBlock = isBlock(node);
-    node.isBlank = isBlank(node);
     return node;
-}
-
-function isBlank(node) {
-    return ['A', 'TH', 'TD'].indexOf(node.nodeName) === -1 && /^\s*$/i.test(node.textContent) && !isVoid(node) && !hasVoid(node);
 }
 
 /*!
@@ -715,9 +719,6 @@ function TurndownService() {
         emDelimiter: '_',
         strongDelimiter: '**',
         linkStyle: 'inlined',
-        blankReplacement: function blankReplacement(content, node) {
-            return null;
-        },
         defaultReplacement: function defaultReplacement(content, node) {
             if (node.isBlock) {
                 return AdaptiveCardHelper.wrap(content);
@@ -856,7 +857,20 @@ function toHTML(json, options) {
     if (typeof options.processMarkdown === 'function') {
         AdaptiveCards.AdaptiveCard.processMarkdown = options.processMarkdown;
     } else {
-        AdaptiveCards.AdaptiveCard.processMarkdown = defaultProcessMarkdown;
+        AdaptiveCards.AdaptiveCard.processMarkdown = function (text) {
+            var htmlString = defaultProcessMarkdown(text);
+            var container = HTMLUtil.createElement('div');
+            var paragraphs;
+            container.innerHTML = htmlString;
+            paragraphs = container.querySelectorAll('p');
+            if (paragraphs.length) {
+                htmlString = '';
+                paragraphs.forEach(function (paragraph) {
+                    htmlString = htmlString + ' ' + paragraph.innerHTML;
+                });
+            }
+            return htmlString.replace(/ +/g, ' ');
+        };
     }
     if (typeof options.processNode !== 'function') {
         options.processNode = processNode;
@@ -876,48 +890,48 @@ function toHTML(json, options) {
 }
 
 function recurseNodeTree(node, options) {
+    _recurseNodeTree(node, node, options);
+}
+
+function _recurseNodeTree(node, root, options) {
     if (!node) {
         return;
     }
-    if (typeof options.processNode === 'function') {
-        options.processNode(node, options);
-    }
     if (node.hasChildNodes()) {
         Array.prototype.slice.call(node.childNodes).forEach(function (child) {
-            return recurseNodeTree(child, options);
+            return _recurseNodeTree(child, root, options);
         });
+    }
+    if (typeof options.processNode === 'function') {
+        options.processNode(node, root, options);
     }
 }
 
-function processNode(node, options) {
+function processNode(node, root, options) {
     var nodeName = node.nodeName;
     switch (nodeName) {
         case 'DIV':
+            // remove empty divs from output html
             if (!node.hasChildNodes()) {
-                // remove empty divs from output html
                 node.remove();
                 return;
             }
+            // Attempt to reconstruct headings / they are wrapped in a div tag
             var headingLevel = detectHeadingLevel(node, options.hostConfig);
             if (headingLevel) {
                 var headingNode = HTMLUtil.createElement('h' + headingLevel);
-                var paragraphs = node.querySelectorAll('p');
-                if (paragraphs.length) {
-                    // Below assumes markdown-it is used to compile TextBlocks to HTML
-                    paragraphs.forEach(function (pTag) {
-                        var cloneHeadingNode = headingNode.cloneNode(false);
-                        cloneHeadingNode.innerHTML = pTag.innerHTML;
-                        node.appendChild(cloneHeadingNode);
-                        pTag.remove();
-                    });
-                } else {
-                    headingNode.innerHTML = node.innerHTML;
-                    node.innerHTML = '';
-                    node.appendChild(headingNode);
-                }
+                headingNode.innerHTML = node.innerHTML;
+                node.parentNode.replaceChild(headingNode, node);
+            } else if (node.children.length === 1 && node.parentNode) {
+                // Div only has 1 child element, and this div
+                // has a parent.  Replace the div with the element it contains
+                node.parentNode.insertBefore(node.children[0], node);
+                node.remove();
             }
             break;
     }
+    // Strip non whitelisted attributes from node
+    // this is done for all nodes
     removeAttributes(node);
 }
 
@@ -939,8 +953,8 @@ function removeAttributes(node) {
     This currently must stay in sync with the adaptiveCardHelper.createHeadingTextBlock construction
 */
 function detectHeadingLevel(node, hostConfig) {
-    var fontWeight = node.style.fontWeight;
-    var fontSize = node.style.fontSize;
+    var fontWeight = node && node.style.fontWeight;
+    var fontSize = node && node.style.fontSize;
     if (fontSize === hostConfig.fontSizes.extraLarge + 'px' && fontWeight == hostConfig.fontWeights.bolder) {
         return 1;
     }
