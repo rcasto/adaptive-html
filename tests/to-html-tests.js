@@ -279,3 +279,26 @@ test('can preserve src and alt for img tag', t => {
     var html = `<div><img src="https://fake-image.com" alt="Some alt text"></div>`;
     t.is(result.outerHTML, html);
 });
+
+test('can handle container with only one element and text nodes', t => {
+    var result = AdaptiveHtml.toHTML({
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "Container",
+                "items": [
+                    {
+                        "type": "TextBlock",
+                        "text": "This is a <strong>test</strong> how did we do"
+                    }
+                ]
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    }, {
+        processMarkdown: (text) => text
+    });
+    var html = `<div>This is a <strong>test</strong> how did we do</div>`;
+    t.is(result.outerHTML, html);
+});
