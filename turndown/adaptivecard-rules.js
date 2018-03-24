@@ -120,10 +120,9 @@ rules.listItem = {
 rules.inlineLink = {
     filter: function (node, options) {
         return (
-            options.linkStyle === 'inlined' &&
             node.nodeName === 'A' &&
             node.getAttribute('href')
-        )
+        );
     },
     replacement: function (content, node) {
         var href = node.getAttribute('href');
@@ -137,7 +136,7 @@ rules.emphasis = {
     filter: ['em', 'i'],
     replacement: function (content, node, options) {
         return handleTextEffects(content, function (text) {
-            return `${options.emDelimiter}${text}${options.emDelimiter}`;
+            return `_${text}_`;
         });
     }
 };
@@ -146,7 +145,7 @@ rules.strong = {
     filter: ['strong', 'b'],
     replacement: function (content, node, options) {
         return handleTextEffects(content, function (text) {
-            return `${options.strongDelimiter}${text}${options.strongDelimiter}`;
+            return `**${text}**`;
         });
     }
 };

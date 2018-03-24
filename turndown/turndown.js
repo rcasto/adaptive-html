@@ -37,9 +37,6 @@ import Node from './node';
 export default function TurndownService() {
     this.options = {
         rules: AdaptiveCardRules,
-        emDelimiter: '_',
-        strongDelimiter: '**',
-        linkStyle: 'inlined',
         defaultReplacement: function (content, node) {
             if (node.isBlock) {
                 return AdaptiveCardHelper.wrap(content);
