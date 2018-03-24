@@ -55,7 +55,6 @@ TurndownService.prototype = {
      * @returns A Markdown representation of the input
      * @type String
      */
-
     turndown: function (input) {
         if (!canConvert(input)) {
             throw new TypeError(`${input} is not a string, or an element/document/fragment node.`);
@@ -72,7 +71,6 @@ TurndownService.prototype = {
  * @returns An Adaptive Card representation of the node
  * @type String
  */
-
 function process(parentNode) {
     var currText = '';
     var blocks = Array.prototype.reduce.call(parentNode.childNodes, (output, node) => {
@@ -115,7 +113,6 @@ function process(parentNode) {
  * @returns An Adaptive Card representation of the node
  * @type String
  */
-
 function replacementForNode(node) {
     var rule = this.rules.forNode(node);
     var content = process.call(this, node); // get's internal content of node
@@ -129,7 +126,6 @@ function replacementForNode(node) {
  * @returns Describe what it returns
  * @type String|Object|Array|Boolean|Number
  */
-
 function canConvert(input) {
     return (
         input != null && (
