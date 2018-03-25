@@ -45,10 +45,14 @@
         //     removePlugins: 'elementspath',
         //     extraAllowedContent: 'ol[start]'
         // };
-        var editor = CKEDITOR.replace('adaptive-ckeditor');
+        var editorConfig = {
+            extraAllowedContent: 'ol[start]'
+        };
+        var editor = CKEDITOR.replace('adaptive-ckeditor', editorConfig);
         var adaptivePreview = document.querySelector('.adaptive-preview');
         var adaptiveCard = new AdaptiveCards.AdaptiveCard();
         var debounceTimeInMs = 50;
+        var adaptiveSessionKey = 'adaptive-session';
 
         adaptiveCard.hostConfig = new AdaptiveCards.HostConfig({
             fontFamily: 'Segoe UI, Segoe UI Web, Segoe UI Symbol, Helvetica Neue, BBAlpha Sans, S60 Sans, Arial, sans-serif',
@@ -80,6 +84,18 @@
             };
         }
 
+        function saveSession() {
+            var html = editor.getData();
+            var adaptiveCardJson = AdaptiveHtml.toJSON(html);
+            sessionStorage.setItem(adaptiveSessionKey, JSON.stringify(adaptiveCardJson));
+        }
+
+        function restoreSession() {
+            var adaptiveCardJson = sessionStorage.getItem(adaptiveSessionKey);
+            var adaptiveElem = AdaptiveHtml.toHTML(adaptiveCardJson);
+            return (adaptiveElem && adaptiveElem.outerHTML) || '';
+        }
+
         editor.on('change', debounce(function (event) {
             var html = event.editor.getData();
             var adaptiveJson = AdaptiveHtml.toJSON(html), adaptiveHtml;
@@ -91,6 +107,15 @@
             }
             console.log(JSON.stringify(adaptiveJson, null, '\t'));
         }, debounceTimeInMs));
+
+        editor.on('instanceReady', function (event) {
+            var restoreAdaptiveSessionData = restoreSession();
+            event.editor.setData(restoreAdaptiveSessionData);
+        });
+
+        window.addEventListener('beforeunload', function () {
+            saveSession();
+        });
     </script>
 </body>
 </html>
