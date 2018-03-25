@@ -130,7 +130,7 @@ test('can remove empty divs from output', t => {
         "actions": [],
         "version": "1.0"
     });
-    var html = `<div><div>testing</div><div>testing</div></div>`;
+    var html = `<div><div><div>testing</div></div><div><div>testing</div></div></div>`;
     t.is(result.outerHTML, html);
 });
 
@@ -240,7 +240,7 @@ test('can preserve start attribute for ordered lists', t => {
     }, {
         processMarkdown: text => `<ol start="2"><li>${text}</li></ol>`
     });
-    var html = `<div><ol start="2"><li>1. hey</li></ol><ol start="2"><li>1. blah</li></ol></div>`;
+    var html = `<div><div><div><ol start="2"><li>1. hey</li></ol></div></div><div><div><ol start="2"><li>1. blah</li></ol></div></div></div>`;
     t.is(result.outerHTML, html);
 });
 
@@ -259,7 +259,7 @@ test('can preserve href for a tag', t => {
     }, {
         processMarkdown: text => `<a href="https://fake-site.com">${text}</a>`
     });
-    var html = `<div><a href="https://fake-site.com">test</a></div>`;
+    var html = `<div><div><a href="https://fake-site.com">test</a></div></div>`;
     t.is(result.outerHTML, html);
 });
 
@@ -276,7 +276,7 @@ test('can preserve src and alt for img tag', t => {
         "actions": [],
         "version": "1.0"
     });
-    var html = `<div><img src="https://fake-image.com" alt="Some alt text"></div>`;
+    var html = `<div><div><img src="https://fake-image.com" alt="Some alt text"></div></div>`;
     t.is(result.outerHTML, html);
 });
 
@@ -296,9 +296,23 @@ test('can handle container with only one element and text nodes', t => {
         ],
         "actions": [],
         "version": "1.0"
-    }, {
-        processMarkdown: (text) => text
     });
-    var html = `<div><div>This is a <strong>test</strong> how did we do</div></div>`;
+    var html = `<div><div><div>This is a <strong>test</strong> how did we do</div></div></div>`;
+    t.is(result.outerHTML, html);
+});
+
+test('can handle line breaks in TextBlock', t => {
+    var result = AdaptiveHtml.toHTML({
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "TextBlock",
+                "text": "Give me a break\n\nI'm so\n\nfunny hahaha"
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    });
+    var html = `<div><div>Give me a break<br>I'm so<br>funny hahaha</div></div>`;
     t.is(result.outerHTML, html);
 });
