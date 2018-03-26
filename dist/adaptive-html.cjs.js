@@ -348,7 +348,7 @@ rules.listItem = {
 
 rules.inlineLink = {
     filter: function filter(node, options) {
-        return options.linkStyle === 'inlined' && node.nodeName === 'A' && node.getAttribute('href');
+        return node.nodeName === 'A' && node.getAttribute('href');
     },
     replacement: function replacement(content, node) {
         var href = node.getAttribute('href');
@@ -362,7 +362,7 @@ rules.emphasis = {
     filter: ['em', 'i'],
     replacement: function replacement(content, node, options) {
         return handleTextEffects(content, function (text) {
-            return '' + options.emDelimiter + text + options.emDelimiter;
+            return '_' + text + '_';
         });
     }
 };
@@ -371,7 +371,7 @@ rules.strong = {
     filter: ['strong', 'b'],
     replacement: function replacement(content, node, options) {
         return handleTextEffects(content, function (text) {
-            return '' + options.strongDelimiter + text + options.strongDelimiter;
+            return '**' + text + '**';
         });
     }
 };
@@ -720,9 +720,6 @@ function Node(node) {
 function TurndownService() {
     this.options = {
         rules: rules,
-        emDelimiter: '_',
-        strongDelimiter: '**',
-        linkStyle: 'inlined',
         defaultReplacement: function defaultReplacement(content, node) {
             if (node.isBlock) {
                 return AdaptiveCardHelper.wrap(content);
@@ -741,7 +738,6 @@ TurndownService.prototype = {
      * @returns A Markdown representation of the input
      * @type String
      */
-
     turndown: function turndown(input) {
         if (!canConvert(input)) {
             throw new TypeError(input + ' is not a string, or an element/document/fragment node.');
@@ -757,7 +753,6 @@ TurndownService.prototype = {
      * @returns An Adaptive Card representation of the node
      * @type String
      */
-
 };function process$1(parentNode) {
     var _this = this;
 
@@ -799,7 +794,6 @@ TurndownService.prototype = {
  * @returns An Adaptive Card representation of the node
  * @type String
  */
-
 function replacementForNode(node) {
     var rule = this.rules.forNode(node);
     var content = process$1.call(this, node); // get's internal content of node
@@ -813,7 +807,6 @@ function replacementForNode(node) {
  * @returns Describe what it returns
  * @type String|Object|Array|Boolean|Number
  */
-
 function canConvert(input) {
     return input != null && (typeof input === 'string' || input.nodeType && (input.nodeType === 1 || input.nodeType === 9 || input.nodeType === 11));
 }
@@ -822,6 +815,8 @@ function isValidNodetype(node) {
     return !!(node && (node.nodeType === 3 || node.nodeType === 1));
 }
 
+var attributeWhiteList = ['start', 'src', 'href', 'alt'];
+var attributeHostConfigWhiteList = ['style', 'class', 'tabindex'];
 /*
  Setting this host config explicitly to try and protect from
  changes within the adaptivecards library for defaults +
@@ -843,9 +838,16 @@ var defaultHostConfig = {
     }
 };
 var defaultProcessMarkdown = AdaptiveCards.AdaptiveCard.processMarkdown;
-var attributeWhiteList = ['start', 'src', 'href', 'alt'];
+var defaultProcessNodeConfig = {
+    removeEmptyNodes: true,
+    reconstructHeadings: true,
+    removeAttributes: attributeWhiteList
+};
+var textNodeType = 3;
+var elementNodeType = 1;
 
 function toHTML(json, options) {
+    var card, cardHtml;
     if (typeof json === 'string') {
         json = UtilityHelper.tryParseJSON(json);
     }
@@ -855,44 +857,17 @@ function toHTML(json, options) {
     if (!AdaptiveCards) {
         throw new ReferenceError('AdaptiveCards is not available.  Make sure you are using the adaptivecards library if you want to utilize the toHTML(object | string) method');
     }
-    if (!options || (typeof options === 'undefined' ? 'undefined' : _typeof(options)) !== 'object') {
-        options = {};
-    }
-    if (typeof options.processMarkdown === 'function') {
-        AdaptiveCards.AdaptiveCard.processMarkdown = options.processMarkdown;
-    } else {
-        AdaptiveCards.AdaptiveCard.processMarkdown = function (text) {
-            var htmlString = defaultProcessMarkdown(text);
-            var container = HTMLUtil.createElement('div');
-            var paragraphs;
-            container.innerHTML = htmlString;
-            paragraphs = container.querySelectorAll('p');
-            if (paragraphs.length) {
-                // This is assuming markdown-it is used
-                // This is the default markdown library supported by adaptivecards
-                htmlString = '';
-                paragraphs.forEach(function (paragraph) {
-                    htmlString = htmlString + ' ' + paragraph.innerHTML;
-                });
-            }
-            return htmlString.replace(/ +/g, ' ');
-        };
-    }
-    if (typeof options.processNode !== 'function') {
-        options.processNode = processNode;
-    }
-    if (!options.hostConfig || _typeof(options.hostConfig) !== 'object') {
-        options.hostConfig = defaultHostConfig;
-    }
-    if (typeof options.reconstructHeadings === 'undefined') {
-        options.reconstructHeadings = true;
-    }
-    var card = new AdaptiveCards.AdaptiveCard();
+    options = setOptions$1(options, {
+        processMarkdown: defaultProcessMarkdownWrapper,
+        processNode: defaultProcessNodeConfig,
+        hostConfig: defaultHostConfig
+    });
+    card = new AdaptiveCards.AdaptiveCard();
     card.hostConfig = new AdaptiveCards.HostConfig(options.hostConfig);
     card.parse(json);
-    var adaptiveHtml = card.render();
-    recurseNodeTree(adaptiveHtml, options);
-    return adaptiveHtml;
+    cardHtml = card.render();
+    recurseNodeTree(cardHtml, options);
+    return cardHtml;
 }
 
 function recurseNodeTree(node, options) {
@@ -909,7 +884,9 @@ function _recurseNodeTree(node, root, options) {
         });
     }
     if (typeof options.processNode === 'function') {
-        options.processNode(node, root, options);
+        options.processNode(node, root);
+    } else if (options.processNode && _typeof(options.processNode) === 'object') {
+        processNode(node, root, options);
     }
 }
 
@@ -917,47 +894,81 @@ function processNode(node, root, options) {
     var nodeName = node.nodeName;
     switch (nodeName) {
         case 'DIV':
-            // remove empty divs from output html
-            if (!node.hasChildNodes()) {
-                node.remove();
-                return;
-            }
             // Attempt to reconstruct headings / they are wrapped in a div tag
-            var headingLevel = detectHeadingLevel(node, options.hostConfig);
-            if (headingLevel) {
-                var headingNode = HTMLUtil.createElement('h' + headingLevel);
-                headingNode.innerHTML = node.innerHTML;
-                node.parentNode.replaceChild(headingNode, node);
-            } else if (node.childNodes.length === 1 && node.children.length === 1 && node.parentNode) {
-                // Div only has 1 child node thats an element, and this div
-                // has a parent.  Replace parent with child node
-                node.parentNode.replaceChild(node.children[0], node);
-                node.remove();
+            if (options.processNode.reconstructHeadings) {
+                var headingLevel = detectHeadingLevel(node, options.hostConfig);
+                if (headingLevel) {
+                    var headingNode = HTMLUtil.createElement('h' + headingLevel);
+                    headingNode.innerHTML = node.innerHTML;
+                    node.parentNode.replaceChild(headingNode, node);
+                }
             }
             break;
     }
-    // remove empty text nodes
-    if (node.nodeType === 3 && node.textContent === '') {
+    // remove empty text and element nodes
+    if (options.processNode.removeEmptyNodes && (node.nodeType === textNodeType && node.textContent === '' || node.nodeType === elementNodeType && !isVoid(node) && !node.hasChildNodes())) {
         node.remove();
         return;
     }
     // Strip non whitelisted attributes from node
     // this is done for all nodes
-    removeAttributes(node);
+    if (options.processNode.removeAttributes) {
+        removeAttributes(node, options.processNode.removeAttributes);
+    }
 }
 
-function removeAttributes(node) {
+function removeAttributes(node, whiteListedAttributes) {
     var attributes = node.attributes;
     if (attributes) {
         /* Remove all attributes from nodes */
         Array.prototype.map.call(attributes, function (attribute) {
             return attribute.name;
         }).filter(function (attributeName) {
-            return attributeWhiteList.indexOf(attributeName) === -1;
+            return whiteListedAttributes.indexOf(attributeName) === -1;
         }).forEach(function (attributeName) {
             node.removeAttribute(attributeName);
         });
     }
+}
+
+function setOptions$1(options, defaults$$1) {
+    options = Object.assign({}, options);
+    if (typeof options.processMarkdown === 'function') {
+        AdaptiveCards.AdaptiveCard.processMarkdown = options.processMarkdown;
+    } else if (typeof options.processMarkdown === 'boolean' && !options.processMarkdown) {
+        AdaptiveCards.AdaptiveCard.processMarkdown = function (text) {
+            return text;
+        };
+    } else {
+        AdaptiveCards.AdaptiveCard.processMarkdown = defaults$$1.processMarkdown;
+    }
+    if (typeof options.processNode === 'undefined' || options.processNode && typeof options.processNode === 'boolean') {
+        options.processNode = Object.assign({}, defaults$$1.processNode);
+        if (options.hostConfig && _typeof(options.hostConfig) === 'object') {
+            options.processNode.removeAttributes = options.processNode.removeAttributes.concat(attributeHostConfigWhiteList);
+        }
+    }
+    if (!options.hostConfig || _typeof(options.hostConfig) !== 'object') {
+        options.hostConfig = defaults$$1.hostConfig;
+    }
+    return options;
+}
+
+function defaultProcessMarkdownWrapper(text) {
+    var htmlString = defaultProcessMarkdown(text);
+    var container = HTMLUtil.createElement('div');
+    var paragraphs;
+    container.innerHTML = htmlString;
+    paragraphs = container.querySelectorAll('p');
+    if (paragraphs.length) {
+        // This is assuming markdown-it is used
+        // This is the default markdown library supported by adaptivecards
+        htmlString = paragraphs[0].innerHTML;
+        Array.prototype.slice.call(paragraphs, 1).forEach(function (paragraph) {
+            htmlString += '<br>' + paragraph.innerHTML;
+        });
+    }
+    return htmlString.replace(/\n\n/g, '<br>');
 }
 
 /*
