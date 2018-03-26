@@ -206,7 +206,7 @@ test('can utilize custom host config pass through options object', t => {
     }, {
         hostConfig: customHostConfig
     });
-    var html = `<div><h1>hey</h1></div>`;
+    var html = `<div class="ac-container" style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;" tabindex="0"><h1>hey</h1></div>`;
     t.is(result.outerHTML, html);
 });
 
@@ -314,5 +314,134 @@ test('can handle line breaks in TextBlock', t => {
         "version": "1.0"
     });
     var html = `<div><div>Give me a break<br>I'm so<br>funny hahaha</div></div>`;
+    t.is(result.outerHTML, html);
+});
+
+test('can not processMarkdown', t => {
+    var result = AdaptiveHtml.toHTML({
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "TextBlock",
+                "text": "**test**",
+                "wrap": true
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    }, {
+        processMarkdown: false
+    });
+    var html = `<div><div>**test**</div></div>`;
+    t.is(result.outerHTML, html);
+});
+
+test('can not processNode', t => {
+    var result = AdaptiveHtml.toHTML({
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "TextBlock",
+                "text": "**test**",
+                "wrap": true
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    }, {
+        processNode: false
+    });
+    var html = `<div class="ac-container" style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;" tabindex="0"><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(0, 0, 0); font-weight: 400; word-wrap: break-word; box-sizing: border-box;">**test**</div></div>`;
+    t.is(result.outerHTML, html);
+});
+
+test('can processNode, dont remove empty nodes', t => {
+    var result = AdaptiveHtml.toHTML({
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "TextBlock",
+                "text": "First block of text",
+                "wrap": true
+            },
+            {
+                "type": "TextBlock",
+                "text": "Second block of text",
+                "wrap": true
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    }, {
+        processNode: {
+            removeEmptyNodes: false
+        }
+    });
+    var html = `<div class="ac-container" style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;" tabindex="0"><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(0, 0, 0); font-weight: 400; word-wrap: break-word; box-sizing: border-box;">First block of text</div><div style="height: 8px; overflow: hidden;"></div><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(0, 0, 0); font-weight: 400; word-wrap: break-word; box-sizing: border-box;">Second block of text</div></div>`;
+    t.is(result.outerHTML, html);
+});
+
+test('can processNode, dont reconstruct headings', t => {
+    var result = AdaptiveHtml.toHTML({
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "TextBlock",
+                "text": "Don't reconstruct me",
+                "wrap": true,
+                "size": "extraLarge",
+                "weight": "bolder"
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    }, {
+        processNode: {
+            reconstructHeadings: false
+        }
+    });
+    var html = `<div class="ac-container" style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;" tabindex="0"><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 26px; line-height: 34.58px; color: rgb(0, 0, 0); font-weight: 600; word-wrap: break-word; box-sizing: border-box;">Don't reconstruct me</div></div>`;
+    t.is(result.outerHTML, html);
+});
+
+test('can processNode, dont remove attributes', t => {
+    var result = AdaptiveHtml.toHTML({
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "TextBlock",
+                "text": "Don't remove my attributes",
+                "wrap": true
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    }, {
+        processNode: {
+            removeAttributes: false
+        }
+    });
+    var html = `<div class="ac-container" style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;" tabindex="0"><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(0, 0, 0); font-weight: 400; word-wrap: break-word; box-sizing: border-box;">Don't remove my attributes</div></div>`;
+    t.is(result.outerHTML, html);
+});
+
+test('can processNode, use custom remove attributes whitelist', t => {
+    var result = AdaptiveHtml.toHTML({
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "TextBlock",
+                "text": "Only keep my style",
+                "wrap": true
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    }, {
+        processNode: {
+            removeAttributes: ['style']
+        }
+    });
+    var html = `<div style="display: flex; box-sizing: border-box; padding: 15px 15px 15px 15px;"><div style="overflow: hidden; font-family: Segoe UI,Segoe,Segoe WP,Helvetica Neue,Helvetica,sans-serif; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(0, 0, 0); font-weight: 400; word-wrap: break-word; box-sizing: border-box;">Only keep my style</div></div>`;
     t.is(result.outerHTML, html);
 });
