@@ -111,8 +111,18 @@ import AdaptiveHtml from './adaptive-html/dist/adaptive-html.es';
     - **Note**: If you want to use this method in the browser, you must also include the [AdaptiveCards for Javascript library](https://docs.microsoft.com/en-us/adaptive-cards/display/libraries/htmlclient)
     ```javascript
     var adaptiveHtmlOptions = {
-        /* No-op override, don't modify HTML output */
-        processNode:  function (node, root, options) {}
+        processNode: {
+            reconstructHeadings: false
+        },
+        hostConfig: { 
+            fontSizes: {
+                small: 14,
+                default: 17,
+                medium: 20,
+                large: 24,
+                extraLarge: 28
+            }
+        }
     };
     var adaptiveCardElem = AdaptiveHtml.toHTML({
             "type": "AdaptiveCard",
@@ -120,7 +130,9 @@ import AdaptiveHtml from './adaptive-html/dist/adaptive-html.es';
                 {
                     "type": "TextBlock",
                     "text": "Turn me into an Adaptive Card",
-                    "wrap": true
+                    "wrap": true,
+                    "weight:": "bolder",
+                    "size": "extraLarge"
                 }
             ],
             "actions": [],
@@ -131,7 +143,7 @@ import AdaptiveHtml from './adaptive-html/dist/adaptive-html.es';
         HTML returned
 
         <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; box-sizing: border-box; flex: 0 0 auto; padding: 15px;">
-            <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;, Segoe, &quot;Segoe WP&quot;, &quot;Helvetica Neue&quot;, Helvetica, sans-serif; text-align: left; font-size: 14px; line-height: 18.62px; color: rgb(0, 0, 0); font-weight: 400; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
+            <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;, Segoe, &quot;Segoe WP&quot;, &quot;Helvetica Neue&quot;, Helvetica, sans-serif; text-align: left; font-size: 28px; line-height: 37.24px; color: rgb(0, 0, 0); font-weight: 400; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
                 Turn me into an Adaptive Card
             </div>
         </div>
