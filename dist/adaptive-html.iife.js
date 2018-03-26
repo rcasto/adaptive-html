@@ -948,8 +948,9 @@ function setOptions$1(options, defaults$$1) {
         }
     }
     if (!options.hostConfig || _typeof(options.hostConfig) !== 'object') {
-        options.hostConfig = defaults$$1.hostConfig;
+        options.hostConfig = {};
     }
+    options.hostConfig = Object.assign(options.hostConfig, defaults$$1.hostConfig);
     return options;
 }
 
