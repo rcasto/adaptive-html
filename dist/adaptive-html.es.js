@@ -833,7 +833,7 @@ var defaultHostConfig = {
         bolder: 600
     }
 };
-var defaultProcessMarkdown = AdaptiveCards.AdaptiveCard.processMarkdown;
+var defaultProcessMarkdown = null;
 var defaultProcessNodeConfig = {
     removeEmptyNodes: true,
     reconstructHeadings: true,
@@ -852,6 +852,9 @@ function toHTML(json, options) {
     }
     if (!AdaptiveCards) {
         throw new ReferenceError('AdaptiveCards is not available.  Make sure you are using the adaptivecards library if you want to utilize the toHTML(object | string) method');
+    }
+    if (!defaultProcessMarkdown) {
+        defaultProcessMarkdown = AdaptiveCards.AdaptiveCard.processMarkdown;
     }
     options = setOptions$1(options, {
         processMarkdown: defaultProcessMarkdownWrapper,
