@@ -76,19 +76,37 @@ import AdaptiveHtml from './adaptive-html/dist/adaptive-html.es';
         - **processMarkdown** (function|boolean) - A function accepting a string parameter and returning a string.  Will be called for each [TextBlock](http://adaptivecards.io/explorer/TextBlock.html) to process it's text and is expected to output compiled markdown or the text itself if no markdown is present
             - Default value is `true` (will utilize standard process markdown function of adaptivecards library)
         - **processNode** (function|boolean|object) - A function accepting an [HTMLElement](https://devdocs.io/dom/htmlelement) representing the current node being processed as the first parameter, another HTMLElement representing the card root as the second parameter, and the options object itself as the third parameter. It is not expected to return anything.  Will be called for each element in the HTML output from the adaptivecards library.  Allows you to manipulate the HTML output if desired.  Will override the default HTML transformations done
-            - The default value is an object:
+            - Default value:
             ```json
             {
                 removeEmptyNodes: true,
                 reconstructHeadings: true,
-                removeAttributes: true // Default whitelist ['start', 'src', 'href', 'alt']
+                removeAttributes: true
             }
             ```
             - options object values:
                 - removeEmptyNodes (boolean) - whether or not to remove empty nodes in card html output
                 - reconstructHeadings (boolean) - whether or not to attempt to reconstruct headings from card html output
                 - removeAttributes (boolean|array) - whether or not to remove attributes or not.  Can also pass a custom attribute white list as an array of attribute names to apply
+                    - Default attribute whitelist ['start', 'src', 'href', 'alt']
         - **hostConfig** (object) - An object specifying a [HostConfig](https://docs.microsoft.com/en-us/adaptive-cards/display/hostconfig) you desire to use when converting the Adaptive Card JSON to HTML
+            - Default value:
+            ```json
+            {
+                fontSizes: {
+                    small: 12,
+                    default: 14,
+                    medium: 17,
+                    large: 21,
+                    extraLarge: 26
+                },
+                fontWeights: {
+                    lighter: 200,
+                    default: 400,
+                    bolder: 600
+                }
+            }
+            ```
             - When this option is set, the whitelisted attributes for removeAttributes is automatically updated to allow the style and class attributes through
     - **Note**: If you want to use this method in the browser, you must also include the [AdaptiveCards for Javascript library](https://docs.microsoft.com/en-us/adaptive-cards/display/libraries/htmlclient)
     ```javascript
