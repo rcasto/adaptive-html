@@ -1,5 +1,4 @@
 import TurndownService from './turndown/turndown';
-import UtilityHelper from './lib/utilityHelper';
 import AdaptiveHtmlHelper from './lib/adaptiveHtmlHelper';
 
 var turndownService = new TurndownService();
@@ -20,14 +19,7 @@ function toHTML(jsonOrJsonString, options = {}) {
     return AdaptiveHtmlHelper.toHTML(jsonOrJsonString, options);
 }
 
-export default (function () {
-    // check and setup globals for node.js for 
-    // adaptivecards library if needed
-    if (!UtilityHelper.hasAccessToBrowserGlobals()) {
-        UtilityHelper.setupNodeAdaptiveCards();
-    }
-    return {
-        toJSON,
-        toHTML
-    };
-}());
+export default {
+    toJSON,
+    toHTML
+};

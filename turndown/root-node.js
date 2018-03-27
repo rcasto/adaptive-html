@@ -1,5 +1,4 @@
 import collapseWhitespace from './collapse-whitespace';
-import HTMLUtil from './html-util';
 import {
     isBlock,
     isVoid
@@ -30,6 +29,6 @@ export default function RootNode(input) {
 
 var _htmlParser;
 function htmlParser() {
-    _htmlParser = _htmlParser || new HTMLUtil.parser();
+    _htmlParser = _htmlParser || new DOMParser();
     return _htmlParser;
 }
