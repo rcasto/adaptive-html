@@ -32,11 +32,9 @@
   ],
   "author": "Richie Casto",
   "license": "MIT",
-  "dependencies": {
-    "adaptivecards": "^1.0.0",
-    "jsdom": "^11.6.2"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "adaptivecards": "^1.0.0",
     "ava": "^0.25.0",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.6.1",
@@ -53,7 +51,7 @@
       "tests/*.js"
     ],
     "require": [
-			"./tests/helpers/browserEnvHelper.js"
-		]
+      "./tests/helpers/browserEnvHelper.js"
+    ]
   }
 }
