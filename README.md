@@ -21,12 +21,12 @@ You can either install the npm package, directly use a pre-built version of the 
 
 ### Using pre-built libraries
 There are [pre-built versions of the library](https://github.com/rcasto/adaptive-html/tree/master/dist) for:
-- Browser (iife)
+- Browser script (iife)
 - CommonJS module environments (cjs)
 - ES module environments (es)
 
-#### Browser
-The browser version is available in both minified and unminified formats.
+#### Browser script
+Available in both minified and unminified formats.
 ```html
 <script src="/adaptive-html/dist/adaptive-html.iife.min.js"></script>
 ```
@@ -79,9 +79,9 @@ import AdaptiveHtml from './adaptive-html/dist/adaptive-html.es';
             - Default value:
             ```json
             {
-                removeEmptyNodes: true,
-                reconstructHeadings: true,
-                removeAttributes: true
+                "removeEmptyNodes": true,
+                "reconstructHeadings": true,
+                "removeAttributes": true
             }
             ```
             - options object values:
@@ -93,22 +93,22 @@ import AdaptiveHtml from './adaptive-html/dist/adaptive-html.es';
             - Default value:
             ```json
             {
-                fontSizes: {
-                    small: 12,
-                    default: 14,
-                    medium: 17,
-                    large: 21,
-                    extraLarge: 26
+                "fontSizes": {
+                    "small": 12,
+                    "default": 14,
+                    "medium": 17,
+                    "large": 21,
+                    "extraLarge": 26
                 },
-                fontWeights: {
-                    lighter: 200,
-                    default: 400,
-                    bolder: 600
+                "fontWeights": {
+                    "lighter": 200,
+                    "default": 400,
+                    "bolder": 600
                 }
             }
             ```
             - When this option is set, the whitelisted attributes for removeAttributes is automatically updated to allow the style and class attributes through
-    - **Note**: If you want to use this method in the browser, you must also include the [AdaptiveCards for Javascript library](https://docs.microsoft.com/en-us/adaptive-cards/display/libraries/htmlclient)
+    - **Note**: If you want to use this method, you must also include the [AdaptiveCards for Javascript library](https://docs.microsoft.com/en-us/adaptive-cards/display/libraries/htmlclient)
     ```javascript
     var adaptiveHtmlOptions = {
         processNode: {
