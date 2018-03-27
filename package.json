@@ -40,6 +40,7 @@
     "ava": "^0.25.0",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.6.1",
+    "browser-env": "^3.2.5",
     "npm-run-all": "^4.1.2",
     "nyc": "^11.4.1",
     "rimraf": "^2.6.2",
@@ -50,6 +51,9 @@
   "ava": {
     "files": [
       "tests/*.js"
-    ]
+    ],
+    "require": [
+			"./tests/helpers/browserEnvHelper.js"
+		]
   }
 }

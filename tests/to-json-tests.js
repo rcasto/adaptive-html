@@ -1,6 +1,5 @@
 var test = require('ava');
 var AdaptiveHtml = require('../dist/adaptive-html.cjs');
-var jsdomHelper = require('./util/jsdomHelper');
 
 test('can handle empty string', t => {
     var result = AdaptiveHtml.toJSON('');
@@ -28,7 +27,9 @@ test('can handle non string or node', t => {
 });
 
 test('can handle node input', t => {
-    var node = jsdomHelper.toFragment('This is some text');
+    var node = document.createElement('div');
+    var nodeText = document.createTextNode('This is some text');
+    node.appendChild(nodeText);
     var result = AdaptiveHtml.toJSON(node);
     t.deepEqual(result, {
         type: "AdaptiveCard",
