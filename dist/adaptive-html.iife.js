@@ -18,24 +18,9 @@ function tryParseJSON(jsonString) {
     }
 }
 
-// setup globals for node with adaptivecards library
-// TODO: is there a better way to do this?
-function setupNodeAdaptiveCards() {
-    var jsdomInstance = new (require('jsdom').JSDOM)();
-    global.document = jsdomInstance.window.document;
-    global.window = jsdomInstance.window;
-    global.HTMLElement = jsdomInstance.window.HTMLElement;
-}
-
-function hasAccessToBrowserGlobals() {
-    return !!(typeof window !== 'undefined' && window.document && window.HTMLElement);
-}
-
 var UtilityHelper = {
     toArray: toArray,
-    tryParseJSON: tryParseJSON,
-    setupNodeAdaptiveCards: setupNodeAdaptiveCards,
-    hasAccessToBrowserGlobals: hasAccessToBrowserGlobals
+    tryParseJSON: tryParseJSON
 };
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -576,86 +561,6 @@ function next(prev, current, isPre) {
     return current.firstChild || current.nextSibling || current.parentNode;
 }
 
-/*
- * Set up window for Node.js
- */
-
-var root = UtilityHelper.hasAccessToBrowserGlobals() ? window : {};
-var parser = canParseHTMLNatively() ? root.DOMParser : createHTMLParser();
-
-/*
- * Parsing HTML strings
- */
-function canParseHTMLNatively() {
-    var Parser = root.DOMParser;
-    var canParse = false;
-
-    // Adapted from https://gist.github.com/1129031
-    // Firefox/Opera/IE throw errors on unsupported types
-    try {
-        // WebKit returns null on unsupported types
-        if (new Parser().parseFromString('', 'text/html')) {
-            canParse = true;
-        }
-    } catch (e) {}
-
-    return canParse;
-}
-
-function createHTMLParser() {
-    var Parser = function Parser() {};
-
-    if (process.browser) {
-        if (shouldUseActiveX()) {
-            Parser.prototype.parseFromString = function (string) {
-                var doc = new window.ActiveXObject('htmlfile');
-                doc.designMode = 'on'; // disable on-page scripts
-                doc.open();
-                doc.write(string);
-                doc.close();
-                return doc;
-            };
-        } else {
-            Parser.prototype.parseFromString = function (string) {
-                var doc = document.implementation.createHTMLDocument('');
-                doc.open();
-                doc.write(string);
-                doc.close();
-                return doc;
-            };
-        }
-    } else {
-        var JSDOM = require('jsdom').JSDOM;
-        Parser.prototype.parseFromString = function (string) {
-            return new JSDOM(string).window.document;
-        };
-    }
-    return Parser;
-}
-
-function shouldUseActiveX() {
-    var useActiveX = false;
-    try {
-        document.implementation.createHTMLDocument('').open();
-    } catch (e) {
-        if (window.ActiveXObject) useActiveX = true;
-    }
-    return useActiveX;
-}
-
-function createElement(tag) {
-    if (canParseHTMLNatively()) {
-        return root.document.createElement(tag);
-    }
-    var JSDOM = require('jsdom').JSDOM;
-    return new JSDOM().window.document.createElement(tag);
-}
-
-var HTMLUtil = {
-    parser: parser,
-    createElement: createElement
-};
-
 function RootNode(input) {
     var root;
     if (typeof input === 'string') {
@@ -679,7 +584,7 @@ function RootNode(input) {
 
 var _htmlParser;
 function htmlParser() {
-    _htmlParser = _htmlParser || new HTMLUtil.parser();
+    _htmlParser = _htmlParser || new DOMParser();
     return _htmlParser;
 }
 
@@ -741,7 +646,7 @@ TurndownService.prototype = {
         if (!canConvert(input)) {
             throw new TypeError(input + ' is not a string, or an element/document/fragment node.');
         }
-        var cardElems = process$1.call(this, new RootNode(input));
+        var cardElems = process.call(this, new RootNode(input));
         return AdaptiveCardHelper.createCard(cardElems);
     }
 
@@ -752,7 +657,7 @@ TurndownService.prototype = {
      * @returns An Adaptive Card representation of the node
      * @type String
      */
-};function process$1(parentNode) {
+};function process(parentNode) {
     var _this = this;
 
     var currText = '';
@@ -795,7 +700,7 @@ TurndownService.prototype = {
  */
 function replacementForNode(node) {
     var rule = this.rules.forNode(node);
-    var content = process$1.call(this, node); // get's internal content of node
+    var content = process.call(this, node); // get's internal content of node
     return rule.replacement(content, node, this.options);
 }
 
@@ -900,7 +805,7 @@ function processNode(node, root, options) {
             if (options.processNode.reconstructHeadings) {
                 var headingLevel = detectHeadingLevel(node, options.hostConfig);
                 if (headingLevel) {
-                    var headingNode = HTMLUtil.createElement('h' + headingLevel);
+                    var headingNode = document.createElement('h' + headingLevel);
                     headingNode.innerHTML = node.innerHTML;
                     node.parentNode.replaceChild(headingNode, node);
                 }
@@ -959,7 +864,7 @@ function setOptions$1(options, defaults$$1) {
 
 function defaultProcessMarkdownWrapper(text) {
     var htmlString = defaultProcessMarkdown(text);
-    var container = HTMLUtil.createElement('div');
+    var container = document.createElement('div');
     var paragraphs;
     container.innerHTML = htmlString;
     paragraphs = container.querySelectorAll('p');
@@ -1025,17 +930,10 @@ function toHTML$1(jsonOrJsonString) {
     return AdaptiveHtmlHelper.toHTML(jsonOrJsonString, options);
 }
 
-var index = (function () {
-    // check and setup globals for node.js for 
-    // adaptivecards library if needed
-    if (!UtilityHelper.hasAccessToBrowserGlobals()) {
-        UtilityHelper.setupNodeAdaptiveCards();
-    }
-    return {
-        toJSON: toJSON,
-        toHTML: toHTML$1
-    };
-})();
+var index = {
+    toJSON: toJSON,
+    toHTML: toHTML$1
+};
 
 return index;
 
