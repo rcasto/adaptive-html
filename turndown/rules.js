@@ -1,14 +1,12 @@
 /**
  * Manages a collection of rules used to convert HTML to Adaptive Card JSON
  */
-export default function Rules(rules) {
+function Rules(rules) {
     this.rules = Object.assign({}, rules);
 }
 
-Rules.prototype = {
-    forNode: function (node) {
-        return findRule(this.rules, node);
-    }
+Rules.prototype.forNode = function (node) {
+    return findRule(this.rules, node);
 };
 
 function findRule(rules, node) {
@@ -34,3 +32,5 @@ function filterValue(rule, node) {
     }
     throw new TypeError('`filter` needs to be a string, array, or function');
 }
+
+export default Rules;

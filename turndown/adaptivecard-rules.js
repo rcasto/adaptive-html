@@ -170,7 +170,7 @@ rules.default = {
         }
         return content;
     }
-}
+};
 
 function handleTextEffects(contentCollection, textFunc) {
     var nonText = AdaptiveCardFilter.getNonTextBlocks(contentCollection) || [];
