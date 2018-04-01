@@ -34,17 +34,8 @@ import Node from './node';
  * THE SOFTWARE.
  */
 
-export default function TurndownService() {
-    this.options = {
-        rules: AdaptiveCardRules,
-        defaultReplacement: function (content, node) {
-            if (node.isBlock) {
-                return AdaptiveCardHelper.wrap(content);
-            }
-            return content;
-        }
-    };
-    this.rules = new Rules(this.options);
+function TurndownService() {
+    this.rules = new Rules(AdaptiveCardRules);
 }
 
 TurndownService.prototype = {
@@ -116,7 +107,7 @@ function process(parentNode) {
 function replacementForNode(node) {
     var rule = this.rules.forNode(node);
     var content = process.call(this, node); // get's internal content of node
-    return rule.replacement(content, node, this.options);
+    return rule.replacement(content, node);
 }
 
 /**
@@ -140,3 +131,5 @@ function canConvert(input) {
 function isValidNodetype(node) {
     return !!(node && (node.nodeType === 3 || node.nodeType === 1));
 }
+
+export default TurndownService;

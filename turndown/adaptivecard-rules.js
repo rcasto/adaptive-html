@@ -118,7 +118,7 @@ rules.listItem = {
 };
 
 rules.inlineLink = {
-    filter: function (node, options) {
+    filter: function (node) {
         return (
             node.nodeName === 'A' &&
             node.getAttribute('href')
@@ -134,7 +134,7 @@ rules.inlineLink = {
 
 rules.emphasis = {
     filter: ['em', 'i'],
-    replacement: function (content, node, options) {
+    replacement: function (content, node) {
         return handleTextEffects(content, function (text) {
             return `_${text}_`;
         });
@@ -143,7 +143,7 @@ rules.emphasis = {
 
 rules.strong = {
     filter: ['strong', 'b'],
-    replacement: function (content, node, options) {
+    replacement: function (content, node) {
         return handleTextEffects(content, function (text) {
             return `**${text}**`;
         });
@@ -160,6 +160,17 @@ rules.image = {
         });
     }
 };
+
+/* This must be the last rule */
+rules.default = {
+    filter: () => true,
+    replacement: function (content, node) {
+        if (node.isBlock) {
+            return AdaptiveCardHelper.wrap(content);
+        }
+        return content;
+    }
+}
 
 function handleTextEffects(contentCollection, textFunc) {
     var nonText = AdaptiveCardFilter.getNonTextBlocks(contentCollection) || [];
