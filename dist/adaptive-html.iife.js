@@ -172,7 +172,7 @@ function createImage(url, options) {
 }
 
 // Wrap adaptive card elements in a container
-function wrap(elements) {
+function wrap(elements, options) {
     elements = UtilityHelper.toArray(elements);
     /* Don't wrap only a container in a container */
     if (elements.length === 1 && AdaptiveCardFilter.isContainer(elements[0])) {
@@ -182,6 +182,7 @@ function wrap(elements) {
         type: AdaptiveCardFilter.cardTypes.container,
         items: elements
     };
+    setOptions(container, options);
     return container;
 }
 
@@ -331,7 +332,7 @@ rules.listItem = {
 };
 
 rules.inlineLink = {
-    filter: function filter(node, options) {
+    filter: function filter(node) {
         return node.nodeName === 'A' && node.getAttribute('href');
     },
     replacement: function replacement(content, node) {
@@ -344,7 +345,7 @@ rules.inlineLink = {
 
 rules.emphasis = {
     filter: ['em', 'i'],
-    replacement: function replacement(content, node, options) {
+    replacement: function replacement(content, node) {
         return handleTextEffects(content, function (text) {
             return '_' + text + '_';
         });
@@ -353,7 +354,7 @@ rules.emphasis = {
 
 rules.strong = {
     filter: ['strong', 'b'],
-    replacement: function replacement(content, node, options) {
+    replacement: function replacement(content, node) {
         return handleTextEffects(content, function (text) {
             return '**' + text + '**';
         });
@@ -371,6 +372,19 @@ rules.image = {
     }
 };
 
+/* This must be the last rule */
+rules.default = {
+    filter: function filter() {
+        return true;
+    },
+    replacement: function replacement(content, node) {
+        if (node.isBlock) {
+            return AdaptiveCardHelper.wrap(content);
+        }
+        return content;
+    }
+};
+
 function handleTextEffects(contentCollection, textFunc) {
     var nonText = AdaptiveCardFilter.getNonTextBlocks(contentCollection) || [];
     var text = AdaptiveCardFilter.getTextBlocksAsString(contentCollection) || '';
@@ -384,51 +398,38 @@ function handleTextEffects(contentCollection, textFunc) {
 }
 
 /**
- * Manages a collection of rules used to convert HTML to Markdown
+ * Manages a collection of rules used to convert HTML to Adaptive Card JSON
  */
-
-function Rules(options) {
-    this.options = options;
-
-    this.defaultRule = {
-        replacement: options.defaultReplacement
-    };
-
-    this.array = [];
-    for (var key in options.rules) {
-        this.array.push(options.rules[key]);
-    }
+function Rules(rules) {
+    this.rules = Object.assign({}, rules);
 }
 
-Rules.prototype = {
-    forNode: function forNode(node) {
-        var rule;
-
-        if (rule = findRule(this.array, node, this.options)) return rule;
-
-        return this.defaultRule;
-    }
+Rules.prototype.forNode = function (node) {
+    return findRule(this.rules, node);
 };
 
-function findRule(rules, node, options) {
-    for (var i = 0; i < rules.length; i++) {
-        var rule = rules[i];
-        if (filterValue(rule, node, options)) return rule;
-    }
-    return void 0;
+function findRule(rules, node) {
+    var foundRule = null;
+    (Object.keys(rules) || []).some(function (ruleKey) {
+        if (filterValue(rules[ruleKey], node)) {
+            foundRule = rules[ruleKey];
+            return true;
+        }
+        return false;
+    });
+    return foundRule;
 }
 
-function filterValue(rule, node, options) {
+function filterValue(rule, node) {
     var filter = rule.filter;
     if (typeof filter === 'string') {
-        if (filter === node.nodeName.toLowerCase()) return true;
+        return filter === node.nodeName.toLowerCase();
     } else if (Array.isArray(filter)) {
-        if (filter.indexOf(node.nodeName.toLowerCase()) > -1) return true;
+        return filter.indexOf(node.nodeName.toLowerCase()) > -1;
     } else if (typeof filter === 'function') {
-        if (filter.call(rule, node, options)) return true;
-    } else {
-        throw new TypeError('`filter` needs to be a string, array, or function');
+        return filter.call(rule, node);
     }
+    throw new TypeError('`filter` needs to be a string, array, or function');
 }
 
 /*!
@@ -561,6 +562,8 @@ function next(prev, current, isPre) {
     return current.firstChild || current.nextSibling || current.parentNode;
 }
 
+var _htmlParser;
+
 function RootNode(input) {
     var root;
     if (typeof input === 'string') {
@@ -578,11 +581,9 @@ function RootNode(input) {
         isBlock: isBlock,
         isVoid: isVoid
     });
-
     return root;
 }
 
-var _htmlParser;
 function htmlParser() {
     _htmlParser = _htmlParser || new DOMParser();
     return _htmlParser;
@@ -622,16 +623,7 @@ function Node(node) {
  */
 
 function TurndownService() {
-    this.options = {
-        rules: rules,
-        defaultReplacement: function defaultReplacement(content, node) {
-            if (node.isBlock) {
-                return AdaptiveCardHelper.wrap(content);
-            }
-            return content;
-        }
-    };
-    this.rules = new Rules(this.options);
+    this.rules = new Rules(rules);
 }
 
 TurndownService.prototype = {
@@ -701,7 +693,7 @@ TurndownService.prototype = {
 function replacementForNode(node) {
     var rule = this.rules.forNode(node);
     var content = process.call(this, node); // get's internal content of node
-    return rule.replacement(content, node, this.options);
+    return rule.replacement(content, node);
 }
 
 /**
