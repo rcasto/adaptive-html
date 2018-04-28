@@ -9,4 +9,3 @@ tests
 .gitignore
 index.js
 rollup
-publish.js
