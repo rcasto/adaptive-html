@@ -16,7 +16,7 @@ async function writePackageJson(packageJsonPath, packageJson) {
 
 async function publish(logger) {
     return new Promise((resolve, reject) => {
-        var publish = spawn('npm', ['pack']);
+        var publish = spawn('npm', ['publish']);
         publish.stdout.on('data', function (data) {
             logger(data.toString());
         });
