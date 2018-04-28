@@ -1,58 +1,59 @@
 {
-  "name": "adaptive-html",
-  "version": "2.2.1",
-  "description": "HTML to Adaptive Card JSON converter",
-  "main": "dist/adaptive-html.cjs.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/rcasto/adaptive-html.git"
-  },
-  "scripts": {
-    "build": "npm-run-all --parallel build:iife.min build:iife build:cjs build:es",
-    "build:iife.min": "rollup --config rollup/rollup.config.iife.js --minify",
-    "build:iife": "rollup --config rollup/rollup.config.iife.js",
-    "build:cjs": "rollup --config rollup/rollup.config.cjs.js",
-    "build:es": "rollup --config rollup/rollup.config.es.js",
-    "client": "node ./client/server.js",
-    "client:build": "rollup --config rollup/rollup.config.iife.js --watch --output.file client/public/adaptive-html.js",
-    "test": "npm-run-all build:cjs && nyc ava",
-    "test:report": "nyc report --reporter=html",
-    "prepack": "npm-run-all test build",
-    "start": "npm-run-all --parallel client client:build",
-    "clean": "rimraf .nyc_output coverage client/public/adaptive-html.js client/node_modules node_modules"
-  },
-  "keywords": [
-    "htmltoadaptivecard",
-    "adaptivecards",
-    "adaptive-cards",
-    "adaptive",
-    "cards",
-    "html",
-    "converter",
-    "wysiwyg"
-  ],
-  "author": "Richie Casto",
-  "license": "MIT",
-  "dependencies": {},
-  "devDependencies": {
-    "adaptivecards": "^1.0.0",
-    "ava": "^0.25.0",
-    "babel-plugin-external-helpers": "^6.22.0",
-    "babel-preset-env": "^1.6.1",
-    "browser-env": "^3.2.5",
-    "npm-run-all": "^4.1.2",
-    "nyc": "^11.7.1",
-    "rimraf": "^2.6.2",
-    "rollup": "^0.56.5",
-    "rollup-plugin-babel": "^3.0.4",
-    "rollup-plugin-uglify": "^3.0.0"
-  },
-  "ava": {
-    "files": [
-      "tests/*.js"
-    ],
-    "require": [
-      "./tests/helpers/browserEnvHelper.js"
-    ]
-  }
+	"name": "adaptive-html",
+	"version": "2.2.1",
+	"description": "HTML to Adaptive Card JSON converter",
+	"main": "dist/adaptive-html.cjs.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/rcasto/adaptive-html.git"
+	},
+	"scripts": {
+		"build": "npm-run-all --parallel build:iife.min build:iife build:cjs build:es",
+		"build:iife.min": "rollup --config rollup/rollup.config.iife.js --minify",
+		"build:iife": "rollup --config rollup/rollup.config.iife.js",
+		"build:cjs": "rollup --config rollup/rollup.config.cjs.js",
+		"build:es": "rollup --config rollup/rollup.config.es.js",
+		"client": "node ./client/server.js",
+		"client:build": "rollup --config rollup/rollup.config.iife.js --watch --output.file client/public/adaptive-html.js",
+		"test": "npm-run-all build:cjs && nyc ava",
+		"test:report": "nyc report --reporter=html",
+		"prepack": "npm-run-all test build",
+		"publish:all": "node publish.js",
+		"start": "npm-run-all --parallel client client:build",
+		"clean": "rimraf .nyc_output coverage client/public/adaptive-html.js client/node_modules node_modules"
+	},
+	"keywords": [
+		"htmltoadaptivecard",
+		"adaptivecards",
+		"adaptive-cards",
+		"adaptive",
+		"cards",
+		"html",
+		"converter",
+		"wysiwyg"
+	],
+	"author": "Richie Casto",
+	"license": "MIT",
+	"dependencies": {},
+	"devDependencies": {
+		"adaptivecards": "^1.0.0",
+		"ava": "^0.25.0",
+		"babel-plugin-external-helpers": "^6.22.0",
+		"babel-preset-env": "^1.6.1",
+		"browser-env": "^3.2.5",
+		"npm-run-all": "^4.1.2",
+		"nyc": "^11.7.1",
+		"rimraf": "^2.6.2",
+		"rollup": "^0.56.5",
+		"rollup-plugin-babel": "^3.0.4",
+		"rollup-plugin-uglify": "^3.0.0"
+	},
+	"ava": {
+		"files": [
+			"tests/*.js"
+		],
+		"require": [
+			"./tests/helpers/browserEnvHelper.js"
+		]
+	}
 }
