@@ -216,12 +216,13 @@ var blockElements = ['address', 'article', 'aside', 'audio', 'blockquote', 'body
 function isBlock(node) {
     return blockElements.indexOf(node.nodeName.toLowerCase()) !== -1;
 }
-
 var voidElements = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
 
 function isVoid(node) {
     return voidElements.indexOf(node.nodeName.toLowerCase()) !== -1;
 }
+var lineBreakRegex = /  \n/g;
+var carriageReturnTabRegex = /\r\t/g;
 
 var voidSelector = voidElements.join();
 function hasVoid(node) {
@@ -259,7 +260,7 @@ rules.lineBreak = {
     filter: 'br',
     replacement: function replacement(content) {
         return handleTextEffects(content, function (text) {
-            return '\n\n';
+            return '  \n';
         });
     }
 };
@@ -303,13 +304,13 @@ rules.listItem = {
             var cardType = currBlock.type;
             switch (cardType) {
                 case AdaptiveCardFilter.cardTypes.textBlock:
-                    currText += ' ' + currBlock.text.replace(/\n\n/g, '\n\n\t').trim();
+                    currText += ' ' + currBlock.text.replace(lineBreakRegex, '  \n\t').trim();
                     break;
                 case AdaptiveCardFilter.cardTypes.container:
                     var nestedListElems = AdaptiveCardHelper.unwrap(currBlock);
                     nestedListElems.forEach(function (nestedListElem) {
                         if (AdaptiveCardFilter.isTextBlock(nestedListElem)) {
-                            currText += '\r\t' + nestedListElem.text.replace(/\r\t/g, '\r\t\t').replace(/\n\n/g, '\n\n\t');
+                            currText += '\r\t' + nestedListElem.text.replace(carriageReturnTabRegex, '\r\t\t').replace(lineBreakRegex, '  \n\t');
                         } else {
                             prevBlocks.push(nestedListElem);
                         }
@@ -869,7 +870,7 @@ function defaultProcessMarkdownWrapper(text) {
             htmlString += '<br>' + paragraph.innerHTML;
         });
     }
-    return htmlString.replace(/\n\n/g, '<br>');
+    return htmlString.replace(lineBreakRegex, '<br>');
 }
 
 /*
