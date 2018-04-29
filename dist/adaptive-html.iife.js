@@ -18,16 +18,32 @@ function tryParseJSON(jsonString) {
     }
 }
 
-var UtilityHelper = {
-    toArray: toArray,
-    tryParseJSON: tryParseJSON
-};
-
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
 } : function (obj) {
   return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 };
+
+var supportedCardVersions = ['1.0'];
+
+function getBlocks(cardCollection, types) {
+    types = toArray(types);
+    cardCollection = toArray(cardCollection);
+    return cardCollection.filter(function (card) {
+        return types.some(function (type) {
+            return isCardType(card, type);
+        });
+    });
+}
+
+function isCardType(card, type) {
+    if (!card) {
+        return false;
+    }
+    var cardType = (card.type || '').toLowerCase();
+    type = (type || '').toLowerCase();
+    return cardType === type;
+}
 
 var cardTypes = Object.freeze({
     textBlock: "TextBlock",
@@ -35,7 +51,6 @@ var cardTypes = Object.freeze({
     image: "Image",
     adaptiveCard: "AdaptiveCard"
 });
-var supportedCardVersions = ['1.0'];
 
 function isTextBlock(card) {
     return isCardType(card, cardTypes.textBlock);
@@ -49,25 +64,12 @@ function isImage(card) {
     return isCardType(card, cardTypes.image);
 }
 
-function isAdaptiveCard(card) {
-    return isCardType(card, cardTypes.adaptiveCard);
-}
-
 function isCardElement(card) {
     return isTextBlock(card) || isImage(card) || isContainer(card);
 }
 
-function isCardType(card, type) {
-    if (!card) {
-        return false;
-    }
-    var cardType = (card.type || '').toLowerCase();
-    type = (type || '').toLowerCase();
-    return cardType === type;
-}
-
 function isValidAdaptiveCardJSON(json) {
-    return json && (typeof json === "undefined" ? "undefined" : _typeof(json)) === 'object' && json.type === cardTypes.adaptiveCard && supportedCardVersions.indexOf(json.version) > -1;
+    return json && (typeof json === 'undefined' ? 'undefined' : _typeof(json)) === 'object' && json.type === cardTypes.adaptiveCard && supportedCardVersions.indexOf(json.version) > -1;
 }
 
 function getTextBlocks(cardCollection) {
@@ -84,39 +86,22 @@ function getTextBlocksAsString(cardCollection) {
     }).join(' ').replace(/ +/g, ' ').trim();
 }
 
-function getBlocks(cardCollection, types) {
-    types = UtilityHelper.toArray(types);
-    cardCollection = UtilityHelper.toArray(cardCollection);
-    return cardCollection.filter(function (card) {
-        return types.some(function (type) {
-            return isCardType(card, type);
-        });
+function setOptions(obj, options) {
+    Object.keys(options || {}).forEach(function (optionKey) {
+        obj[optionKey] = options[optionKey];
     });
 }
 
-var AdaptiveCardFilter = {
-    isTextBlock: isTextBlock,
-    isContainer: isContainer,
-    isImage: isImage,
-    isAdaptiveCard: isAdaptiveCard,
-    isCardElement: isCardElement,
-    isValidAdaptiveCardJSON: isValidAdaptiveCardJSON,
-    getTextBlocks: getTextBlocks,
-    getTextBlocksAsString: getTextBlocksAsString,
-    getNonTextBlocks: getNonTextBlocks,
-    cardTypes: cardTypes
-};
-
 function createCard(elements) {
     var card = {
-        type: AdaptiveCardFilter.cardTypes.adaptiveCard,
+        type: cardTypes.adaptiveCard,
         body: [],
         actions: [],
         version: '1.0'
     };
-    var body = UtilityHelper.toArray(elements);
-    if (Array.isArray(elements) && elements.length === 1 && AdaptiveCardFilter.isContainer(elements[0])) {
-        body = UtilityHelper.toArray(unwrap(elements[0]));
+    var body = toArray(elements);
+    if (Array.isArray(elements) && elements.length === 1 && isContainer(elements[0])) {
+        body = toArray(unwrap(elements[0]));
     }
     card.body = body;
     return card;
@@ -124,7 +109,7 @@ function createCard(elements) {
 
 function createTextBlock(text, options) {
     var textBlock = {
-        type: AdaptiveCardFilter.cardTypes.textBlock,
+        type: cardTypes.textBlock,
         text: text || '',
         wrap: true
     };
@@ -164,7 +149,7 @@ function createHeadingTextBlock(text, depth) {
 
 function createImage(url, options) {
     var image = {
-        type: AdaptiveCardFilter.cardTypes.image,
+        type: cardTypes.image,
         url: url
     };
     setOptions(image, options);
@@ -173,13 +158,13 @@ function createImage(url, options) {
 
 // Wrap adaptive card elements in a container
 function wrap(elements, options) {
-    elements = UtilityHelper.toArray(elements);
+    elements = toArray(elements);
     /* Don't wrap only a container in a container */
-    if (elements.length === 1 && AdaptiveCardFilter.isContainer(elements[0])) {
+    if (elements.length === 1 && isContainer(elements[0])) {
         return elements[0];
     }
     var container = {
-        type: AdaptiveCardFilter.cardTypes.container,
+        type: cardTypes.container,
         items: elements
     };
     setOptions(container, options);
@@ -189,26 +174,11 @@ function wrap(elements, options) {
 // Returns the list of elements within a container
 // If the item passed in is not a container, it is simply returned
 function unwrap(container) {
-    if (!AdaptiveCardFilter.isContainer(container)) {
-        return UtilityHelper.toArray(container);
+    if (!isContainer(container)) {
+        return toArray(container);
     }
     return container.items || [];
 }
-
-function setOptions(obj, options) {
-    Object.keys(options || {}).forEach(function (optionKey) {
-        obj[optionKey] = options[optionKey];
-    });
-}
-
-var AdaptiveCardHelper = {
-    createHeadingTextBlock: createHeadingTextBlock,
-    createTextBlock: createTextBlock,
-    createImage: createImage,
-    createCard: createCard,
-    wrap: wrap,
-    unwrap: unwrap
-};
 
 var blockElements = ['address', 'article', 'aside', 'audio', 'blockquote', 'body', 'canvas', 'center', 'dd', 'dir', 'div', 'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'html', 'isindex', 'li', 'main', 'menu', 'nav', 'noframes', 'noscript', 'ol', 'output', 'p', 'pre', 'section', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'ul'];
 
@@ -268,9 +238,9 @@ rules.heading = {
     filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
     replacement: function replacement(content, node) {
         var hLevel = Number(node.nodeName.charAt(1));
-        var hText = AdaptiveCardFilter.getTextBlocksAsString(content);
-        var hNonText = AdaptiveCardFilter.getNonTextBlocks(content);
-        return AdaptiveCardHelper.wrap([AdaptiveCardHelper.createHeadingTextBlock(hText, hLevel)].concat(hNonText));
+        var hText = getTextBlocksAsString(content);
+        var hNonText = getNonTextBlocks(content);
+        return wrap([createHeadingTextBlock(hText, hLevel)].concat(hNonText));
     }
 };
 
@@ -281,9 +251,9 @@ rules.list = {
         var isOrdered = node.nodeName === 'OL';
         var startIndex = parseInt(node.getAttribute('start'), 10) || 1; // only applicable to ordered lists
         var blocks = (listItemContainers || []).map(function (listItemContainer, listItemIndex) {
-            var listItemElems = AdaptiveCardHelper.unwrap(listItemContainer);
+            var listItemElems = unwrap(listItemContainer);
             var firstListItemElem = listItemElems[0];
-            if (firstListItemElem && AdaptiveCardFilter.isTextBlock(firstListItemElem)) {
+            if (firstListItemElem && isTextBlock(firstListItemElem)) {
                 var firstListItemPrefix = isOrdered ? startIndex + listItemIndex + '. ' : '- ';
                 firstListItemElem.text = firstListItemPrefix + firstListItemElem.text;
             }
@@ -291,7 +261,7 @@ rules.list = {
         }).reduce(function (prevBlocks, listItemBlocks) {
             return prevBlocks.concat(listItemBlocks);
         }, []);
-        return AdaptiveCardHelper.wrap(blocks);
+        return wrap(blocks);
     }
 };
 
@@ -302,20 +272,20 @@ rules.listItem = {
         var blocks = (content || []).reduce(function (prevBlocks, currBlock) {
             var cardType = currBlock.type;
             switch (cardType) {
-                case AdaptiveCardFilter.cardTypes.textBlock:
+                case cardTypes.textBlock:
                     currText += ' ' + currBlock.text.replace(lineBreakRegex, '  \n\t').trim();
                     break;
-                case AdaptiveCardFilter.cardTypes.container:
-                    var nestedListElems = AdaptiveCardHelper.unwrap(currBlock);
+                case cardTypes.container:
+                    var nestedListElems = unwrap(currBlock);
                     nestedListElems.forEach(function (nestedListElem) {
-                        if (AdaptiveCardFilter.isTextBlock(nestedListElem)) {
+                        if (isTextBlock(nestedListElem)) {
                             currText += '\r\t' + nestedListElem.text.replace(carriageReturnTabRegex, '\r\t\t').replace(lineBreakRegex, '  \n\t');
                         } else {
                             prevBlocks.push(nestedListElem);
                         }
                     });
                     break;
-                case AdaptiveCardFilter.cardTypes.image:
+                case cardTypes.image:
                     prevBlocks.push(currBlock);
                     break;
                 default:
@@ -325,10 +295,10 @@ rules.listItem = {
         }, []);
 
         if (currText) {
-            blocks.unshift(AdaptiveCardHelper.createTextBlock(currText.trim()));
+            blocks.unshift(createTextBlock(currText.trim()));
         }
 
-        return AdaptiveCardHelper.wrap(blocks);
+        return wrap(blocks);
     }
 };
 
@@ -367,7 +337,7 @@ rules.image = {
     replacement: function replacement(content, node) {
         var alt = node.alt || '';
         var src = node.getAttribute('src') || '';
-        return AdaptiveCardHelper.createImage(src, {
+        return createImage(src, {
             altText: alt
         });
     }
@@ -380,15 +350,15 @@ rules.default = {
     },
     replacement: function replacement(content, node) {
         if (node.isBlock) {
-            return AdaptiveCardHelper.wrap(content);
+            return wrap(content);
         }
         return content;
     }
 };
 
 function handleTextEffects(contentCollection, textFunc) {
-    var nonText = AdaptiveCardFilter.getNonTextBlocks(contentCollection) || [];
-    var text = AdaptiveCardFilter.getTextBlocksAsString(contentCollection) || '';
+    var nonText = getNonTextBlocks(contentCollection) || [];
+    var text = getTextBlocksAsString(contentCollection) || '';
     if (typeof textFunc === 'function') {
         text = textFunc(text);
     }
@@ -640,7 +610,7 @@ TurndownService.prototype = {
             throw new TypeError(input + ' is not a string, or an element/document/fragment node.');
         }
         var cardElems = process.call(this, new RootNode(input));
-        return AdaptiveCardHelper.createCard(cardElems);
+        return createCard(cardElems);
     }
 
     /**
@@ -665,20 +635,20 @@ TurndownService.prototype = {
         replacement = replacement || [];
 
         // text nodes, em, i, b, strong, a tags will hit this
-        if ((typeof replacement === 'undefined' ? 'undefined' : _typeof(replacement)) === 'object' && !AdaptiveCardFilter.isCardElement(replacement) && !Array.isArray(replacement)) {
+        if ((typeof replacement === 'undefined' ? 'undefined' : _typeof(replacement)) === 'object' && !isCardElement(replacement) && !Array.isArray(replacement)) {
             currText += replacement.text;
             if (replacement.nonText && replacement.nonText.length || !node.nextSibling) {
-                output.push(AdaptiveCardHelper.createTextBlock(currText));
+                output.push(createTextBlock(currText));
                 currText = '';
             }
             replacement = replacement.nonText || [];
         } else if (currText) {
             // Collection detected, let's push this textblock first, then clear the text
-            output.push(AdaptiveCardHelper.createTextBlock(currText));
+            output.push(createTextBlock(currText));
             currText = '';
         }
 
-        return output.concat(UtilityHelper.toArray(replacement));
+        return output.concat(toArray(replacement));
     }, []);
 
     return blocks;
@@ -746,9 +716,9 @@ var elementNodeType = 1;
 function toHTML(json, options) {
     var card, cardHtml;
     if (typeof json === 'string') {
-        json = UtilityHelper.tryParseJSON(json);
+        json = tryParseJSON(json);
     }
-    if (!AdaptiveCardFilter.isValidAdaptiveCardJSON(json)) {
+    if (!isValidAdaptiveCardJSON(json)) {
         throw new TypeError(JSON.stringify(json) + ' is not valid Adaptive Card JSON.');
     }
     if (!AdaptiveCards) {
