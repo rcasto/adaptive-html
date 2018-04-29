@@ -1,5 +1,16 @@
-import AdaptiveCardHelper from '../lib/adaptiveCardHelper';
-import AdaptiveCardFilter from '../lib/adaptiveCardFilter';
+import {
+    wrap,
+    unwrap,
+    createTextBlock,
+    createHeadingTextBlock,
+    createImage
+} from '../lib/adaptiveCardHelper';
+import {
+    getTextBlocksAsString,
+    getNonTextBlocks,
+    isTextBlock,
+    cardTypes
+} from '../lib/adaptiveCardFilter';
 import {
     isVoid,
     hasVoid,
@@ -52,10 +63,10 @@ rules.heading = {
     filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
     replacement: function (content, node) {
         var hLevel = Number(node.nodeName.charAt(1));
-        var hText = AdaptiveCardFilter.getTextBlocksAsString(content);
-        var hNonText = AdaptiveCardFilter.getNonTextBlocks(content);
-        return AdaptiveCardHelper.wrap([
-            AdaptiveCardHelper.createHeadingTextBlock(hText, hLevel)
+        var hText = getTextBlocksAsString(content);
+        var hNonText = getNonTextBlocks(content);
+        return wrap([
+            createHeadingTextBlock(hText, hLevel)
         ].concat(hNonText));
     }
 };
@@ -67,9 +78,9 @@ rules.list = {
         var isOrdered = node.nodeName === 'OL';
         var startIndex = parseInt(node.getAttribute('start'), 10) || 1; // only applicable to ordered lists
         var blocks = (listItemContainers || []).map((listItemContainer, listItemIndex) => {
-            var listItemElems = AdaptiveCardHelper.unwrap(listItemContainer);
+            var listItemElems = unwrap(listItemContainer);
             var firstListItemElem = listItemElems[0];
-            if (firstListItemElem && AdaptiveCardFilter.isTextBlock(firstListItemElem)) {
+            if (firstListItemElem && isTextBlock(firstListItemElem)) {
                 let firstListItemPrefix = isOrdered ? `${startIndex + listItemIndex}. ` : `- `;
                 firstListItemElem.text = firstListItemPrefix + firstListItemElem.text;
             }
@@ -77,7 +88,7 @@ rules.list = {
         }).reduce((prevBlocks, listItemBlocks) => {
             return prevBlocks.concat(listItemBlocks);
         }, []);
-        return AdaptiveCardHelper.wrap(blocks);
+        return wrap(blocks);
     }
 };
 
@@ -88,16 +99,16 @@ rules.listItem = {
         var blocks = (content || []).reduce((prevBlocks, currBlock) => {
             var cardType = currBlock.type;
             switch (cardType) {
-                case AdaptiveCardFilter.cardTypes.textBlock:
+                case cardTypes.textBlock:
                     currText += ` ${currBlock.text
                         .replace(lineBreakRegex, '  \n\t')
                         .trim()}`;
                     break;
-                case AdaptiveCardFilter.cardTypes.container:
-                    let nestedListElems = AdaptiveCardHelper.unwrap(currBlock);
+                case cardTypes.container:
+                    let nestedListElems = unwrap(currBlock);
                     nestedListElems
                         .forEach(nestedListElem => {
-                            if (AdaptiveCardFilter.isTextBlock(nestedListElem)) {
+                            if (isTextBlock(nestedListElem)) {
                                 currText += `\r\t${nestedListElem.text
                                     .replace(carriageReturnTabRegex, '\r\t\t')
                                     .replace(lineBreakRegex, '  \n\t')}`;
@@ -106,7 +117,7 @@ rules.listItem = {
                             }
                         });
                     break;
-                case AdaptiveCardFilter.cardTypes.image:
+                case cardTypes.image:
                     prevBlocks.push(currBlock);
                     break;
                 default:
@@ -116,10 +127,10 @@ rules.listItem = {
         }, []);
 
         if (currText) {
-            blocks.unshift(AdaptiveCardHelper.createTextBlock(currText.trim()));
+            blocks.unshift(createTextBlock(currText.trim()));
         }
 
-        return AdaptiveCardHelper.wrap(blocks);
+        return wrap(blocks);
     }
 };
 
@@ -161,7 +172,7 @@ rules.image = {
     replacement: function (content, node) {
         var alt = node.alt || '';
         var src = node.getAttribute('src') || '';
-        return AdaptiveCardHelper.createImage(src, {
+        return createImage(src, {
             altText: alt
         });
     }
@@ -172,15 +183,15 @@ rules.default = {
     filter: () => true,
     replacement: function (content, node) {
         if (node.isBlock) {
-            return AdaptiveCardHelper.wrap(content);
+            return wrap(content);
         }
         return content;
     }
 };
 
 function handleTextEffects(contentCollection, textFunc) {
-    var nonText = AdaptiveCardFilter.getNonTextBlocks(contentCollection) || [];
-    var text = AdaptiveCardFilter.getTextBlocksAsString(contentCollection) || '';
+    var nonText = getNonTextBlocks(contentCollection) || [];
+    var text = getTextBlocksAsString(contentCollection) || '';
     if (typeof textFunc === 'function') {
         text = textFunc(text);
     }

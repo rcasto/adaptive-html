@@ -1,7 +1,14 @@
 import AdaptiveCardRules from './adaptivecard-rules';
-import AdaptiveCardHelper from '../lib/adaptiveCardHelper';
-import AdaptiveCardFilter from '../lib/adaptiveCardFilter';
-import UtilityHelper from '../lib/utilityHelper';
+import {
+    createCard,
+    createTextBlock
+} from '../lib/adaptiveCardHelper';
+import {
+    isCardElement
+} from '../lib/adaptiveCardFilter';
+import {
+    toArray
+} from '../lib/utilityHelper';
 import Rules from './rules';
 import RootNode from './root-node';
 import Node from './node';
@@ -51,7 +58,7 @@ TurndownService.prototype = {
             throw new TypeError(`${input} is not a string, or an element/document/fragment node.`);
         }
         var cardElems = process.call(this, new RootNode(input));
-        return AdaptiveCardHelper.createCard(cardElems);
+        return createCard(cardElems);
     }
 }
 
@@ -76,22 +83,22 @@ function process(parentNode) {
 
         // text nodes, em, i, b, strong, a tags will hit this
         if (typeof replacement === 'object' &&
-            !AdaptiveCardFilter.isCardElement(replacement) &&
+            !isCardElement(replacement) &&
             !Array.isArray(replacement)) {
             currText += replacement.text;
             if ((replacement.nonText &&
                 replacement.nonText.length) || 
                 !node.nextSibling) {
-                output.push(AdaptiveCardHelper.createTextBlock(currText));
+                output.push(createTextBlock(currText));
                 currText = '';
             }
             replacement = replacement.nonText || [];
         } else if (currText) { // Collection detected, let's push this textblock first, then clear the text
-            output.push(AdaptiveCardHelper.createTextBlock(currText));
+            output.push(createTextBlock(currText));
             currText = '';
         }
 
-        return output.concat(UtilityHelper.toArray(replacement));
+        return output.concat(toArray(replacement));
     }, []);
 
     return blocks;
