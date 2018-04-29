@@ -307,7 +307,7 @@ test('can handle line breaks in TextBlock', t => {
         "body": [
             {
                 "type": "TextBlock",
-                "text": "Give me a break\n\nI'm so\n\nfunny hahaha"
+                "text": "Give me a break  \nI'm so  \nfunny hahaha"
             }
         ],
         "actions": [],

@@ -20,6 +20,9 @@ export function isVoid(node) {
     return voidElements.indexOf(node.nodeName.toLowerCase()) !== -1
 };
 
+export const lineBreakRegex = /  \n/g;
+export const carriageReturnTabRegex = /\r\t/g;
+
 const voidSelector = voidElements.join();
 export function hasVoid(node) {
     return node.querySelector && node.querySelector(voidSelector)

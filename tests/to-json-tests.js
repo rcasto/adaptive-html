@@ -63,7 +63,7 @@ test('can transform text node with breaks in it', t => {
         type: "AdaptiveCard",
         body: [{
             type: "TextBlock",
-            text: "This is some text\n\nwith a break in it",
+            text: "This is some text  \nwith a break in it",
             wrap: true
         }],
         actions: [],
@@ -158,7 +158,7 @@ test('can handle p tag with line breaks in it', t => {
         body: [
             {
                 type: "TextBlock",
-                text: "This paragraph is\n\nbreaking up\n\nwhat is happening?",
+                text: "This paragraph is  \nbreaking up  \nwhat is happening?",
                 wrap: true
             }
         ],
@@ -547,7 +547,7 @@ test('can handle line break in list', t => {
         body: [
             {
                 type: "TextBlock",
-                text: "- List item 1\n\n\tList item 1 continues",
+                text: "- List item 1  \n\tList item 1 continues",
                 wrap: true
             }, {
                 type: "TextBlock",

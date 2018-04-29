@@ -2,10 +2,12 @@ import AdaptiveCardHelper from '../lib/adaptiveCardHelper';
 import AdaptiveCardFilter from '../lib/adaptiveCardFilter';
 import {
     isVoid,
-    hasVoid
+    hasVoid,
+    lineBreakRegex,
+    carriageReturnTabRegex
 } from './utilities';
 
-var rules = {};
+const rules = {};
 
 rules.blank = {
     filter: function (node) {
@@ -41,7 +43,7 @@ rules.lineBreak = {
     filter: 'br',
     replacement: function (content) {
         return handleTextEffects(content, function (text) {
-            return '\n\n';
+            return '  \n';
         });
     }
 };
@@ -87,14 +89,18 @@ rules.listItem = {
             var cardType = currBlock.type;
             switch (cardType) {
                 case AdaptiveCardFilter.cardTypes.textBlock:
-                    currText += ` ${currBlock.text.replace(/\n\n/g, '\n\n\t').trim()}`;
+                    currText += ` ${currBlock.text
+                        .replace(lineBreakRegex, '  \n\t')
+                        .trim()}`;
                     break;
                 case AdaptiveCardFilter.cardTypes.container:
                     let nestedListElems = AdaptiveCardHelper.unwrap(currBlock);
                     nestedListElems
                         .forEach(nestedListElem => {
                             if (AdaptiveCardFilter.isTextBlock(nestedListElem)) {
-                                currText += '\r\t' + nestedListElem.text.replace(/\r\t/g, '\r\t\t').replace(/\n\n/g, '\n\n\t');
+                                currText += `\r\t${nestedListElem.text
+                                    .replace(carriageReturnTabRegex, '\r\t\t')
+                                    .replace(lineBreakRegex, '  \n\t')}`;
                             } else {
                                 prevBlocks.push(nestedListElem);
                             }

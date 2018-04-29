@@ -51,7 +51,7 @@ test('can handle more complex JSON -> HTML -> JSON', t => {
                 "items": [
                     {
                         "type": "TextBlock",
-                        "text": "**Prep:** 5 minutes\n\n**Cook:** 15 minutes\n\n**Ready In:** 20 Minutes",
+                        "text": "**Prep:** 5 minutes  \n**Cook:** 15 minutes  \n**Ready In:** 20 Minutes",
                         "wrap": true
                     }
                 ]
