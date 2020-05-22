@@ -5,7 +5,7 @@ var buildMinifiedLibrary = shouldMinify(process.argv);
 var plugins = [
     babel({
         exclude: 'node_modules/**', // only transpile our source code
-        babelHelpers: 'external'
+        babelHelpers: 'bundled'
     })
 ];
 

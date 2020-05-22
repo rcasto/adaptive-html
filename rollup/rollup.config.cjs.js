@@ -3,7 +3,7 @@ import babel from '@rollup/plugin-babel';
 var plugins = [
     babel({
         exclude: 'node_modules/**', // only transpile our source code
-        babelHelpers: 'external'
+        babelHelpers: 'bundled'
     })
 ];
 

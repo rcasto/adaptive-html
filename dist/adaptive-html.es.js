@@ -1,5 +1,21 @@
 import AdaptiveCards from 'adaptivecards';
 
+function _typeof(obj) {
+  "@babel/helpers - typeof";
+
+  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+    _typeof = function (obj) {
+      return typeof obj;
+    };
+  } else {
+    _typeof = function (obj) {
+      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    };
+  }
+
+  return _typeof(obj);
+}
+
 function toArray(x) {
   if (Array.isArray(x)) {
     return x;
@@ -56,7 +72,7 @@ function isCardElement(card) {
   return isTextBlock(card) || isImage(card) || isContainer(card);
 }
 function isValidAdaptiveCardJSON(json) {
-  return json && babelHelpers["typeof"](json) === 'object' && json.type === cardTypes.adaptiveCard && supportedCardVersions.indexOf(json.version) > -1;
+  return json && _typeof(json) === 'object' && json.type === cardTypes.adaptiveCard && supportedCardVersions.indexOf(json.version) > -1;
 }
 function getTextBlocks(cardCollection) {
   return getBlocks(cardCollection, cardTypes.textBlock);
@@ -629,7 +645,7 @@ function process(parentNode) {
 
     replacement = replacement || []; // text nodes, em, i, b, strong, a tags will hit this
 
-    if (babelHelpers["typeof"](replacement) === 'object' && !isCardElement(replacement) && !Array.isArray(replacement)) {
+    if (_typeof(replacement) === 'object' && !isCardElement(replacement) && !Array.isArray(replacement)) {
       currText += replacement.text;
 
       if (replacement.nonText && replacement.nonText.length || !node.nextSibling) {
@@ -761,7 +777,7 @@ function _recurseNodeTree(node, root, options) {
 
   if (typeof options.processNode === 'function') {
     options.processNode(node, root);
-  } else if (options.processNode && babelHelpers["typeof"](options.processNode) === 'object') {
+  } else if (options.processNode && _typeof(options.processNode) === 'object') {
     processNode(node, root, options);
   }
 }
@@ -829,12 +845,12 @@ function setOptions$1(options, defaults) {
   if (typeof options.processNode === 'undefined' || options.processNode && typeof options.processNode === 'boolean') {
     options.processNode = Object.assign({}, defaults.processNode);
 
-    if (options.hostConfig && babelHelpers["typeof"](options.hostConfig) === 'object') {
+    if (options.hostConfig && _typeof(options.hostConfig) === 'object') {
       options.processNode.removeAttributes = options.processNode.removeAttributes.concat(attributeHostConfigWhiteList);
     }
   }
 
-  if (!options.hostConfig || babelHelpers["typeof"](options.hostConfig) !== 'object') {
+  if (!options.hostConfig || _typeof(options.hostConfig) !== 'object') {
     options.hostConfig = {};
   }
 
