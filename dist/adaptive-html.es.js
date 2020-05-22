@@ -1,381 +1,401 @@
+function _typeof(obj) {
+  "@babel/helpers - typeof";
+
+  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+    _typeof = function (obj) {
+      return typeof obj;
+    };
+  } else {
+    _typeof = function (obj) {
+      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    };
+  }
+
+  return _typeof(obj);
+}
+
 function toArray(x) {
-    if (Array.isArray(x)) {
-        return x;
-    }
-    return x ? [x] : [];
+  if (Array.isArray(x)) {
+    return x;
+  }
+
+  return x ? [x] : [];
 }
 
 function getBlocks(cardCollection, types) {
-    types = toArray(types);
-    cardCollection = toArray(cardCollection);
-    return cardCollection.filter(function (card) {
-        return types.some(function (type) {
-            return isCardType(card, type);
-        });
+  types = toArray(types);
+  cardCollection = toArray(cardCollection);
+  return cardCollection.filter(function (card) {
+    return types.some(function (type) {
+      return isCardType(card, type);
     });
+  });
 }
 
 function isCardType(card, type) {
-    if (!card) {
-        return false;
-    }
-    var cardType = (card.type || '').toLowerCase();
-    type = (type || '').toLowerCase();
-    return cardType === type;
+  if (!card) {
+    return false;
+  }
+
+  var cardType = (card.type || '').toLowerCase();
+  type = (type || '').toLowerCase();
+  return cardType === type;
 }
 
 var cardTypes = Object.freeze({
-    textBlock: "TextBlock",
-    container: "Container",
-    image: "Image",
-    adaptiveCard: "AdaptiveCard"
+  textBlock: "TextBlock",
+  container: "Container",
+  image: "Image",
+  adaptiveCard: "AdaptiveCard"
 });
-
 function isTextBlock(card) {
-    return isCardType(card, cardTypes.textBlock);
+  return isCardType(card, cardTypes.textBlock);
 }
-
 function isContainer(card) {
-    return isCardType(card, cardTypes.container);
+  return isCardType(card, cardTypes.container);
 }
-
 function isImage(card) {
-    return isCardType(card, cardTypes.image);
+  return isCardType(card, cardTypes.image);
 }
-
 function isCardElement(card) {
-    return isTextBlock(card) || isImage(card) || isContainer(card);
+  return isTextBlock(card) || isImage(card) || isContainer(card);
 }
-
 function getTextBlocks(cardCollection) {
-    return getBlocks(cardCollection, cardTypes.textBlock);
+  return getBlocks(cardCollection, cardTypes.textBlock);
 }
-
 function getNonTextBlocks(cardCollection) {
-    return getBlocks(cardCollection, [cardTypes.image, cardTypes.container]);
+  return getBlocks(cardCollection, [cardTypes.image, cardTypes.container]);
 }
-
 function getTextBlocksAsString(cardCollection) {
-    return getTextBlocks(cardCollection).map(function (textBlock) {
-        return textBlock.text;
-    }).join(' ').replace(/ +/g, ' ').trim();
+  return getTextBlocks(cardCollection).map(function (textBlock) {
+    return textBlock.text;
+  }).join(' ').replace(/ +/g, ' ').trim();
 }
 
 function setOptions(obj, options) {
-    Object.keys(options || {}).forEach(function (optionKey) {
-        obj[optionKey] = options[optionKey];
-    });
+  Object.keys(options || {}).forEach(function (optionKey) {
+    obj[optionKey] = options[optionKey];
+  });
 }
 
 function createCard(elements) {
-    var card = {
-        type: cardTypes.adaptiveCard,
-        body: [],
-        actions: [],
-        version: '1.0'
-    };
-    var body = toArray(elements);
-    if (Array.isArray(elements) && elements.length === 1 && isContainer(elements[0])) {
-        body = toArray(unwrap(elements[0]));
-    }
-    card.body = body;
-    return card;
-}
+  var card = {
+    type: cardTypes.adaptiveCard,
+    body: [],
+    actions: [],
+    version: '1.0'
+  };
+  var body = toArray(elements);
 
+  if (Array.isArray(elements) && elements.length === 1 && isContainer(elements[0])) {
+    body = toArray(unwrap(elements[0]));
+  }
+
+  card.body = body;
+  return card;
+}
 function createTextBlock(text, options) {
-    var textBlock = {
-        type: cardTypes.textBlock,
-        text: text || '',
-        wrap: true
-    };
-    setOptions(textBlock, options);
-    return textBlock;
+  var textBlock = {
+    type: cardTypes.textBlock,
+    text: text || '',
+    wrap: true
+  };
+  setOptions(textBlock, options);
+  return textBlock;
 }
-
 function createHeadingTextBlock(text, depth) {
-    var weight = 'bolder';
-    var size = 'default';
-    switch (depth) {
-        case 1:
-            size = 'extraLarge';
-            break;
-        case 2:
-            size = 'large';
-            break;
-        case 3:
-            size = 'medium';
-            break;
-        case 4:
-            size = 'medium';
-            weight = 'default';
-            break;
-        case 5:
-            size = 'default';
-            break;
-        case 6:
-            size = 'small';
-            break;
-    }
-    return createTextBlock(text, {
-        size: size,
-        weight: weight
-    });
-}
+  var weight = 'bolder';
+  var size = 'default';
 
+  switch (depth) {
+    case 1:
+      size = 'extraLarge';
+      break;
+
+    case 2:
+      size = 'large';
+      break;
+
+    case 3:
+      size = 'medium';
+      break;
+
+    case 4:
+      size = 'medium';
+      weight = 'default';
+      break;
+
+    case 5:
+      size = 'default';
+      break;
+
+    case 6:
+      size = 'small';
+      break;
+  }
+
+  return createTextBlock(text, {
+    size: size,
+    weight: weight
+  });
+}
 function createImage(url, options) {
-    var image = {
-        type: cardTypes.image,
-        url: url
-    };
-    setOptions(image, options);
-    return image;
-}
+  var image = {
+    type: cardTypes.image,
+    url: url
+  };
+  setOptions(image, options);
+  return image;
+} // Wrap adaptive card elements in a container
 
-// Wrap adaptive card elements in a container
 function wrap(elements, options) {
-    elements = toArray(elements);
-    /* Don't wrap only a container in a container */
-    if (elements.length === 1 && isContainer(elements[0])) {
-        return elements[0];
-    }
-    var container = {
-        type: cardTypes.container,
-        items: elements
-    };
-    setOptions(container, options);
-    return container;
-}
+  elements = toArray(elements);
+  /* Don't wrap only a container in a container */
 
-// Returns the list of elements within a container
+  if (elements.length === 1 && isContainer(elements[0])) {
+    return elements[0];
+  }
+
+  var container = {
+    type: cardTypes.container,
+    items: elements
+  };
+  setOptions(container, options);
+  return container;
+} // Returns the list of elements within a container
 // If the item passed in is not a container, it is simply returned
+
 function unwrap(container) {
-    if (!isContainer(container)) {
-        return toArray(container);
-    }
-    return container.items || [];
+  if (!isContainer(container)) {
+    return toArray(container);
+  }
+
+  return container.items || [];
 }
 
 var blockElements = ['address', 'article', 'aside', 'audio', 'blockquote', 'body', 'canvas', 'center', 'dd', 'dir', 'div', 'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'html', 'isindex', 'li', 'main', 'menu', 'nav', 'noframes', 'noscript', 'ol', 'output', 'p', 'pre', 'section', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'ul'];
-
 function isBlock(node) {
-    return blockElements.indexOf(node.nodeName.toLowerCase()) !== -1;
+  return blockElements.indexOf(node.nodeName.toLowerCase()) !== -1;
 }
 var voidElements = ['area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'];
-
 function isVoid(node) {
-    return voidElements.indexOf(node.nodeName.toLowerCase()) !== -1;
+  return voidElements.indexOf(node.nodeName.toLowerCase()) !== -1;
 }
 var lineBreakRegex = /  \n/g;
 var carriageReturnTabRegex = /\r\t/g;
-
 var voidSelector = voidElements.join();
 function hasVoid(node) {
-    return node.querySelector && node.querySelector(voidSelector);
+  return node.querySelector && node.querySelector(voidSelector);
 }
 
 var rules = {};
-
 rules.blank = {
-    filter: function filter(node) {
-        return ['A', 'TH', 'TD'].indexOf(node.nodeName) === -1 && /^\s*$/i.test(node.textContent) && !isVoid(node) && !hasVoid(node);
-    },
-    replacement: function replacement(content, node) {
-        if (node.textContent) {
-            return handleTextEffects(content, function () {
-                return node.textContent;
-            });
-        }
-        return null;
+  filter: function filter(node) {
+    return ['A', 'TH', 'TD'].indexOf(node.nodeName) === -1 && /^\s*$/i.test(node.textContent) && !isVoid(node) && !hasVoid(node);
+  },
+  replacement: function replacement(content, node) {
+    if (node.textContent) {
+      return handleTextEffects(content, function () {
+        return node.textContent;
+      });
     }
-};
 
+    return null;
+  }
+};
 rules.text = {
-    filter: function filter(node) {
-        return node.nodeType === 3;
-    },
-    replacement: function replacement(content, node) {
-        return handleTextEffects(content, function () {
-            return node.nodeValue;
-        });
-    }
+  filter: function filter(node) {
+    return node.nodeType === 3;
+  },
+  replacement: function replacement(content, node) {
+    return handleTextEffects(content, function () {
+      return node.nodeValue;
+    });
+  }
 };
-
 rules.lineBreak = {
-    filter: 'br',
-    replacement: function replacement(content) {
-        return handleTextEffects(content, function (text) {
-            return '  \n';
-        });
-    }
+  filter: 'br',
+  replacement: function replacement(content) {
+    return handleTextEffects(content, function (text) {
+      return '  \n';
+    });
+  }
 };
-
 rules.heading = {
-    filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-    replacement: function replacement(content, node) {
-        var hLevel = Number(node.nodeName.charAt(1));
-        var hText = getTextBlocksAsString(content);
-        var hNonText = getNonTextBlocks(content);
-        return wrap([createHeadingTextBlock(hText, hLevel)].concat(hNonText));
-    }
+  filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+  replacement: function replacement(content, node) {
+    var hLevel = Number(node.nodeName.charAt(1));
+    var hText = getTextBlocksAsString(content);
+    var hNonText = getNonTextBlocks(content);
+    return wrap([createHeadingTextBlock(hText, hLevel)].concat(hNonText));
+  }
 };
-
 rules.list = {
-    filter: ['ul', 'ol'],
-    // content = array of listitem containers
-    replacement: function replacement(listItemContainers, node) {
-        var isOrdered = node.nodeName === 'OL';
-        var startIndex = parseInt(node.getAttribute('start'), 10) || 1; // only applicable to ordered lists
-        var blocks = (listItemContainers || []).map(function (listItemContainer, listItemIndex) {
-            var listItemElems = unwrap(listItemContainer);
-            var firstListItemElem = listItemElems[0];
-            if (firstListItemElem && isTextBlock(firstListItemElem)) {
-                var firstListItemPrefix = isOrdered ? startIndex + listItemIndex + '. ' : '- ';
-                firstListItemElem.text = firstListItemPrefix + firstListItemElem.text;
-            }
-            return listItemElems;
-        }).reduce(function (prevBlocks, listItemBlocks) {
-            return prevBlocks.concat(listItemBlocks);
-        }, []);
-        return wrap(blocks);
-    }
-};
+  filter: ['ul', 'ol'],
+  // content = array of listitem containers
+  replacement: function replacement(listItemContainers, node) {
+    var isOrdered = node.nodeName === 'OL';
+    var startIndex = parseInt(node.getAttribute('start'), 10) || 1; // only applicable to ordered lists
 
+    var blocks = (listItemContainers || []).map(function (listItemContainer, listItemIndex) {
+      var listItemElems = unwrap(listItemContainer);
+      var firstListItemElem = listItemElems[0];
+
+      if (firstListItemElem && isTextBlock(firstListItemElem)) {
+        var firstListItemPrefix = isOrdered ? "".concat(startIndex + listItemIndex, ". ") : "- ";
+        firstListItemElem.text = firstListItemPrefix + firstListItemElem.text;
+      }
+
+      return listItemElems;
+    }).reduce(function (prevBlocks, listItemBlocks) {
+      return prevBlocks.concat(listItemBlocks);
+    }, []);
+    return wrap(blocks);
+  }
+};
 rules.listItem = {
-    filter: 'li',
-    replacement: function replacement(content) {
-        var currText = '';
-        var blocks = (content || []).reduce(function (prevBlocks, currBlock) {
-            var cardType = currBlock.type;
-            switch (cardType) {
-                case cardTypes.textBlock:
-                    currText += ' ' + currBlock.text.replace(lineBreakRegex, '  \n\t').trim();
-                    break;
-                case cardTypes.container:
-                    var nestedListElems = unwrap(currBlock);
-                    nestedListElems.forEach(function (nestedListElem) {
-                        if (isTextBlock(nestedListElem)) {
-                            currText += '\r\t' + nestedListElem.text.replace(carriageReturnTabRegex, '\r\t\t').replace(lineBreakRegex, '  \n\t');
-                        } else {
-                            prevBlocks.push(nestedListElem);
-                        }
-                    });
-                    break;
-                case cardTypes.image:
-                    prevBlocks.push(currBlock);
-                    break;
-                default:
-                    console.error('Unsupported card type: ' + cardType + ' ' + currBlock);
+  filter: 'li',
+  replacement: function replacement(content) {
+    var currText = '';
+    var blocks = (content || []).reduce(function (prevBlocks, currBlock) {
+      var cardType = currBlock.type;
+
+      switch (cardType) {
+        case cardTypes.textBlock:
+          currText += " ".concat(currBlock.text.replace(lineBreakRegex, '  \n\t').trim());
+          break;
+
+        case cardTypes.container:
+          var nestedListElems = unwrap(currBlock);
+          nestedListElems.forEach(function (nestedListElem) {
+            if (isTextBlock(nestedListElem)) {
+              currText += "\r\t".concat(nestedListElem.text.replace(carriageReturnTabRegex, '\r\t\t').replace(lineBreakRegex, '  \n\t'));
+            } else {
+              prevBlocks.push(nestedListElem);
             }
-            return prevBlocks;
-        }, []);
+          });
+          break;
 
-        if (currText) {
-            blocks.unshift(createTextBlock(currText.trim()));
-        }
+        case cardTypes.image:
+          prevBlocks.push(currBlock);
+          break;
 
-        return wrap(blocks);
+        default:
+          console.error("Unsupported card type: ".concat(cardType, " ").concat(currBlock));
+      }
+
+      return prevBlocks;
+    }, []);
+
+    if (currText) {
+      blocks.unshift(createTextBlock(currText.trim()));
     }
-};
 
+    return wrap(blocks);
+  }
+};
 rules.inlineLink = {
-    filter: function filter(node) {
-        return node.nodeName === 'A' && node.getAttribute('href');
-    },
-    replacement: function replacement(content, node) {
-        var href = node.getAttribute('href');
-        return handleTextEffects(content, function (text) {
-            return '[' + text + '](' + href + ')';
-        });
-    }
+  filter: function filter(node) {
+    return node.nodeName === 'A' && node.getAttribute('href');
+  },
+  replacement: function replacement(content, node) {
+    var href = node.getAttribute('href');
+    return handleTextEffects(content, function (text) {
+      return "[".concat(text, "](").concat(href, ")");
+    });
+  }
 };
-
 rules.emphasis = {
-    filter: ['em', 'i'],
-    replacement: function replacement(content, node) {
-        return handleTextEffects(content, function (text) {
-            return '_' + text + '_';
-        });
-    }
+  filter: ['em', 'i'],
+  replacement: function replacement(content, node) {
+    return handleTextEffects(content, function (text) {
+      return "_".concat(text, "_");
+    });
+  }
 };
-
 rules.strong = {
-    filter: ['strong', 'b'],
-    replacement: function replacement(content, node) {
-        return handleTextEffects(content, function (text) {
-            return '**' + text + '**';
-        });
-    }
+  filter: ['strong', 'b'],
+  replacement: function replacement(content, node) {
+    return handleTextEffects(content, function (text) {
+      return "**".concat(text, "**");
+    });
+  }
 };
-
 rules.image = {
-    filter: 'img',
-    replacement: function replacement(content, node) {
-        var alt = node.alt || '';
-        var src = node.getAttribute('src') || '';
-        return createImage(src, {
-            altText: alt
-        });
-    }
+  filter: 'img',
+  replacement: function replacement(content, node) {
+    var alt = node.alt || '';
+    var src = node.getAttribute('src') || '';
+    return createImage(src, {
+      altText: alt
+    });
+  }
 };
-
 /* This must be the last rule */
-rules.default = {
-    filter: function filter() {
-        return true;
-    },
-    replacement: function replacement(content, node) {
-        if (node.isBlock) {
-            return wrap(content);
-        }
-        return content;
+
+rules["default"] = {
+  filter: function filter() {
+    return true;
+  },
+  replacement: function replacement(content, node) {
+    if (node.isBlock) {
+      return wrap(content);
     }
+
+    return content;
+  }
 };
 
 function handleTextEffects(contentCollection, textFunc) {
-    var nonText = getNonTextBlocks(contentCollection) || [];
-    var text = getTextBlocksAsString(contentCollection) || '';
-    if (typeof textFunc === 'function') {
-        text = textFunc(text);
-    }
-    return {
-        text: text,
-        nonText: nonText
-    };
+  var nonText = getNonTextBlocks(contentCollection) || [];
+  var text = getTextBlocksAsString(contentCollection) || '';
+
+  if (typeof textFunc === 'function') {
+    text = textFunc(text);
+  }
+
+  return {
+    text: text,
+    nonText: nonText
+  };
 }
 
 /**
  * Manages a collection of rules used to convert HTML to Adaptive Card JSON
  */
 function Rules(rules) {
-    this.rules = Object.assign({}, rules);
+  this.rules = Object.assign({}, rules);
 }
 
 Rules.prototype.forNode = function (node) {
-    return findRule(this.rules, node);
+  return findRule(this.rules, node);
 };
 
 function findRule(rules, node) {
-    var foundRule = null;
-    (Object.keys(rules) || []).some(function (ruleKey) {
-        if (filterValue(rules[ruleKey], node)) {
-            foundRule = rules[ruleKey];
-            return true;
-        }
-        return false;
-    });
-    return foundRule;
+  var foundRule = null;
+  (Object.keys(rules) || []).some(function (ruleKey) {
+    if (filterValue(rules[ruleKey], node)) {
+      foundRule = rules[ruleKey];
+      return true;
+    }
+
+    return false;
+  });
+  return foundRule;
 }
 
 function filterValue(rule, node) {
-    var filter = rule.filter;
-    if (typeof filter === 'string') {
-        return filter === node.nodeName.toLowerCase();
-    } else if (Array.isArray(filter)) {
-        return filter.indexOf(node.nodeName.toLowerCase()) > -1;
-    } else if (typeof filter === 'function') {
-        return filter.call(rule, node);
-    }
-    throw new TypeError('`filter` needs to be a string, array, or function');
+  var filter = rule.filter;
+
+  if (typeof filter === 'string') {
+    return filter === node.nodeName.toLowerCase();
+  } else if (Array.isArray(filter)) {
+    return filter.indexOf(node.nodeName.toLowerCase()) > -1;
+  } else if (typeof filter === 'function') {
+    return filter.call(rule, node);
+  }
+
+  throw new TypeError('`filter` needs to be a string, array, or function');
 }
 
 /*!
@@ -411,71 +431,69 @@ function filterValue(rule, node) {
  * @param {Object} options
  */
 function collapseWhitespace(options) {
-    var element = options.element;
-    var isBlock = options.isBlock;
-    var isVoid = options.isVoid;
-    var isPre = options.isPre || function (node) {
-        return node.nodeName === 'PRE';
-    };
+  var element = options.element;
+  var isBlock = options.isBlock;
+  var isVoid = options.isVoid;
 
-    if (!element.firstChild || isPre(element)) return;
+  var isPre = options.isPre || function (node) {
+    return node.nodeName === 'PRE';
+  };
 
-    var prevText = null;
-    var prevVoid = false;
+  if (!element.firstChild || isPre(element)) return;
+  var prevText = null;
+  var prevVoid = false;
+  var prev = null;
+  var node = next(prev, element, isPre);
 
-    var prev = null;
-    var node = next(prev, element, isPre);
+  while (node !== element) {
+    if (node.nodeType === 3 || node.nodeType === 4) {
+      // Node.TEXT_NODE or Node.CDATA_SECTION_NODE
+      var text = node.data.replace(/[ \r\n\t]+/g, ' ');
 
-    while (node !== element) {
-        if (node.nodeType === 3 || node.nodeType === 4) {
-            // Node.TEXT_NODE or Node.CDATA_SECTION_NODE
-            var text = node.data.replace(/[ \r\n\t]+/g, ' ');
+      if ((!prevText || / $/.test(prevText.data)) && !prevVoid && text[0] === ' ') {
+        text = text.substr(1);
+      } // `text` might be empty at this point.
 
-            if ((!prevText || / $/.test(prevText.data)) && !prevVoid && text[0] === ' ') {
-                text = text.substr(1);
-            }
 
-            // `text` might be empty at this point.
-            if (!text) {
-                node = remove(node);
-                continue;
-            }
+      if (!text) {
+        node = remove(node);
+        continue;
+      }
 
-            node.data = text;
-
-            prevText = node;
-        } else if (node.nodeType === 1) {
-            // Node.ELEMENT_NODE
-            if (isBlock(node) || node.nodeName === 'BR') {
-                if (prevText) {
-                    prevText.data = prevText.data.replace(/ $/, '');
-                }
-
-                prevText = null;
-                prevVoid = false;
-            } else if (isVoid(node)) {
-                // Avoid trimming space around non-block, non-BR void elements.
-                prevText = null;
-                prevVoid = true;
-            }
-        } else {
-            node = remove(node);
-            continue;
+      node.data = text;
+      prevText = node;
+    } else if (node.nodeType === 1) {
+      // Node.ELEMENT_NODE
+      if (isBlock(node) || node.nodeName === 'BR') {
+        if (prevText) {
+          prevText.data = prevText.data.replace(/ $/, '');
         }
 
-        var nextNode = next(prev, node, isPre);
-        prev = node;
-        node = nextNode;
+        prevText = null;
+        prevVoid = false;
+      } else if (isVoid(node)) {
+        // Avoid trimming space around non-block, non-BR void elements.
+        prevText = null;
+        prevVoid = true;
+      }
+    } else {
+      node = remove(node);
+      continue;
     }
 
-    if (prevText) {
-        prevText.data = prevText.data.replace(/ $/, '');
-        if (!prevText.data) {
-            remove(prevText);
-        }
+    var nextNode = next(prev, node, isPre);
+    prev = node;
+    node = nextNode;
+  }
+
+  if (prevText) {
+    prevText.data = prevText.data.replace(/ $/, '');
+
+    if (!prevText.data) {
+      remove(prevText);
     }
+  }
 }
-
 /**
 * remove(node) removes the given node from the DOM and returns the
 * next node in the sequence.
@@ -483,14 +501,13 @@ function collapseWhitespace(options) {
 * @param {Node} node
 * @return {Node} node
 */
+
+
 function remove(node) {
-    var next = node.nextSibling || node.parentNode;
-
-    node.parentNode.removeChild(node);
-
-    return next;
+  var next = node.nextSibling || node.parentNode;
+  node.parentNode.removeChild(node);
+  return next;
 }
-
 /**
 * next(prev, current, isPre) returns the next node in the sequence, given the
 * current and previous nodes.
@@ -500,51 +517,48 @@ function remove(node) {
 * @param {Function} isPre
 * @return {Node}
 */
-function next(prev, current, isPre) {
-    if (prev && prev.parentNode === current || isPre(current)) {
-        return current.nextSibling || current.parentNode;
-    }
 
-    return current.firstChild || current.nextSibling || current.parentNode;
+
+function next(prev, current, isPre) {
+  if (prev && prev.parentNode === current || isPre(current)) {
+    return current.nextSibling || current.parentNode;
+  }
+
+  return current.firstChild || current.nextSibling || current.parentNode;
 }
 
 var _htmlParser;
 
 function RootNode(input) {
-    var root;
-    if (typeof input === 'string') {
-        var doc = htmlParser().parseFromString(
-        // DOM parsers arrange elements in the <head> and <body>.
-        // Wrapping in a custom element ensures elements are reliably arranged in
-        // a single element.
-        '<x-turndown id="turndown-root">' + input + '</x-turndown>', 'text/html');
-        root = doc.getElementById('turndown-root');
-    } else {
-        root = input.cloneNode(true);
-    }
-    collapseWhitespace({
-        element: root,
-        isBlock: isBlock,
-        isVoid: isVoid
-    });
-    return root;
+  var root;
+
+  if (typeof input === 'string') {
+    var doc = htmlParser().parseFromString( // DOM parsers arrange elements in the <head> and <body>.
+    // Wrapping in a custom element ensures elements are reliably arranged in
+    // a single element.
+    "<x-turndown id=\"turndown-root\">".concat(input, "</x-turndown>"), 'text/html');
+    root = doc.getElementById('turndown-root');
+  } else {
+    root = input.cloneNode(true);
+  }
+
+  collapseWhitespace({
+    element: root,
+    isBlock: isBlock,
+    isVoid: isVoid
+  });
+  return root;
 }
 
 function htmlParser() {
-    _htmlParser = _htmlParser || new DOMParser();
-    return _htmlParser;
+  _htmlParser = _htmlParser || new DOMParser();
+  return _htmlParser;
 }
 
 function Node(node) {
-    node.isBlock = isBlock(node);
-    return node;
+  node.isBlock = isBlock(node);
+  return node;
 }
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
 
 /*!
  * Code in files within the turndown folder is taken and modified from the Turndown
@@ -575,66 +589,67 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
  */
 
 function TurndownService() {
-    this.rules = new Rules(rules);
+  this.rules = new Rules(rules);
 }
 
 TurndownService.prototype = {
-    /**
-     * The entry point for converting a string or DOM node to JSON
-     * @public
-     * @param {String|HTMLElement} input The string or DOM node to convert
-     * @returns A Markdown representation of the input
-     * @type String
-     */
-    turndown: function turndown(input) {
-        if (!canConvert(input)) {
-            throw new TypeError(input + ' is not a string, or an element/document/fragment node.');
-        }
-        var cardElems = process.call(this, new RootNode(input));
-        return createCard(cardElems);
+  /**
+   * The entry point for converting a string or DOM node to JSON
+   * @public
+   * @param {String|HTMLElement} input The string or DOM node to convert
+   * @returns A Markdown representation of the input
+   * @type String
+   */
+  turndown: function turndown(input) {
+    if (!canConvert(input)) {
+      throw new TypeError("".concat(input, " is not a string, or an element/document/fragment node."));
     }
 
-    /**
-     * Reduces a DOM node down to its Adaptive Card equivalent
-     * @private
-     * @param {HTMLElement} parentNode The node to convert
-     * @returns An Adaptive Card representation of the node
-     * @type String
-     */
-};function process(parentNode) {
-    var _this = this;
+    var cardElems = process.call(this, new RootNode(input));
+    return createCard(cardElems);
+  }
+};
+/**
+ * Reduces a DOM node down to its Adaptive Card equivalent
+ * @private
+ * @param {HTMLElement} parentNode The node to convert
+ * @returns An Adaptive Card representation of the node
+ * @type String
+ */
 
-    var currText = '';
-    var blocks = Array.prototype.reduce.call(parentNode.childNodes || [], function (output, node) {
-        var replacement = [];
+function process(parentNode) {
+  var _this = this;
 
-        node = new Node(node);
+  var currText = '';
+  var blocks = Array.prototype.reduce.call(parentNode.childNodes || [], function (output, node) {
+    var replacement = [];
+    node = new Node(node);
 
-        if (isValidNodetype(node)) {
-            replacement = replacementForNode.call(_this, node);
-        }
-        replacement = replacement || [];
+    if (isValidNodetype(node)) {
+      replacement = replacementForNode.call(_this, node);
+    }
 
-        // text nodes, em, i, b, strong, a tags will hit this
-        if ((typeof replacement === 'undefined' ? 'undefined' : _typeof(replacement)) === 'object' && !isCardElement(replacement) && !Array.isArray(replacement)) {
-            currText += replacement.text;
-            if (replacement.nonText && replacement.nonText.length || !node.nextSibling) {
-                output.push(createTextBlock(currText));
-                currText = '';
-            }
-            replacement = replacement.nonText || [];
-        } else if (currText) {
-            // Collection detected, let's push this textblock first, then clear the text
-            output.push(createTextBlock(currText));
-            currText = '';
-        }
+    replacement = replacement || []; // text nodes, em, i, b, strong, a tags will hit this
 
-        return output.concat(toArray(replacement));
-    }, []);
+    if (_typeof(replacement) === 'object' && !isCardElement(replacement) && !Array.isArray(replacement)) {
+      currText += replacement.text;
 
-    return blocks;
+      if (replacement.nonText && replacement.nonText.length || !node.nextSibling) {
+        output.push(createTextBlock(currText));
+        currText = '';
+      }
+
+      replacement = replacement.nonText || [];
+    } else if (currText) {
+      // Collection detected, let's push this textblock first, then clear the text
+      output.push(createTextBlock(currText));
+      currText = '';
+    }
+
+    return output.concat(toArray(replacement));
+  }, []);
+  return blocks;
 }
-
 /**
  * Converts an element node to its Adaptive Card equivalent
  * @private
@@ -642,12 +657,14 @@ TurndownService.prototype = {
  * @returns An Adaptive Card representation of the node
  * @type String
  */
-function replacementForNode(node) {
-    var rule = this.rules.forNode(node);
-    var content = process.call(this, node); // get's internal content of node
-    return rule.replacement(content, node);
-}
 
+
+function replacementForNode(node) {
+  var rule = this.rules.forNode(node);
+  var content = process.call(this, node); // get's internal content of node
+
+  return rule.replacement(content, node);
+}
 /**
  * Determines whether an input can be converted
  * @private
@@ -655,26 +672,28 @@ function replacementForNode(node) {
  * @returns Describe what it returns
  * @type String|Object|Array|Boolean|Number
  */
+
+
 function canConvert(input) {
-    return input != null && (typeof input === 'string' || input.nodeType && (input.nodeType === 1 || input.nodeType === 9 || input.nodeType === 11));
+  return input != null && (typeof input === 'string' || input.nodeType && (input.nodeType === 1 || input.nodeType === 9 || input.nodeType === 11));
 }
 
 function isValidNodetype(node) {
-    return !!(node && (node.nodeType === 3 || node.nodeType === 1));
+  return !!(node && (node.nodeType === 3 || node.nodeType === 1));
 }
 
 var turndownService = new TurndownService();
-
 /**
  * @param {(string | HTMLElement)} htmlStringOrElem
  * @returns {object} Adaptive Card JSON
  */
+
 function toJSON(htmlStringOrElem) {
-    return turndownService.turndown(htmlStringOrElem);
+  return turndownService.turndown(htmlStringOrElem);
 }
 
 var index = {
-    toJSON: toJSON
+  toJSON: toJSON
 };
 
 export default index;

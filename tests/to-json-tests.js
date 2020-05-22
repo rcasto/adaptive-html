@@ -22,7 +22,9 @@ test('can handle blank tag', t => {
 });
 
 test('can handle non string or node', t => {
-    var error = t.throws(() => AdaptiveHtml.toJSON(null), TypeError);
+    var error = t.throws(() => AdaptiveHtml.toJSON(null), {
+        instanceOf: TypeError
+    });
     t.is(error.message, 'null is not a string, or an element/document/fragment node.');
 });
 
