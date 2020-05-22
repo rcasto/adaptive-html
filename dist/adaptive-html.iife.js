@@ -1,12 +1,31 @@
 var AdaptiveHtml = (function () {
-'use strict';
+  'use strict';
 
-function toArray(x) {
+  function _typeof(obj) {
+    "@babel/helpers - typeof";
+
+    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+      _typeof = function (obj) {
+        return typeof obj;
+      };
+    } else {
+      _typeof = function (obj) {
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+      };
+    }
+
+    return _typeof(obj);
+  }
+
+  function toArray(x) {
     if (Array.isArray(x)) {
       return x;
     }
 
-function getBlocks(cardCollection, types) {
+    return x ? [x] : [];
+  }
+
+  function getBlocks(cardCollection, types) {
     types = toArray(types);
     cardCollection = toArray(cardCollection);
     return cardCollection.filter(function (card) {
@@ -43,9 +62,8 @@ function getBlocks(cardCollection, types) {
   }
   function isCardElement(card) {
     return isTextBlock(card) || isImage(card) || isContainer(card);
-}
-
-function getTextBlocks(cardCollection) {
+  }
+  function getTextBlocks(cardCollection) {
     return getBlocks(cardCollection, cardTypes.textBlock);
   }
   function getNonTextBlocks(cardCollection) {
@@ -543,43 +561,37 @@ function getTextBlocks(cardCollection) {
   function Node(node) {
     node.isBlock = isBlock(node);
     return node;
-}
+  }
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
+  /*!
+   * Code in files within the turndown folder is taken and modified from the Turndown
+   * project created by Dom Christie (https://github.com/domchristie/turndown/)
+   *
+   * MIT License
+   *
+   * Original work Copyright (c) 2017 Dom Christie
+   * Modified work Copyright (c) 2018 Richie Casto
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining a copy
+   * of this software and associated documentation files (the "Software"), to deal
+   * in the Software without restriction, including without limitation the rights
+   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   * copies of the Software, and to permit persons to whom the Software is
+   * furnished to do so, subject to the following conditions:
+   *
+   * The above copyright notice and this permission notice shall be included in
+   * all copies or substantial portions of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+   * THE SOFTWARE.
+   */
 
-/*!
- * Code in files within the turndown folder is taken and modified from the Turndown
- * project created by Dom Christie (https://github.com/domchristie/turndown/)
- *
- * MIT License
- *
- * Original work Copyright (c) 2017 Dom Christie
- * Modified work Copyright (c) 2018 Richie Casto
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
-function TurndownService() {
+  function TurndownService() {
     this.rules = new Rules(rules);
   }
 
@@ -671,17 +683,21 @@ function TurndownService() {
 
   function isValidNodetype(node) {
     return !!(node && (node.nodeType === 3 || node.nodeType === 1));
-}
+  }
 
-var turndownService = new TurndownService();
+  var turndownService = new TurndownService();
+  /**
+   * @param {(string | HTMLElement)} htmlStringOrElem
+   * @returns {object} Adaptive Card JSON
+   */
 
   function toJSON(htmlStringOrElem) {
     return turndownService.turndown(htmlStringOrElem);
-}
+  }
 
-var index = {
+  var index = {
     toJSON: toJSON
-};
+  };
 
   return index;
 

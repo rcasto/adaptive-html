@@ -1,8 +1,25 @@
+function _typeof(obj) {
+  "@babel/helpers - typeof";
+
+  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+    _typeof = function (obj) {
+      return typeof obj;
+    };
+  } else {
+    _typeof = function (obj) {
+      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    };
+  }
+
+  return _typeof(obj);
+}
+
 function toArray(x) {
-    if (Array.isArray(x)) {
-        return x;
-    }
-    return x ? [x] : [];
+  if (Array.isArray(x)) {
+    return x;
+  }
+
+  return x ? [x] : [];
 }
 
 function getBlocks(cardCollection, types) {
@@ -543,12 +560,6 @@ function Node(node) {
   return node;
 }
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
-
 /*!
  * Code in files within the turndown folder is taken and modified from the Turndown
  * project created by Dom Christie (https://github.com/domchristie/turndown/)
@@ -682,7 +693,7 @@ function toJSON(htmlStringOrElem) {
 }
 
 var index = {
-    toJSON: toJSON
+  toJSON: toJSON
 };
 
 export default index;
