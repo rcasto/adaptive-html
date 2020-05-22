@@ -10,7 +10,6 @@ Under the hood, this project has taken the [Turndown](https://github.com/domchri
 - [API](#api)
 - [Currently supported HTML tags](#currently-supported-html-tags)
 - [Known caveats](#known-caveats)
-- [Integrating with CKEditor](#integrating-with-ckeditor)
 - [Building it yourself](#building-it-yourself)
 
 ## Getting started
@@ -70,85 +69,6 @@ import AdaptiveHtml from './adaptive-html/dist/adaptive-html.es';
         }
     */
     ```
-- toHTML(object | string, object) => [HTMLElement](https://devdocs.io/dom/htmlelement)
-    - Reconstructs headings (h1 - h6), removes empty nodes, and removes attributes from nodes on top of the standard JSON to HTML conversion done by the adaptivecards library
-    - The second parameter is optional, but allows you to pass in a few options:
-        - **processMarkdown** (function|boolean) - A function accepting a string parameter and returning a string.  Will be called for each [TextBlock](http://adaptivecards.io/explorer/TextBlock.html) to process it's text and is expected to output compiled markdown or the text itself if no markdown is present
-            - Default value is `true` (will utilize standard process markdown function of adaptivecards library)
-        - **processNode** (function|boolean|object) - A function accepting an [HTMLElement](https://devdocs.io/dom/htmlelement) representing the current node being processed as the first parameter, another HTMLElement representing the card root as the second parameter, and the options object itself as the third parameter. It is not expected to return anything.  Will be called for each element in the HTML output from the adaptivecards library.  Allows you to manipulate the HTML output if desired.  Will override the default HTML transformations done
-            - Default value:
-            ```json
-            {
-                "removeEmptyNodes": true,
-                "reconstructHeadings": true,
-                "removeAttributes": true
-            }
-            ```
-            - options object values:
-                - removeEmptyNodes (boolean) - whether or not to remove empty nodes in card html output
-                - reconstructHeadings (boolean) - whether or not to attempt to reconstruct headings from card html output
-                - removeAttributes (boolean|array) - whether or not to remove attributes or not.  Can also pass a custom attribute white list as an array of attribute names to apply
-                    - Default attribute whitelist ['start', 'src', 'href', 'alt']
-        - **hostConfig** (object) - An object specifying a [HostConfig](https://docs.microsoft.com/en-us/adaptive-cards/display/hostconfig) you desire to use when converting the Adaptive Card JSON to HTML
-            - Default value:
-            ```json
-            {
-                "fontSizes": {
-                    "small": 12,
-                    "default": 14,
-                    "medium": 17,
-                    "large": 21,
-                    "extraLarge": 26
-                },
-                "fontWeights": {
-                    "lighter": 200,
-                    "default": 400,
-                    "bolder": 600
-                }
-            }
-            ```
-            - When this option is set, the whitelisted attributes for removeAttributes is automatically updated to allow the style and class attributes through
-    - **Note**: If you want to use this method, you must also include the [AdaptiveCards for Javascript library](https://docs.microsoft.com/en-us/adaptive-cards/display/libraries/htmlclient)
-    ```javascript
-    var adaptiveHtmlOptions = {
-        processNode: {
-            reconstructHeadings: false
-        },
-        hostConfig: { 
-            fontSizes: {
-                small: 14,
-                default: 17,
-                medium: 20,
-                large: 24,
-                extraLarge: 28
-            }
-        }
-    };
-    var adaptiveCardElem = AdaptiveHtml.toHTML({
-            "type": "AdaptiveCard",
-            "body": [
-                {
-                    "type": "TextBlock",
-                    "text": "Turn me into an Adaptive Card",
-                    "wrap": true,
-                    "weight:": "bolder",
-                    "size": "extraLarge"
-                }
-            ],
-            "actions": [],
-            "version": "1.0"
-        }, adaptiveHtmlOptions);
-    console.log(adaptiveCardElem.outerHTML);
-    /*
-        HTML returned
-
-        <div class="ac-container" tabindex="0" style="display: flex; flex-direction: column; justify-content: flex-start; box-sizing: border-box; flex: 0 0 auto; padding: 15px;">
-            <div style="overflow: hidden; font-family: &quot;Segoe UI&quot;, Segoe, &quot;Segoe WP&quot;, &quot;Helvetica Neue&quot;, Helvetica, sans-serif; text-align: left; font-size: 28px; line-height: 37.24px; color: rgb(0, 0, 0); font-weight: 400; word-wrap: break-word; box-sizing: border-box; flex: 0 0 auto;">
-                Turn me into an Adaptive Card
-            </div>
-        </div>
-    */
-    ```
 
 ## Currently supported HTML tags
 - p
@@ -169,16 +89,6 @@ For inline level elements, its contents are processed and simply returned.
 ## Known caveats
 - Images in list steps and nested steps are pushed to the bottom of the corresponding list step
 - Lists cannot contain headings
-
-## Integrating with CKEditor
-If you wish to integrate this with CKEditor it should for the most part work out of the box.  However, if you are utilizing the toHTML(object | string) function to take an Adaptive Card JSON and prepopulate the CKEditor instance then you will need [one extra configuration setting](https://docs.ckeditor.com/ckeditor4/latest/api/CKEDITOR_config.html#cfg-extraAllowedContent).
-```javascript
-var editorConfig = {
-    ...,
-    extraAllowedContent: 'ol[start]'
-}
-```
-The reason this is necessary is such that ordered lists are reconstructed with the correct starting index.
 
 ## Building it yourself
 If you wish to build the library yourself then you can follow these steps:  
