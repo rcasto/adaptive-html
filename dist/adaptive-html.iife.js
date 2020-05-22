@@ -1,42 +1,12 @@
-var AdaptiveHtml = (function (AdaptiveCards) {
-  'use strict';
+var AdaptiveHtml = (function () {
+'use strict';
 
-  AdaptiveCards = AdaptiveCards && Object.prototype.hasOwnProperty.call(AdaptiveCards, 'default') ? AdaptiveCards['default'] : AdaptiveCards;
-
-  function _typeof(obj) {
-    "@babel/helpers - typeof";
-
-    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-      _typeof = function (obj) {
-        return typeof obj;
-      };
-    } else {
-      _typeof = function (obj) {
-        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-      };
-    }
-
-    return _typeof(obj);
-  }
-
-  function toArray(x) {
+function toArray(x) {
     if (Array.isArray(x)) {
       return x;
     }
 
-    return x ? [x] : [];
-  }
-  function tryParseJSON(jsonString) {
-    try {
-      return JSON.parse(jsonString);
-    } catch (err) {
-      return null;
-    }
-  }
-
-  var supportedCardVersions = ['1.0'];
-
-  function getBlocks(cardCollection, types) {
+function getBlocks(cardCollection, types) {
     types = toArray(types);
     cardCollection = toArray(cardCollection);
     return cardCollection.filter(function (card) {
@@ -73,11 +43,9 @@ var AdaptiveHtml = (function (AdaptiveCards) {
   }
   function isCardElement(card) {
     return isTextBlock(card) || isImage(card) || isContainer(card);
-  }
-  function isValidAdaptiveCardJSON(json) {
-    return json && _typeof(json) === 'object' && json.type === cardTypes.adaptiveCard && supportedCardVersions.indexOf(json.version) > -1;
-  }
-  function getTextBlocks(cardCollection) {
+}
+
+function getTextBlocks(cardCollection) {
     return getBlocks(cardCollection, cardTypes.textBlock);
   }
   function getNonTextBlocks(cardCollection) {
@@ -575,37 +543,43 @@ var AdaptiveHtml = (function (AdaptiveCards) {
   function Node(node) {
     node.isBlock = isBlock(node);
     return node;
-  }
+}
 
-  /*!
-   * Code in files within the turndown folder is taken and modified from the Turndown
-   * project created by Dom Christie (https://github.com/domchristie/turndown/)
-   *
-   * MIT License
-   *
-   * Original work Copyright (c) 2017 Dom Christie
-   * Modified work Copyright (c) 2018 Richie Casto
-   *
-   * Permission is hereby granted, free of charge, to any person obtaining a copy
-   * of this software and associated documentation files (the "Software"), to deal
-   * in the Software without restriction, including without limitation the rights
-   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-   * copies of the Software, and to permit persons to whom the Software is
-   * furnished to do so, subject to the following conditions:
-   *
-   * The above copyright notice and this permission notice shall be included in
-   * all copies or substantial portions of the Software.
-   *
-   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-   * THE SOFTWARE.
-   */
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
 
-  function TurndownService() {
+/*!
+ * Code in files within the turndown folder is taken and modified from the Turndown
+ * project created by Dom Christie (https://github.com/domchristie/turndown/)
+ *
+ * MIT License
+ *
+ * Original work Copyright (c) 2017 Dom Christie
+ * Modified work Copyright (c) 2018 Richie Casto
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+function TurndownService() {
     this.rules = new Rules(rules);
   }
 
@@ -697,254 +671,18 @@ var AdaptiveHtml = (function (AdaptiveCards) {
 
   function isValidNodetype(node) {
     return !!(node && (node.nodeType === 3 || node.nodeType === 1));
-  }
+}
 
-  var attributeWhiteList = ['start', 'src', 'href', 'alt'];
-  var attributeHostConfigWhiteList = ['style', 'class', 'tabindex'];
-  /*
-   Setting this host config explicitly to try and protect from
-   changes within the adaptivecards library for defaults +
-   the adaptivecards library currently has no way to get the 
-   default hostConfig programmatically
-  */
-
-  var defaultHostConfig = {
-    fontSizes: {
-      small: 12,
-      "default": 14,
-      medium: 17,
-      large: 21,
-      extraLarge: 26
-    },
-    fontWeights: {
-      lighter: 200,
-      "default": 400,
-      bolder: 600
-    }
-  };
-  var defaultProcessMarkdown = null;
-  var defaultProcessNodeConfig = {
-    removeEmptyNodes: true,
-    reconstructHeadings: true,
-    removeAttributes: attributeWhiteList
-  };
-  var textNodeType = 3;
-  var elementNodeType = 1;
-
-  function toHTML(json, options) {
-    var card, cardHtml;
-
-    if (typeof json === 'string') {
-      json = tryParseJSON(json);
-    }
-
-    if (!isValidAdaptiveCardJSON(json)) {
-      throw new TypeError("".concat(JSON.stringify(json), " is not valid Adaptive Card JSON."));
-    }
-
-    if (!AdaptiveCards) {
-      throw new ReferenceError("AdaptiveCards is not available.  Make sure you are using the adaptivecards library if you want to utilize the toHTML(object | string) method");
-    }
-
-    if (!defaultProcessMarkdown) {
-      defaultProcessMarkdown = AdaptiveCards.AdaptiveCard.processMarkdown;
-    }
-
-    options = setOptions$1(options, {
-      processMarkdown: defaultProcessMarkdownWrapper,
-      processNode: defaultProcessNodeConfig,
-      hostConfig: defaultHostConfig
-    });
-    card = new AdaptiveCards.AdaptiveCard();
-    card.hostConfig = new AdaptiveCards.HostConfig(options.hostConfig);
-    card.parse(json);
-    cardHtml = card.render();
-    recurseNodeTree(cardHtml, options);
-    return cardHtml;
-  }
-
-  function recurseNodeTree(node, options) {
-    _recurseNodeTree(node, node, options);
-  }
-
-  function _recurseNodeTree(node, root, options) {
-    if (!node) {
-      return;
-    }
-
-    if (node.hasChildNodes()) {
-      Array.prototype.slice.call(node.childNodes).forEach(function (child) {
-        return _recurseNodeTree(child, root, options);
-      });
-    }
-
-    if (typeof options.processNode === 'function') {
-      options.processNode(node, root);
-    } else if (options.processNode && _typeof(options.processNode) === 'object') {
-      processNode(node, root, options);
-    }
-  }
-
-  function processNode(node, root, options) {
-    var nodeName = node.nodeName;
-
-    switch (nodeName) {
-      case 'DIV':
-        // Attempt to reconstruct headings / they are wrapped in a div tag
-        if (options.processNode.reconstructHeadings) {
-          var headingLevel = detectHeadingLevel(node, options.hostConfig);
-
-          if (headingLevel) {
-            var headingNode = document.createElement('h' + headingLevel);
-            headingNode.innerHTML = node.innerHTML;
-            node.parentNode.replaceChild(headingNode, node);
-          }
-        }
-
-        break;
-    } // remove empty text and element nodes
-
-
-    if (options.processNode.removeEmptyNodes && (node.nodeType === textNodeType && node.textContent === '' || node.nodeType === elementNodeType && !isVoid(node) && !node.hasChildNodes())) {
-      node.remove();
-      return;
-    } // Strip non whitelisted attributes from node
-    // this is done for all nodes
-
-
-    if (options.processNode.removeAttributes) {
-      removeAttributes(node, options.processNode.removeAttributes);
-    }
-  }
-
-  function removeAttributes(node, whiteListedAttributes) {
-    var attributes = node.attributes;
-
-    if (attributes) {
-      /* Remove all attributes from nodes */
-      Array.prototype.map.call(attributes, function (attribute) {
-        return attribute.name;
-      }).filter(function (attributeName) {
-        return whiteListedAttributes.indexOf(attributeName) === -1;
-      }).forEach(function (attributeName) {
-        node.removeAttribute(attributeName);
-      });
-    }
-  }
-
-  function setOptions$1(options, defaults) {
-    options = Object.assign({}, options);
-
-    if (typeof options.processMarkdown === 'function') {
-      AdaptiveCards.AdaptiveCard.processMarkdown = options.processMarkdown;
-    } else if (typeof options.processMarkdown === 'boolean' && !options.processMarkdown) {
-      AdaptiveCards.AdaptiveCard.processMarkdown = function (text) {
-        return text;
-      };
-    } else {
-      AdaptiveCards.AdaptiveCard.processMarkdown = defaults.processMarkdown;
-    }
-
-    if (typeof options.processNode === 'undefined' || options.processNode && typeof options.processNode === 'boolean') {
-      options.processNode = Object.assign({}, defaults.processNode);
-
-      if (options.hostConfig && _typeof(options.hostConfig) === 'object') {
-        options.processNode.removeAttributes = options.processNode.removeAttributes.concat(attributeHostConfigWhiteList);
-      }
-    }
-
-    if (!options.hostConfig || _typeof(options.hostConfig) !== 'object') {
-      options.hostConfig = {};
-    }
-
-    options.hostConfig = Object.assign(options.hostConfig, defaults.hostConfig);
-    return options;
-  }
-
-  function defaultProcessMarkdownWrapper(text) {
-    var htmlString = defaultProcessMarkdown(text);
-    var container = document.createElement('div');
-    var paragraphs;
-    container.innerHTML = htmlString;
-    paragraphs = container.querySelectorAll('p');
-
-    if (paragraphs.length) {
-      // This is assuming markdown-it is used
-      // This is the default markdown library supported by adaptivecards
-      htmlString = paragraphs[0].innerHTML;
-      Array.prototype.slice.call(paragraphs, 1).forEach(function (paragraph) {
-        htmlString += "<br>".concat(paragraph.innerHTML);
-      });
-    }
-
-    return htmlString.replace(lineBreakRegex, "<br>");
-  }
-  /*
-      This currently must stay in sync with the adaptiveCardHelper.createHeadingTextBlock construction
-  */
-
-
-  function detectHeadingLevel(node, hostConfig) {
-    var fontWeight = node && node.style.fontWeight;
-    var fontSize = node && node.style.fontSize;
-
-    if (fontSize === "".concat(hostConfig.fontSizes.extraLarge, "px") && fontWeight == hostConfig.fontWeights.bolder) {
-      return 1;
-    }
-
-    if (fontSize === "".concat(hostConfig.fontSizes.large, "px") && fontWeight == hostConfig.fontWeights.bolder) {
-      return 2;
-    }
-
-    if (fontSize === "".concat(hostConfig.fontSizes.medium, "px") && fontWeight == hostConfig.fontWeights.bolder) {
-      return 3;
-    }
-
-    if (fontSize === "".concat(hostConfig.fontSizes.medium, "px") && fontWeight == hostConfig.fontWeights["default"]) {
-      return 4;
-    }
-
-    if (fontSize === "".concat(hostConfig.fontSizes["default"], "px") && fontWeight == hostConfig.fontWeights.bolder) {
-      return 5;
-    }
-
-    if (fontSize === "".concat(hostConfig.fontSizes.small, "px") && fontWeight == hostConfig.fontWeights.bolder) {
-      return 6;
-    }
-
-    return null;
-  }
-
-  var AdaptiveHtmlHelper = {
-    toHTML: toHTML
-  };
-
-  var turndownService = new TurndownService();
-  /**
-   * @param {(string | HTMLElement)} htmlStringOrElem
-   * @returns {object} Adaptive Card JSON
-   */
+var turndownService = new TurndownService();
 
   function toJSON(htmlStringOrElem) {
     return turndownService.turndown(htmlStringOrElem);
-  }
-  /**
-   * @param {(string | object)} jsonOrJsonString
-   * @param {object=} options
-   * @returns {HTMLElement} Adaptive Card HTMLElement
-   */
+}
 
-
-  function toHTML$1(jsonOrJsonString) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    return AdaptiveHtmlHelper.toHTML(jsonOrJsonString, options);
-  }
-
-  var index = {
-    toJSON: toJSON,
-    toHTML: toHTML$1
-  };
+var index = {
+    toJSON: toJSON
+};
 
   return index;
 
-}(window.AdaptiveCards));
+}());
