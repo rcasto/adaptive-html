@@ -1,10 +1,11 @@
-import babel from 'rollup-plugin-babel';
-import uglify from 'rollup-plugin-uglify';
+import babel from '@rollup/plugin-babel';
+import { uglify } from 'rollup-plugin-uglify';
 
 var buildMinifiedLibrary = shouldMinify(process.argv);
 var plugins = [
     babel({
-        exclude: 'node_modules/**' // only transpile our source code
+        exclude: 'node_modules/**', // only transpile our source code
+        babelHelpers: 'external'
     })
 ];
 
