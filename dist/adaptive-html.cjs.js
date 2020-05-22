@@ -625,7 +625,7 @@ TurndownService.prototype = {
     var _this = this;
 
     var currText = '';
-    var blocks = Array.prototype.reduce.call(parentNode.childNodes, function (output, node) {
+    var blocks = Array.prototype.reduce.call(parentNode.childNodes || [], function (output, node) {
         var replacement = [];
 
         node = new Node(node);

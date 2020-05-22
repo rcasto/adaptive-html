@@ -71,7 +71,7 @@ TurndownService.prototype = {
  */
 function process(parentNode) {
     var currText = '';
-    var blocks = Array.prototype.reduce.call(parentNode.childNodes, (output, node) => {
+    var blocks = Array.prototype.reduce.call(parentNode.childNodes || [], (output, node) => {
         var replacement = [];
 
         node = new Node(node);
