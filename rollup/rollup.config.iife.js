@@ -24,7 +24,7 @@ function shouldMinify(args) {
 }
 
 export default {
-    input: "index.js",
+    input: "src/index.js",
     output: {
         format: "iife",
         file:  buildMinifiedLibrary ? "dist/adaptive-html.iife.min.js" : "dist/adaptive-html.iife.js",
@@ -36,9 +36,7 @@ export default {
     plugins: plugins,
     watch: {
         include: [
-            "lib/*.js",
-            "index.js",
-            "turndown/*.js"
+            "src/**/*.js"
         ]
     },
     external: ['adaptivecards']

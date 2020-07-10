@@ -8,7 +8,7 @@ var plugins = [
 ];
 
 export default {
-    input: "index.js",
+    input: "src/index.js",
     output: {
         format: "es",
         file: "dist/adaptive-html.es.js",
@@ -17,9 +17,7 @@ export default {
     plugins: plugins,
     watch: {
         include: [
-            "lib/*.js",
-            "index.js",
-            "turndown/*.js"
+            "src/**/*.js"
         ]
     },
     external: ['adaptivecards']
