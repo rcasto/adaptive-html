@@ -90,14 +90,14 @@
             console.log(JSON.stringify(adaptiveJson, null, '\t'));
         }, debounceTimeInMs));
 
-        editor.on('instanceReady', function (event) {
-            var restoreAdaptiveSessionData = restoreSession();
-            event.editor.setData(restoreAdaptiveSessionData);
-        });
+        // editor.on('instanceReady', function (event) {
+        //     var restoreAdaptiveSessionData = restoreSession();
+        //     event.editor.setData(restoreAdaptiveSessionData);
+        // });
 
-        window.addEventListener('beforeunload', function () {
-            saveSession();
-        });
+        // window.addEventListener('beforeunload', function () {
+        //     saveSession();
+        // });
     </script>
 </body>
 </html>
