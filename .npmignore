@@ -2,10 +2,8 @@ samples
 client
 .nyc_output
 coverage
-lib
-turndown
+src
 tests
 .babelrc
 .gitignore
-index.js
 rollup
