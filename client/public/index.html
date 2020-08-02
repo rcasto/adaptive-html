@@ -6,8 +6,14 @@
     <title>Test AdaptiveHtml Client</title>
     <link rel="stylesheet" href="/normalize.css">
     <style>
+        body {
+            display: flex;
+            flex-direction: column;
+        }
         textarea {
-            display: none;
+            width: 95%;
+            height: 320px;
+            margin: 6px auto;
         }
         .adaptive-preview > .ac-container {
             margin-top: 6px;
@@ -19,22 +25,17 @@
     </style>
 </head>
 <body>
-    <textarea id="adaptive-ckeditor"></textarea>
+    <textarea class="adaptive-textarea"></textarea>
     <div class="adaptive-preview"></div>
 
-    <script src="//cdn.ckeditor.com/4.14.1/standard/ckeditor.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@11.0.0/dist/markdown-it.min.js"></script>
     <script src="https://unpkg.com/adaptivecards@2.0.0/dist/adaptivecards.min.js"></script>
     <script src="/adaptive-html.js"></script>
     <script>
-        var editorConfig = {
-            extraAllowedContent: 'ol[start]'
-        };
-        var editor = CKEDITOR.replace('adaptive-ckeditor', editorConfig);
+        var adaptiveTextArea = document.querySelector('.adaptive-textarea');
         var adaptivePreview = document.querySelector('.adaptive-preview');
         var adaptiveCard = new AdaptiveCards.AdaptiveCard();
         var debounceTimeInMs = 50;
-        var adaptiveSessionKey = 'adaptive-session';
 
         adaptiveCard.hostConfig = new AdaptiveCards.HostConfig({
             fontFamily: 'Segoe UI, Segoe UI Web, Segoe UI Symbol, Helvetica Neue, BBAlpha Sans, S60 Sans, Arial, sans-serif',
@@ -66,38 +67,24 @@
             };
         }
 
-        function saveSession() {
-            var html = editor.getData();
-            var adaptiveCardJson = AdaptiveHtml.toJSON(html);
-            sessionStorage.setItem(adaptiveSessionKey, JSON.stringify(adaptiveCardJson));
+        function toHTML(text) {
+            var div = document.createElement('div');
+            div.innerHTML = text;
+            return div;
         }
 
-        function restoreSession() {
-            var adaptiveCardJson = sessionStorage.getItem(adaptiveSessionKey);
-            var adaptiveElem = AdaptiveHtml.toHTML(adaptiveCardJson);
-            return (adaptiveElem && adaptiveElem.outerHTML) || '';
-        }
+        window.addEventListener('load', function () {
+            adaptiveTextArea.addEventListener('input', debounce(function () {
+                var html = toHTML(adaptiveTextArea.value);
+                var adaptiveCardJson = AdaptiveHtml.toJSON(html);
+                console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
 
-        editor.on('change', debounce(function (event) {
-            var html = event.editor.getData();
-            var adaptiveJson = AdaptiveHtml.toJSON(html), adaptiveHtml;
-            adaptiveCard.parse(adaptiveJson);
-            adaptiveHtml = adaptiveCard.render();
-            adaptivePreview.textContent = '';
-            if (adaptiveHtml) {
-                adaptivePreview.appendChild(adaptiveHtml);
-            }
-            console.log(JSON.stringify(adaptiveJson, null, '\t'));
-        }, debounceTimeInMs));
+                adaptiveCard.parse(adaptiveCardJson);
 
-        // editor.on('instanceReady', function (event) {
-        //     var restoreAdaptiveSessionData = restoreSession();
-        //     event.editor.setData(restoreAdaptiveSessionData);
-        // });
-
-        // window.addEventListener('beforeunload', function () {
-        //     saveSession();
-        // });
+                adaptivePreview.textContent = '';
+                adaptivePreview.appendChild(adaptiveCard.render());
+            }, debounceTimeInMs))
+        });
     </script>
 </body>
 </html>
