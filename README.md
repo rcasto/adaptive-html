@@ -13,12 +13,12 @@ Under the hood, this project has taken the [Turndown](https://github.com/domchri
 - [Building it yourself](#building-it-yourself)
 
 ## Getting started
-You can either install the npm package, directly use a pre-built version of the library, or use a CDN.
+You can either install the npm package or use a CDN.
 
 ### Via npm
 `npm install adaptive-html`
 
-### CDN
+### Via CDN
 ```html
 <script src="https://cdn.jsdelivr.net/npm/adaptive-html/dist/adaptive-html.iife.min.js"></script>
 ```
