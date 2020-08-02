@@ -81,7 +81,6 @@ If you wish to build the library yourself then you can follow these steps:
 ### Test Client
 To demonstrate the transformation there is a test client within the repository. To launch it follow these steps:
 1. Execute the command `npm run client` from project root
-    - **Note:** The first time you will need to install the test client npm dependencies. So `cd client && npm install`.
 2. Navigate to http://localhost:8080
 
 ### Running tests
