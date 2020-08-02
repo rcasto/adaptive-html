@@ -51,6 +51,7 @@
 		"files": [
 			"tests/*.js"
 		],
+		"verbose": true,
 		"require": [
 			"./tests/helpers/browserEnvHelper.js"
 		]
