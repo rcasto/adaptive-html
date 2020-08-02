@@ -2,6 +2,16 @@ var test = require('ava');
 var AdaptiveCards = require('adaptivecards');
 var AdaptiveHtml = require('../dist/adaptive-html.cjs');
 
+/*
+    Shim processing of markdown to prevent console warnings:
+    https://github.com/microsoft/AdaptiveCards/blob/c59079a3b2770211e3d56a51f8f524f29b0b9f44/source/nodejs/adaptivecards/src/card-elements.ts#L6341
+    https://www.npmjs.com/package/adaptivecards#supporting-markdown
+*/
+AdaptiveCards.AdaptiveCard.onProcessMarkdown = (text, result) => {
+    result.outputHtml = text;
+    result.didProcess = true;
+};
+
 function doesTransformStabilize(cardJson, numCycles = 2) {
     const adaptiveCard = new AdaptiveCards.AdaptiveCard();
     let renderedAdaptiveCard;
