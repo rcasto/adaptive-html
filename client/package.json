@@ -4,12 +4,13 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "http-server -p 8080 ./public/"
   },
   "keywords": [],
   "author": "Richie Casto",
   "license": "ISC",
-  "dependencies": {
-    "express": "4.17.1"
+  "dependencies": {},
+  "devDependencies": {
+    "http-server": "0.12.3"
   }
 }
