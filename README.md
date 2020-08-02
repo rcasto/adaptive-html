@@ -18,28 +18,6 @@ You can either install the npm package, directly use a pre-built version of the 
 ### Via npm
 `npm install adaptive-html`
 
-### Using pre-built libraries
-There are [pre-built versions of the library](https://github.com/rcasto/adaptive-html/tree/master/dist) for:
-- Browser script (iife)
-- CommonJS module environments (cjs)
-- ES module environments (es)
-
-#### Browser script
-Available in both minified and unminified formats.
-```html
-<script src="/adaptive-html/dist/adaptive-html.iife.min.js"></script>
-```
-
-#### CommonJS
-```javascript
-var AdaptiveHtml = require('./adaptive-html/dist/adaptive-html.cjs');
-```
-
-#### ES
-```javascript
-import AdaptiveHtml from './adaptive-html/dist/adaptive-html.es';
-```
-
 ### CDN
 ```html
 <script src="https://cdn.jsdelivr.net/npm/adaptive-html/dist/adaptive-html.iife.min.js"></script>

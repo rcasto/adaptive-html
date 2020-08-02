@@ -3,3 +3,4 @@ client/public/adaptive-html.js
 tests/adaptive-html.js
 .nyc_output
 coverage
+dist
