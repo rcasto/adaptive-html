@@ -34,20 +34,19 @@
 	],
 	"author": "Richie Casto",
 	"license": "MIT",
-	"dependencies": {},
 	"devDependencies": {
-		"@babel/core": "7.11.0",
-		"@babel/preset-env": "7.11.0",
-		"@rollup/plugin-babel": "5.1.0",
-		"adaptivecards": "2.0.0",
-		"ava": "3.11.0",
+		"@babel/core": "7.14.5",
+		"@babel/preset-env": "7.14.5",
+		"@rollup/plugin-babel": "5.3.0",
+		"adaptivecards": "2.9.0",
+		"ava": "3.15.0",
 		"browser-env": "3.3.0",
 		"http-server": "0.12.3",
 		"npm-run-all": "4.1.5",
 		"nyc": "15.1.0",
 		"rimraf": "3.0.2",
-		"rollup": "2.23.0",
-		"rollup-plugin-uglify": "6.0.4"
+		"rollup": "2.51.2",
+		"rollup-plugin-uglify": "^5.0.2"
 	},
 	"ava": {
 		"files": [
