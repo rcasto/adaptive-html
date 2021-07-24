@@ -6,7 +6,7 @@ var turndownService = new TurndownService();
  * @param {(string | HTMLElement)} htmlStringOrElem
  * @returns {object} Adaptive Card JSON
  */
-function toJSON(htmlStringOrElem) {
+function toJSON(htmlStringOrElem: string | HTMLElement) {
     return turndownService.turndown(htmlStringOrElem);
 }
 

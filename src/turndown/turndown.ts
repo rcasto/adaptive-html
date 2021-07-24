@@ -57,7 +57,7 @@ TurndownService.prototype = {
         if (!canConvert(input)) {
             throw new TypeError(`${input} is not a string, or an element/document/fragment node.`);
         }
-        var cardElems = process.call(this, new RootNode(input));
+        var cardElems = process.call(this, RootNode(input));
         return createCard(cardElems);
     }
 }
@@ -72,9 +72,9 @@ TurndownService.prototype = {
 function process(parentNode) {
     var currText = '';
     var blocks = Array.prototype.reduce.call(parentNode.childNodes || [], (output, node) => {
-        var replacement = [];
+        var replacement: any = [];
 
-        node = new Node(node);
+        node = Node(node);
 
         if (isValidNodetype(node)) {
             replacement = replacementForNode.call(this, node);

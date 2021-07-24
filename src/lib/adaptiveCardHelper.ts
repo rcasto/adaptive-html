@@ -6,8 +6,8 @@ import {
     isContainer
 } from './adaptiveCardFilter';
 
-function setOptions(obj, options) {
-    Object.keys(options || {})
+function setOptions(obj, options = {}) {
+    Object.keys(options)
         .forEach(optionKey => {
             obj[optionKey] = options[optionKey];
         });
@@ -30,7 +30,7 @@ export function createCard(elements) {
     return card;
 }
 
-export function createTextBlock(text, options) {
+export function createTextBlock(text, options = {}) {
     var textBlock = {
         type: cardTypes.textBlock,
         text: text || '',
@@ -80,7 +80,7 @@ export function createImage(url, options) {
 }
 
 // Wrap adaptive card elements in a container
-export function wrap(elements, options) {
+export function wrap(elements, options = {}) {
     elements = toArray(elements);
     /* Don't wrap only a container in a container */
     if (elements.length === 1 &&

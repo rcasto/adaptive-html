@@ -1,13 +1,7 @@
-import babel from '@rollup/plugin-babel';
+import { input, plugins, watch, external } from './rollup.config.common';
 import { terser } from 'rollup-plugin-terser';
 
 var buildMinifiedLibrary = shouldMinify(process.argv);
-var plugins = [
-    babel({
-        exclude: 'node_modules/**', // only transpile our source code
-        babelHelpers: 'bundled'
-    })
-];
 
 if (buildMinifiedLibrary) {
     plugins.unshift(terser({
@@ -31,7 +25,7 @@ function shouldMinify(args) {
 }
 
 export default {
-    input: "src/index.js",
+    input,
     output: {
         format: "iife",
         file: buildMinifiedLibrary ? "dist/adaptive-html.iife.min.js" : "dist/adaptive-html.iife.js",
@@ -40,11 +34,7 @@ export default {
             adaptivecards: 'window.AdaptiveCards'
         }
     },
-    plugins: plugins,
-    watch: {
-        include: [
-            "src/**/*.js"
-        ]
-    },
-    external: ['adaptivecards']
+    plugins,
+    watch,
+    external,
 };

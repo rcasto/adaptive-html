@@ -18,7 +18,7 @@ import {
     carriageReturnTabRegex
 } from './utilities';
 
-const rules = {};
+const rules: any = {};
 
 rules.blank = {
     filter: function (node) {
