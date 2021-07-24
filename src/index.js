@@ -10,6 +10,4 @@ function toJSON(htmlStringOrElem) {
     return turndownService.turndown(htmlStringOrElem);
 }
 
-export default {
-    toJSON
-};
+export { toJSON }
