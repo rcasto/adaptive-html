@@ -48,16 +48,18 @@
 		"rimraf": "3.0.2",
 		"rollup": "2.53.3",
 		"rollup-plugin-terser": "7.0.2",
+		"ts-node": "10.1.0",
 		"tslib": "2.3.0",
 		"typescript": "4.3.5"
 	},
 	"ava": {
-		"files": [
-			"tests/*.js"
+		"extensions": [
+			"ts"
 		],
 		"verbose": true,
 		"require": [
-			"./tests/helpers/browserEnvHelper.js"
+			"ts-node/register",
+			"./tests/helpers/browserEnvHelper.ts"
 		]
 	}
 }
