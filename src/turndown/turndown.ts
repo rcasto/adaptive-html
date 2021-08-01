@@ -9,7 +9,7 @@ import {
 import {
     toArray
 } from '../lib/utilityHelper';
-import Rules from './rules';
+import { findRule } from './rules';
 import RootNode from './root-node';
 import Node from './node';
 
@@ -42,7 +42,7 @@ import Node from './node';
  */
 
 function TurndownService() {
-    this.rules = new Rules(AdaptiveCardRules);
+    this.rules = AdaptiveCardRules;
 }
 
 TurndownService.prototype = {
@@ -112,7 +112,7 @@ function process(parentNode) {
  * @type String
  */
 function replacementForNode(node) {
-    var rule = this.rules.forNode(node);
+    var rule = findRule(this.rules, node);
     var content = process.call(this, node); // get's internal content of node
     return rule.replacement(content, node);
 }
