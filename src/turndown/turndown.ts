@@ -41,25 +41,19 @@ import Node from './node';
  * THE SOFTWARE.
  */
 
-function TurndownService() {
-    this.rules = AdaptiveCardRules;
-}
-
-TurndownService.prototype = {
-    /**
-     * The entry point for converting a string or DOM node to JSON
-     * @public
-     * @param {String|HTMLElement} input The string or DOM node to convert
-     * @returns A Markdown representation of the input
-     * @type String
-     */
-    turndown: function (input) {
-        if (!canConvert(input)) {
-            throw new TypeError(`${input} is not a string, or an element/document/fragment node.`);
-        }
-        var cardElems = process.call(this, RootNode(input));
-        return createCard(cardElems);
+/**
+ * The entry point for converting a string or DOM node to JSON
+ * @public
+ * @param {String|HTMLElement} input The string or DOM node to convert
+ * @returns A Markdown representation of the input
+ * @type String
+ */
+export function turndown(input) {
+    if (!canConvert(input)) {
+        throw new TypeError(`${input} is not a string, or an element/document/fragment node.`);
     }
+    var cardElems = process(RootNode(input));
+    return createCard(cardElems);
 }
 
 /**
@@ -77,7 +71,7 @@ function process(parentNode) {
         node = Node(node);
 
         if (isValidNodetype(node)) {
-            replacement = replacementForNode.call(this, node);
+            replacement = replacementForNode(node);
         }
         replacement = replacement || [];
 
@@ -87,7 +81,7 @@ function process(parentNode) {
             !Array.isArray(replacement)) {
             currText += replacement.text;
             if ((replacement.nonText &&
-                replacement.nonText.length) || 
+                replacement.nonText.length) ||
                 !node.nextSibling) {
                 output.push(createTextBlock(currText));
                 currText = '';
@@ -112,8 +106,8 @@ function process(parentNode) {
  * @type String
  */
 function replacementForNode(node) {
-    var rule = findRule(this.rules, node);
-    var content = process.call(this, node); // get's internal content of node
+    var rule = findRule(AdaptiveCardRules, node);
+    var content = process(node); // get's internal content of node
     return rule.replacement(content, node);
 }
 
@@ -135,8 +129,6 @@ function canConvert(input) {
     )
 }
 
-function isValidNodetype(node) {
+function isValidNodetype(node: HTMLElement): boolean {
     return !!(node && (node.nodeType === 3 || node.nodeType === 1));
 }
-
-export default TurndownService;
