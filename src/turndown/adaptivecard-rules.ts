@@ -9,7 +9,7 @@ import {
     getTextBlocksAsString,
     getNonTextBlocks,
     isTextBlock,
-    cardTypes
+    CARD_TYPES
 } from '../lib/adaptiveCardFilter';
 import {
     isVoid,
@@ -17,6 +17,10 @@ import {
     lineBreakRegex,
     carriageReturnTabRegex
 } from './utilities';
+
+export interface IRule {
+    filter: (node: HTMLElement) => boolean | string | Array<string>;
+};
 
 const rules: any = {};
 
@@ -99,12 +103,12 @@ rules.listItem = {
         var blocks = (content || []).reduce((prevBlocks, currBlock) => {
             var cardType = currBlock.type;
             switch (cardType) {
-                case cardTypes.textBlock:
+                case CARD_TYPES.TEXT_BLOCK:
                     currText += ` ${currBlock.text
                         .replace(lineBreakRegex, '  \n\t')
                         .trim()}`;
                     break;
-                case cardTypes.container:
+                case CARD_TYPES.CONTAINER:
                     let nestedListElems = unwrap(currBlock);
                     nestedListElems
                         .forEach(nestedListElem => {
@@ -117,7 +121,7 @@ rules.listItem = {
                             }
                         });
                     break;
-                case cardTypes.image:
+                case CARD_TYPES.IMAGE:
                     prevBlocks.push(currBlock);
                     break;
                 default:

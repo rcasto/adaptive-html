@@ -1,10 +1,7 @@
 import {
     toArray
 } from './utilityHelper';
-
-const supportedCardVersions = [
-    '1.0'
-];
+import { IAdaptiveCard } from 'adaptivecards';
 
 function getBlocks(cardCollection, types) {
     types = toArray(types);
@@ -12,7 +9,7 @@ function getBlocks(cardCollection, types) {
     return cardCollection.filter(card => types.some(type => isCardType(card, type)));
 }
 
-function isCardType(card, type) {
+function isCardType(card: IAdaptiveCard, type: string): boolean {
     if (!card) {
         return false;
     }
@@ -21,41 +18,41 @@ function isCardType(card, type) {
     return cardType === type;
 }
 
-export const cardTypes = Object.freeze({
-    textBlock: "TextBlock",
-    container: "Container",
-    image: "Image",
-    adaptiveCard: "AdaptiveCard"
-});
-
-export function isTextBlock(card) {
-    return isCardType(card, cardTypes.textBlock);
+export enum CARD_TYPES {
+    TEXT_BLOCK = "TextBlock",
+    CONTAINER = "Container",
+    IMAGE = "Image",
+    ADAPTIVE_CARD = "AdaptiveCard",
 }
 
-export function isContainer(card) {
-    return isCardType(card, cardTypes.container);
+export function isTextBlock(card: IAdaptiveCard): boolean {
+    return isCardType(card, CARD_TYPES.TEXT_BLOCK);
 }
 
-export function isImage(card) {
-    return isCardType(card, cardTypes.image);
+export function isContainer(card: IAdaptiveCard): boolean {
+    return isCardType(card, CARD_TYPES.CONTAINER);
 }
 
-export function isAdaptiveCard(card) {
-    return isCardType(card, cardTypes.adaptiveCard);
+export function isImage(card: IAdaptiveCard): boolean {
+    return isCardType(card, CARD_TYPES.IMAGE);
 }
 
-export function isCardElement(card) {
+export function isAdaptiveCard(card: IAdaptiveCard): boolean {
+    return isCardType(card, CARD_TYPES.ADAPTIVE_CARD);
+}
+
+export function isCardElement(card: IAdaptiveCard): boolean {
     return isTextBlock(card) ||
            isImage(card) ||
            isContainer(card);
 }
 
 export function getTextBlocks(cardCollection) {
-    return getBlocks(cardCollection, cardTypes.textBlock);
+    return getBlocks(cardCollection, CARD_TYPES.TEXT_BLOCK);
 }
 
 export function getNonTextBlocks(cardCollection) {
-    return getBlocks(cardCollection, [cardTypes.image, cardTypes.container]);
+    return getBlocks(cardCollection, [CARD_TYPES.IMAGE, CARD_TYPES.CONTAINER]);
 }
 
 export function getTextBlocksAsString(cardCollection) {
@@ -65,15 +62,3 @@ export function getTextBlocksAsString(cardCollection) {
         .replace(/ +/g, ' ')
         .trim();
 }
-
-export default {
-    isTextBlock,
-    isContainer,
-    isImage,
-    isAdaptiveCard,
-    isCardElement,
-    getTextBlocks,
-    getTextBlocksAsString,
-    getNonTextBlocks,
-    cardTypes
-};

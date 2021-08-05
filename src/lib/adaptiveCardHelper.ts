@@ -2,9 +2,11 @@ import {
     toArray
 } from './utilityHelper';
 import {
-    cardTypes,
+    CARD_TYPES,
     isContainer
 } from './adaptiveCardFilter';
+import { IAdaptiveCard } from 'adaptivecards';
+import { IImage, ITextBlock } from 'adaptivecards/lib/schema';
 
 function setOptions(obj, options = {}) {
     Object.keys(options)
@@ -13,9 +15,9 @@ function setOptions(obj, options = {}) {
         });
 }
 
-export function createCard(elements) {
-    var card = {
-        type: cardTypes.adaptiveCard,
+export function createCard(elements): IAdaptiveCard {
+    var card: IAdaptiveCard = {
+        type: CARD_TYPES.ADAPTIVE_CARD,
         body: [],
         actions: [],
         version: '1.0'
@@ -30,9 +32,9 @@ export function createCard(elements) {
     return card;
 }
 
-export function createTextBlock(text, options = {}) {
-    var textBlock = {
-        type: cardTypes.textBlock,
+export function createTextBlock(text: string, options = {}): ITextBlock {
+    const textBlock: ITextBlock = {
+        type: CARD_TYPES.TEXT_BLOCK,
         text: text || '',
         wrap: true
     };
@@ -40,7 +42,7 @@ export function createTextBlock(text, options = {}) {
     return textBlock;
 }
 
-export function createHeadingTextBlock(text, depth) {
+export function createHeadingTextBlock(text: string, depth: number): ITextBlock {
     var weight = 'bolder';
     var size = 'default';
     switch (depth) {
@@ -70,9 +72,9 @@ export function createHeadingTextBlock(text, depth) {
     });
 }
 
-export function createImage(url, options) {
-    var image = {
-        type: cardTypes.image,
+export function createImage(url: string, options = {}): IImage {
+    const image: IImage = {
+        type: CARD_TYPES.IMAGE,
         url: url
     };
     setOptions(image, options);
@@ -88,7 +90,7 @@ export function wrap(elements, options = {}) {
         return elements[0];
     }
     let container = {
-        type: cardTypes.container,
+        type: CARD_TYPES.CONTAINER,
         items: elements
     };
     setOptions(container, options);
@@ -103,12 +105,3 @@ export function unwrap(container) {
     }
     return (container.items || []); 
 }
-
-export default {
-    createHeadingTextBlock,
-    createTextBlock,
-    createImage,
-    createCard,
-    wrap,
-    unwrap
-};

@@ -48,7 +48,7 @@ import Node from './node';
  * @returns A Markdown representation of the input
  * @type String
  */
-export function turndown(input) {
+export function turndown(input: string | HTMLElement) {
     if (!canConvert(input)) {
         throw new TypeError(`${input} is not a string, or an element/document/fragment node.`);
     }
