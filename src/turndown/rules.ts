@@ -1,8 +1,10 @@
+import { IRule } from "./adaptivecard-rules";
+
 /**
  * Manages a collection of rules used to convert HTML to Adaptive Card JSON
  */
-export function findRule(rules, node) {
-    var foundRule = null;
+export function findRule(rules: Record<string, IRule>, node: Node): IRule {
+    let foundRule: IRule = null;
     (Object.keys(rules) || []).some(ruleKey => {
         if (filterValue(rules[ruleKey], node)) {
             foundRule = rules[ruleKey];

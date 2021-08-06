@@ -11,7 +11,6 @@ import {
 } from '../lib/utilityHelper';
 import { findRule } from './rules';
 import RootNode from './root-node';
-import Node from './node';
 
 /*!
  * Code in files within the turndown folder is taken and modified from the Turndown
@@ -48,11 +47,11 @@ import Node from './node';
  * @returns A Markdown representation of the input
  * @type String
  */
-export function turndown(input: string | HTMLElement) {
+export function turndown(input: string | Node) {
     if (!canConvert(input)) {
         throw new TypeError(`${input} is not a string, or an element/document/fragment node.`);
     }
-    var cardElems = process(RootNode(input));
+    const cardElems = process(RootNode(input));
     return createCard(cardElems);
 }
 
@@ -63,12 +62,10 @@ export function turndown(input: string | HTMLElement) {
  * @returns An Adaptive Card representation of the node
  * @type String
  */
-function process(parentNode) {
-    var currText = '';
-    var blocks = Array.prototype.reduce.call(parentNode.childNodes || [], (output, node) => {
-        var replacement: any = [];
-
-        node = Node(node);
+function process(parentNode: Node) {
+    let currText = '';
+    const blocks = Array.prototype.reduce.call(parentNode.childNodes || [], (output, node: Node) => {
+        let replacement: any = [];
 
         if (isValidNodetype(node)) {
             replacement = replacementForNode(node);
@@ -105,9 +102,9 @@ function process(parentNode) {
  * @returns An Adaptive Card representation of the node
  * @type String
  */
-function replacementForNode(node) {
-    var rule = findRule(AdaptiveCardRules, node);
-    var content = process(node); // get's internal content of node
+function replacementForNode(node: Node) {
+    const rule = findRule(AdaptiveCardRules, node);
+    const content = process(node); // get's internal content of node
     return rule.replacement(content, node);
 }
 
@@ -118,17 +115,17 @@ function replacementForNode(node) {
  * @returns Describe what it returns
  * @type String|Object|Array|Boolean|Number
  */
-function canConvert(input) {
+function canConvert(input: string | Node): boolean {
     return (
         input != null && (
             typeof input === 'string' ||
             (input.nodeType && (
-                input.nodeType === 1 || input.nodeType === 9 || input.nodeType === 11
+                input.nodeType === Node.ELEMENT_NODE || input.nodeType === Node.DOCUMENT_NODE || input.nodeType === Node.DOCUMENT_FRAGMENT_NODE
             ))
         )
     )
 }
 
-function isValidNodetype(node: HTMLElement): boolean {
-    return !!(node && (node.nodeType === 3 || node.nodeType === 1));
+function isValidNodetype(node: Node): boolean {
+    return !!(node && (node.nodeType === Node.TEXT_NODE || node.nodeType === Node.ELEMENT_NODE));
 }

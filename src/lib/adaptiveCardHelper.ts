@@ -6,7 +6,7 @@ import {
     isContainer
 } from './adaptiveCardFilter';
 import { IAdaptiveCard } from 'adaptivecards';
-import { IImage, ITextBlock } from 'adaptivecards/lib/schema';
+import { ICardElement, IContainer, IImage, ITextBlock } from 'adaptivecards/lib/schema';
 
 function setOptions(obj, options = {}) {
     Object.keys(options)
@@ -82,16 +82,16 @@ export function createImage(url: string, options = {}): IImage {
 }
 
 // Wrap adaptive card elements in a container
-export function wrap(elements, options = {}) {
-    elements = toArray(elements);
+export function wrap(elements: ICardElement | ICardElement[], options = {}): IContainer {
+    const elementsArray: ICardElement[] = toArray(elements);
     /* Don't wrap only a container in a container */
     if (elements.length === 1 &&
         isContainer(elements[0])) {
         return elements[0];
     }
-    let container = {
+    let container: IContainer = {
         type: CARD_TYPES.CONTAINER,
-        items: elements
+        items: elementsArray,
     };
     setOptions(container, options);
     return container;
@@ -99,7 +99,7 @@ export function wrap(elements, options = {}) {
 
 // Returns the list of elements within a container
 // If the item passed in is not a container, it is simply returned
-export function unwrap(container) {
+export function unwrap(container: IContainer): ICardElement[] {
     if (!isContainer(container)) {
         return toArray(container);
     }
