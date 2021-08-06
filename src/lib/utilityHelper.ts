@@ -1,4 +1,4 @@
-export function toArray<T>(x: T): T[] {
+export function toArray<T>(x: T | T[]): T[] {
     if (Array.isArray(x)) {
         return x;
     }
