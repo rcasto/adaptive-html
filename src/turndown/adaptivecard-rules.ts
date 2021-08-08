@@ -23,7 +23,7 @@ import { IContainer, ICardElement } from 'adaptivecards/lib/schema';
 
 export interface IRule {
     filter: ((node: HTMLElement) => boolean) | string | Array<string>;
-    replacement: (content: AdaptiveCardElement[], node: Node) => null | IBlock | ICardElement;
+    replacement: (content: AdaptiveCardElement[], node: Node | Element) => null | IBlock | ICardElement;
 }
 
 export interface IBlock {
@@ -34,7 +34,7 @@ export interface IBlock {
 const rules: Record<string, IRule> = {};
 
 rules.blank = {
-    filter: function (node) {
+    filter: function (node: Element) {
         return (
             ['A', 'TH', 'TD'].indexOf(node.nodeName) === -1 &&
             /^\s*$/i.test(node.textContent) &&
@@ -54,7 +54,7 @@ rules.blank = {
 
 rules.text = {
     filter: function (node) {
-        return node.nodeType === 3;
+        return node.nodeType === Node.TEXT_NODE;
     },
     replacement: function (content, node) {
         return handleTextEffects(content, function () {
@@ -89,7 +89,7 @@ rules.heading = {
 rules.list = {
     filter: ['ul', 'ol'],
     // content = array of listitem containers
-    replacement: function (listItemContainers, node) {
+    replacement: function (listItemContainers, node: Element) {
         var isOrdered = node.nodeName === 'OL';
         var startIndex = parseInt(node.getAttribute('start'), 10) || 1; // only applicable to ordered lists
         var blocks = (listItemContainers || []).map((listItemContainer, listItemIndex) => {
@@ -156,7 +156,7 @@ rules.inlineLink = {
             !!node.getAttribute('href')
         );
     },
-    replacement: function (content, node) {
+    replacement: function (content, node: Element) {
         var href = node.getAttribute('href');
         return handleTextEffects(content, function (text) {
             return `[${text}](${href})`;
@@ -175,7 +175,7 @@ rules.emphasis = {
 
 rules.strong = {
     filter: ['strong', 'b'],
-    replacement: function (content, node) {
+    replacement: function (content, _node) {
         return handleTextEffects(content, function (text) {
             return `**${text}**`;
         });
@@ -184,7 +184,7 @@ rules.strong = {
 
 rules.image = {
     filter: 'img',
-    replacement: function (content, node) {
+    replacement: function (content, node: Element) {
         const alt = node.getAttribute('alt') || '';
         const src = node.getAttribute('src') || '';
         return createImage(src, {
@@ -196,7 +196,7 @@ rules.image = {
 /* This must be the last rule */
 rules.default = {
     filter: () => true,
-    replacement: function (content, node) {
+    replacement: function (content, node: Element) {
         if (isBlock(node)) {
             return wrap(content);
         }
