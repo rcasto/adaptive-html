@@ -48,7 +48,7 @@ export function getTextBlocks(cardCollection: AdaptiveCardElement[]): ITextBlock
     return getBlocks(cardCollection, CARD_TYPES.TEXT_BLOCK) as ITextBlock[];
 }
 
-export function getNonTextBlocks(cardCollection): Array<NonTextAdaptiveCardElement> {
+export function getNonTextBlocks(cardCollection: AdaptiveCardElement[]): Array<NonTextAdaptiveCardElement> {
     return getBlocks(cardCollection, [CARD_TYPES.IMAGE, CARD_TYPES.CONTAINER]) as Array<NonTextAdaptiveCardElement>;
 }
 

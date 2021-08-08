@@ -119,9 +119,9 @@ function canConvert(input: string | Node): boolean {
     return (
         input != null && (
             typeof input === 'string' ||
-            (input.nodeType && (
+            (
                 input.nodeType === Node.ELEMENT_NODE || input.nodeType === Node.DOCUMENT_NODE || input.nodeType === Node.DOCUMENT_FRAGMENT_NODE
-            ))
+            )
         )
     )
 }

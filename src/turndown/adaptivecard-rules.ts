@@ -22,7 +22,7 @@ import { AdaptiveCardElement, NonTextAdaptiveCardElement } from '../interfaces';
 import { IContainer, ICardElement } from 'adaptivecards/lib/schema';
 
 export interface IRule {
-    filter: ((node: HTMLElement) => boolean) | string | Array<string>;
+    filter: ((node: Element) => boolean) | string | Array<string>;
     replacement: (content: AdaptiveCardElement[], node: Node | Element) => null | IBlock | ICardElement;
 }
 
