@@ -4,10 +4,10 @@ import {
     isVoid
 } from './utilities';
 
-var _htmlParser;
+var _htmlParser: DOMParser;
 
-function RootNode(input) {
-    var root;
+function RootNode(input: string | Node): Node {
+    var root: Node;
     if (typeof input === 'string') {
         var doc = htmlParser().parseFromString(
             // DOM parsers arrange elements in the <head> and <body>.
@@ -28,7 +28,7 @@ function RootNode(input) {
     return root;
 }
 
-function htmlParser() {
+function htmlParser(): DOMParser {
     _htmlParser = _htmlParser || new DOMParser();
     return _htmlParser;
 }

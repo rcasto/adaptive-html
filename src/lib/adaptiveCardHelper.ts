@@ -2,20 +2,22 @@ import {
     toArray
 } from './utilityHelper';
 import {
-    cardTypes,
+    CARD_TYPES,
     isContainer
 } from './adaptiveCardFilter';
+import { IAdaptiveCard } from 'adaptivecards';
+import { ICardElement, IContainer, IImage, ITextBlock } from 'adaptivecards/lib/schema';
 
-function setOptions(obj, options) {
-    Object.keys(options || {})
+function setOptions(obj, options = {}) {
+    Object.keys(options)
         .forEach(optionKey => {
             obj[optionKey] = options[optionKey];
         });
 }
 
-export function createCard(elements) {
-    var card = {
-        type: cardTypes.adaptiveCard,
+export function createCard(elements): IAdaptiveCard {
+    var card: IAdaptiveCard = {
+        type: CARD_TYPES.ADAPTIVE_CARD,
         body: [],
         actions: [],
         version: '1.0'
@@ -30,9 +32,9 @@ export function createCard(elements) {
     return card;
 }
 
-export function createTextBlock(text, options) {
-    var textBlock = {
-        type: cardTypes.textBlock,
+export function createTextBlock(text: string, options = {}): ITextBlock {
+    const textBlock: ITextBlock = {
+        type: CARD_TYPES.TEXT_BLOCK,
         text: text || '',
         wrap: true
     };
@@ -40,7 +42,7 @@ export function createTextBlock(text, options) {
     return textBlock;
 }
 
-export function createHeadingTextBlock(text, depth) {
+export function createHeadingTextBlock(text: string, depth: number): ITextBlock {
     var weight = 'bolder';
     var size = 'default';
     switch (depth) {
@@ -70,9 +72,9 @@ export function createHeadingTextBlock(text, depth) {
     });
 }
 
-export function createImage(url, options) {
-    var image = {
-        type: cardTypes.image,
+export function createImage(url: string, options = {}): IImage {
+    const image: IImage = {
+        type: CARD_TYPES.IMAGE,
         url: url
     };
     setOptions(image, options);
@@ -80,16 +82,16 @@ export function createImage(url, options) {
 }
 
 // Wrap adaptive card elements in a container
-export function wrap(elements, options) {
-    elements = toArray(elements);
+export function wrap(elements: ICardElement | ICardElement[], options = {}): IContainer {
+    const elementsArray: ICardElement[] = toArray(elements);
     /* Don't wrap only a container in a container */
     if (elements.length === 1 &&
         isContainer(elements[0])) {
         return elements[0];
     }
-    let container = {
-        type: cardTypes.container,
-        items: elements
+    let container: IContainer = {
+        type: CARD_TYPES.CONTAINER,
+        items: elementsArray,
     };
     setOptions(container, options);
     return container;
@@ -97,18 +99,9 @@ export function wrap(elements, options) {
 
 // Returns the list of elements within a container
 // If the item passed in is not a container, it is simply returned
-export function unwrap(container) {
+export function unwrap(container: IContainer): ICardElement[] {
     if (!isContainer(container)) {
         return toArray(container);
     }
     return (container.items || []); 
 }
-
-export default {
-    createHeadingTextBlock,
-    createTextBlock,
-    createImage,
-    createCard,
-    wrap,
-    unwrap
-};

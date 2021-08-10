@@ -9,9 +9,8 @@ import {
 import {
     toArray
 } from '../lib/utilityHelper';
-import Rules from './rules';
+import { findRule } from './rules';
 import RootNode from './root-node';
-import Node from './node';
 
 /*!
  * Code in files within the turndown folder is taken and modified from the Turndown
@@ -41,25 +40,19 @@ import Node from './node';
  * THE SOFTWARE.
  */
 
-function TurndownService() {
-    this.rules = new Rules(AdaptiveCardRules);
-}
-
-TurndownService.prototype = {
-    /**
-     * The entry point for converting a string or DOM node to JSON
-     * @public
-     * @param {String|HTMLElement} input The string or DOM node to convert
-     * @returns A Markdown representation of the input
-     * @type String
-     */
-    turndown: function (input) {
-        if (!canConvert(input)) {
-            throw new TypeError(`${input} is not a string, or an element/document/fragment node.`);
-        }
-        var cardElems = process.call(this, new RootNode(input));
-        return createCard(cardElems);
+/**
+ * The entry point for converting a string or DOM node to JSON
+ * @public
+ * @param {String|HTMLElement} input The string or DOM node to convert
+ * @returns A Markdown representation of the input
+ * @type String
+ */
+export function turndown(input: string | Node) {
+    if (!canConvert(input)) {
+        throw new TypeError(`${input} is not a string, or an element/document/fragment node.`);
     }
+    const cardElems = process(RootNode(input));
+    return createCard(cardElems);
 }
 
 /**
@@ -69,15 +62,13 @@ TurndownService.prototype = {
  * @returns An Adaptive Card representation of the node
  * @type String
  */
-function process(parentNode) {
-    var currText = '';
-    var blocks = Array.prototype.reduce.call(parentNode.childNodes || [], (output, node) => {
-        var replacement = [];
-
-        node = new Node(node);
+function process(parentNode: Node) {
+    let currText = '';
+    const blocks = Array.prototype.reduce.call(parentNode.childNodes || [], (output, node: Node) => {
+        let replacement: any = [];
 
         if (isValidNodetype(node)) {
-            replacement = replacementForNode.call(this, node);
+            replacement = replacementForNode(node);
         }
         replacement = replacement || [];
 
@@ -87,7 +78,7 @@ function process(parentNode) {
             !Array.isArray(replacement)) {
             currText += replacement.text;
             if ((replacement.nonText &&
-                replacement.nonText.length) || 
+                replacement.nonText.length) ||
                 !node.nextSibling) {
                 output.push(createTextBlock(currText));
                 currText = '';
@@ -111,9 +102,9 @@ function process(parentNode) {
  * @returns An Adaptive Card representation of the node
  * @type String
  */
-function replacementForNode(node) {
-    var rule = this.rules.forNode(node);
-    var content = process.call(this, node); // get's internal content of node
+function replacementForNode(node: Node) {
+    const rule = findRule(AdaptiveCardRules, node);
+    const content = process(node); // get's internal content of node
     return rule.replacement(content, node);
 }
 
@@ -124,19 +115,17 @@ function replacementForNode(node) {
  * @returns Describe what it returns
  * @type String|Object|Array|Boolean|Number
  */
-function canConvert(input) {
+function canConvert(input: string | Node): boolean {
     return (
         input != null && (
             typeof input === 'string' ||
-            (input.nodeType && (
-                input.nodeType === 1 || input.nodeType === 9 || input.nodeType === 11
-            ))
+            (
+                input.nodeType === Node.ELEMENT_NODE || input.nodeType === Node.DOCUMENT_NODE || input.nodeType === Node.DOCUMENT_FRAGMENT_NODE
+            )
         )
     )
 }
 
-function isValidNodetype(node) {
-    return !!(node && (node.nodeType === 3 || node.nodeType === 1));
+function isValidNodetype(node: Node): boolean {
+    return !!(node && (node.nodeType === Node.TEXT_NODE || node.nodeType === Node.ELEMENT_NODE));
 }
-
-export default TurndownService;

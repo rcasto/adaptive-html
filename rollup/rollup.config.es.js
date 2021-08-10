@@ -1,24 +1,13 @@
-import babel from '@rollup/plugin-babel';
-
-var plugins = [
-    babel({
-        exclude: 'node_modules/**', // only transpile our source code
-        babelHelpers: 'bundled'
-    })
-];
+import { input, plugins, watch, external } from './rollup.config.common';
 
 export default {
-    input: "src/index.js",
+    input,
     output: {
         format: "es",
         file: "dist/adaptive-html.es.js",
         name: "AdaptiveHtml"
     },
-    plugins: plugins,
-    watch: {
-        include: [
-            "src/**/*.js"
-        ]
-    },
-    external: ['adaptivecards']
+    plugins,
+    watch,
+    external,
 };

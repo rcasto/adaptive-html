@@ -7,8 +7,8 @@ export const blockElements = [
     'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'ul'
 ];
 
-export function isBlock(node) {
-    return blockElements.indexOf(node.nodeName.toLowerCase()) !== -1
+export function isBlock(node: Element): boolean {
+    return blockElements.includes(node.nodeName.toLowerCase());
 };
 
 export const voidElements = [
@@ -16,14 +16,14 @@ export const voidElements = [
     'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'
 ];
 
-export function isVoid(node) {
-    return voidElements.indexOf(node.nodeName.toLowerCase()) !== -1
+export function isVoid(node: Element): boolean {
+    return voidElements.includes(node.nodeName.toLowerCase());
 };
 
 export const lineBreakRegex = /  \n/g;
 export const carriageReturnTabRegex = /\r\t/g;
 
 const voidSelector = voidElements.join();
-export function hasVoid(node) {
-    return node.querySelector && node.querySelector(voidSelector)
+export function hasVoid(node: Element): boolean {
+    return !!(node.querySelector && node.querySelector(voidSelector));
 };

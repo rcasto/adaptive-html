@@ -9,19 +9,32 @@ import {
     getTextBlocksAsString,
     getNonTextBlocks,
     isTextBlock,
-    cardTypes
+    CARD_TYPES
 } from '../lib/adaptiveCardFilter';
 import {
     isVoid,
     hasVoid,
     lineBreakRegex,
-    carriageReturnTabRegex
+    carriageReturnTabRegex,
+    isBlock
 } from './utilities';
+import { AdaptiveCardElement, NonTextAdaptiveCardElement } from '../interfaces';
+import { IContainer, ICardElement } from 'adaptivecards/lib/schema';
 
-const rules = {};
+export interface IRule {
+    filter: ((node: Element) => boolean) | string | Array<string>;
+    replacement: (content: AdaptiveCardElement[], node: Node | Element) => null | IBlock | ICardElement;
+}
+
+export interface IBlock {
+    text: string;
+    nonText: Array<NonTextAdaptiveCardElement>;
+}
+
+const rules: Record<string, IRule> = {};
 
 rules.blank = {
-    filter: function (node) {
+    filter: function (node: Element) {
         return (
             ['A', 'TH', 'TD'].indexOf(node.nodeName) === -1 &&
             /^\s*$/i.test(node.textContent) &&
@@ -41,7 +54,7 @@ rules.blank = {
 
 rules.text = {
     filter: function (node) {
-        return node.nodeType === 3;
+        return node.nodeType === Node.TEXT_NODE;
     },
     replacement: function (content, node) {
         return handleTextEffects(content, function () {
@@ -62,23 +75,25 @@ rules.lineBreak = {
 rules.heading = {
     filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
     replacement: function (content, node) {
-        var hLevel = Number(node.nodeName.charAt(1));
-        var hText = getTextBlocksAsString(content);
-        var hNonText = getNonTextBlocks(content);
-        return wrap([
-            createHeadingTextBlock(hText, hLevel)
-        ].concat(hNonText));
+        const hLevel = Number(node.nodeName.charAt(1));
+        const hText = getTextBlocksAsString(content);
+        const hNonText = getNonTextBlocks(content);
+        const hElements: ICardElement[] = [
+            createHeadingTextBlock(hText, hLevel),
+            ...hNonText
+        ];
+        return wrap(hElements);
     }
 };
 
 rules.list = {
     filter: ['ul', 'ol'],
     // content = array of listitem containers
-    replacement: function (listItemContainers, node) {
+    replacement: function (listItemContainers, node: Element) {
         var isOrdered = node.nodeName === 'OL';
         var startIndex = parseInt(node.getAttribute('start'), 10) || 1; // only applicable to ordered lists
         var blocks = (listItemContainers || []).map((listItemContainer, listItemIndex) => {
-            var listItemElems = unwrap(listItemContainer);
+            var listItemElems = unwrap(listItemContainer as IContainer);
             var firstListItemElem = listItemElems[0];
             if (firstListItemElem && isTextBlock(firstListItemElem)) {
                 let firstListItemPrefix = isOrdered ? `${startIndex + listItemIndex}. ` : `- `;
@@ -99,13 +114,13 @@ rules.listItem = {
         var blocks = (content || []).reduce((prevBlocks, currBlock) => {
             var cardType = currBlock.type;
             switch (cardType) {
-                case cardTypes.textBlock:
+                case CARD_TYPES.TEXT_BLOCK:
                     currText += ` ${currBlock.text
                         .replace(lineBreakRegex, '  \n\t')
                         .trim()}`;
                     break;
-                case cardTypes.container:
-                    let nestedListElems = unwrap(currBlock);
+                case CARD_TYPES.CONTAINER:
+                    let nestedListElems = unwrap(currBlock as IContainer);
                     nestedListElems
                         .forEach(nestedListElem => {
                             if (isTextBlock(nestedListElem)) {
@@ -117,7 +132,7 @@ rules.listItem = {
                             }
                         });
                     break;
-                case cardTypes.image:
+                case CARD_TYPES.IMAGE:
                     prevBlocks.push(currBlock);
                     break;
                 default:
@@ -138,10 +153,10 @@ rules.inlineLink = {
     filter: function (node) {
         return (
             node.nodeName === 'A' &&
-            node.getAttribute('href')
+            !!node.getAttribute('href')
         );
     },
-    replacement: function (content, node) {
+    replacement: function (content, node: Element) {
         var href = node.getAttribute('href');
         return handleTextEffects(content, function (text) {
             return `[${text}](${href})`;
@@ -160,7 +175,7 @@ rules.emphasis = {
 
 rules.strong = {
     filter: ['strong', 'b'],
-    replacement: function (content, node) {
+    replacement: function (content, _node) {
         return handleTextEffects(content, function (text) {
             return `**${text}**`;
         });
@@ -169,9 +184,9 @@ rules.strong = {
 
 rules.image = {
     filter: 'img',
-    replacement: function (content, node) {
-        var alt = node.alt || '';
-        var src = node.getAttribute('src') || '';
+    replacement: function (content, node: Element) {
+        const alt = node.getAttribute('alt') || '';
+        const src = node.getAttribute('src') || '';
         return createImage(src, {
             altText: alt
         });
@@ -181,15 +196,15 @@ rules.image = {
 /* This must be the last rule */
 rules.default = {
     filter: () => true,
-    replacement: function (content, node) {
-        if (node.isBlock) {
+    replacement: function (content, node: Element) {
+        if (isBlock(node)) {
             return wrap(content);
         }
         return content;
     }
 };
 
-function handleTextEffects(contentCollection, textFunc) {
+function handleTextEffects(contentCollection: AdaptiveCardElement[], textFunc?: (text: string) => string): IBlock {
     var nonText = getNonTextBlocks(contentCollection) || [];
     var text = getTextBlocksAsString(contentCollection) || '';
     if (typeof textFunc === 'function') {
