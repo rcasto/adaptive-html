@@ -1,5 +1,5 @@
 # AdaptiveHtml
-HTML to Adaptive Card JSON converter library ([Demo editor](https://adaptive-editor.appspot.com))
+HTML to Adaptive Card JSON converter library ([Demo editor](https://rcasto.github.io/adaptive-editor/))
 
 The goal of this project is to allow integration with existing WYSIWYG editors such as [CKEditor](https://ckeditor.com/) and convert their HTML output to an [Adaptive Card](https://adaptivecards.io/).
 
