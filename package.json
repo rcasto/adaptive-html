@@ -1,65 +1,68 @@
 {
-	"name": "adaptive-html",
-	"version": "3.0.0",
-	"description": "HTML to Adaptive Card JSON converter",
-	"main": "dist/adaptive-html.cjs.js",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/rcasto/adaptive-html.git"
-	},
-	"scripts": {
-		"build": "npm-run-all --parallel build:iife.min build:iife build:cjs build:es",
-		"build:iife.min": "rollup --config rollup/rollup.config.iife.js --minify",
-		"build:iife": "rollup --config rollup/rollup.config.iife.js",
-		"build:cjs": "rollup --config rollup/rollup.config.cjs.js",
-		"build:es": "rollup --config rollup/rollup.config.es.js",
-		"client": "npm-run-all --parallel client:*",
-		"client:server": "http-server -p 8080 ./client/public/",
-		"client:build": "rollup --config rollup/rollup.config.iife.js --watch --output.file client/public/adaptive-html.js",
-		"test": "npm-run-all build:cjs && nyc ava",
-		"test:report": "nyc report --reporter=html",
-		"prepack": "npm-run-all test build",
-		"start": "npm-run-all --parallel client client:build",
-		"clean": "rimraf .nyc_output coverage client/public/adaptive-html.js client/node_modules node_modules"
-	},
-	"keywords": [
-		"htmltoadaptivecard",
-		"adaptivecards",
-		"adaptive-cards",
-		"adaptive",
-		"cards",
-		"html",
-		"converter",
-		"wysiwyg"
-	],
-	"author": "Richie Casto",
-	"license": "MIT",
-	"devDependencies": {
-		"@babel/core": "7.15.0",
-		"@babel/preset-env": "7.15.0",
-		"@rollup/plugin-babel": "5.3.0",
-		"@rollup/plugin-typescript": "8.2.5",
-		"adaptivecards": "2.9.0",
-		"ava": "3.15.0",
-		"browser-env": "3.3.0",
-		"http-server": "13.0.0",
-		"npm-run-all": "4.1.5",
-		"nyc": "15.1.0",
-		"rimraf": "3.0.2",
-		"rollup": "2.56.2",
-		"rollup-plugin-terser": "7.0.2",
-		"ts-node": "10.2.0",
-		"tslib": "2.3.0",
-		"typescript": "4.3.5"
-	},
-	"ava": {
-		"extensions": [
-			"ts"
-		],
-		"verbose": true,
-		"require": [
-			"ts-node/register",
-			"./tests/helpers/browserEnvHelper.ts"
-		]
-	}
+  "name": "adaptive-html",
+  "version": "3.0.0",
+  "description": "HTML to Adaptive Card JSON converter",
+  "main": "dist/adaptive-html.cjs.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rcasto/adaptive-html.git"
+  },
+  "scripts": {
+    "build": "npm-run-all --parallel build:iife.min build:iife build:cjs build:es",
+    "build:iife.min": "rollup --config rollup/rollup.config.iife.js --minify",
+    "build:iife": "rollup --config rollup/rollup.config.iife.js",
+    "build:cjs": "rollup --config rollup/rollup.config.cjs.js",
+    "build:es": "rollup --config rollup/rollup.config.es.js",
+    "client": "npm-run-all --parallel client:*",
+    "client:server": "http-server -p 8080 ./client/public/",
+    "client:build": "rollup --config rollup/rollup.config.iife.js --watch --output.file client/public/adaptive-html.js",
+    "test": "npm-run-all build:cjs && nyc ava",
+    "test:report": "nyc report --reporter=html",
+    "prepack": "npm-run-all test build",
+    "start": "npm-run-all --parallel client client:build",
+    "clean": "rimraf .nyc_output coverage client/public/adaptive-html.js client/node_modules node_modules",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "keywords": [
+    "htmltoadaptivecard",
+    "adaptivecards",
+    "adaptive-cards",
+    "adaptive",
+    "cards",
+    "html",
+    "converter",
+    "wysiwyg"
+  ],
+  "author": "Richie Casto",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "7.15.0",
+    "@babel/preset-env": "7.15.0",
+    "@rollup/plugin-babel": "5.3.0",
+    "@rollup/plugin-typescript": "8.2.5",
+    "adaptivecards": "2.9.0",
+    "ava": "3.15.0",
+    "browser-env": "3.3.0",
+    "http-server": "13.0.0",
+    "npm-run-all": "4.1.5",
+    "nyc": "15.1.0",
+    "prettier": "2.8.4",
+    "rimraf": "3.0.2",
+    "rollup": "2.56.2",
+    "rollup-plugin-terser": "7.0.2",
+    "ts-node": "10.2.0",
+    "tslib": "2.3.0",
+    "typescript": "4.3.5"
+  },
+  "ava": {
+    "extensions": [
+      "ts"
+    ],
+    "verbose": true,
+    "require": [
+      "ts-node/register",
+      "./tests/helpers/browserEnvHelper.ts"
+    ]
+  }
 }
