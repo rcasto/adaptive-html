@@ -1,6 +1,6 @@
 {
 	"name": "adaptive-html",
-	"version": "3.0.1",
+	"version": "3.0.0",
 	"description": "HTML to Adaptive Card JSON converter",
 	"main": "dist/adaptive-html.cjs.js",
 	"repository": {
