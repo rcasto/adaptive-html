@@ -1,6 +1,18 @@
 var test = require("ava");
 var AdaptiveHtml = require("../dist/adaptive-html.cjs");
 
+test("can handle version being passed in for card", (t) => {
+  var result = AdaptiveHtml.toJSON("", {
+    version: "1.5",
+  });
+  t.deepEqual(result, {
+    type: "AdaptiveCard",
+    body: [],
+    actions: [],
+    version: "1.5",
+  });
+});
+
 test("can handle empty string", (t) => {
   var result = AdaptiveHtml.toJSON("");
   t.deepEqual(result, {

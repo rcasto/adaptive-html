@@ -7,6 +7,7 @@ import {
   IImage,
   ITextBlock,
 } from "adaptivecards/lib/schema";
+import { IToJSONOptions } from "../interfaces";
 
 function setOptions(obj, options = {}) {
   Object.keys(options).forEach((optionKey) => {
@@ -14,12 +15,15 @@ function setOptions(obj, options = {}) {
   });
 }
 
-export function createCard(elements): IAdaptiveCard {
+export function createCard(
+  elements,
+  options: IToJSONOptions = {}
+): IAdaptiveCard {
   var card: IAdaptiveCard = {
     type: CARD_TYPES.ADAPTIVE_CARD,
     body: [],
     actions: [],
-    version: "1.0",
+    version: options.version || "1.0",
   };
   var body = toArray(elements);
   if (
