@@ -7,5 +7,5 @@ import { turndown } from './turndown/turndown';
  * @returns {object} Adaptive Card JSON
  */
 export function toJSON(htmlStringOrElem: string | Node, options: IToJSONOptions = {}): IAdaptiveCard {
-    return turndown(htmlStringOrElem);
+    return turndown(htmlStringOrElem, options);
 }

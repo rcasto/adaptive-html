@@ -53,7 +53,7 @@ export function turndown(input: string | Node, options: IToJSONOptions = {}) {
         throw new TypeError(`${input} is not a string, or an element/document/fragment node.`);
     }
     const cardElems = process(RootNode(input));
-    return createCard(cardElems);
+    return createCard(cardElems, options);
 }
 
 /**
