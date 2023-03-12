@@ -24,29 +24,56 @@ You can either install the npm package or use a CDN.
 ```
 
 ## API
-- toJSON(string | [HTMLElement](https://devdocs.io/dom/htmlelement)) => Adaptive Card JSON
-    ```javascript
-    var adaptiveCardJson = AdaptiveHtml.toJSON(`
-        <p>Turn me into an Adaptive Card</p>
-    `);
-    console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
-    /*
-        JSON returned
+toJSON(string | [HTMLElement](https://devdocs.io/dom/htmlelement)) => Adaptive Card JSON
+```javascript
+var adaptiveCardJson = AdaptiveHtml.toJSON(`
+    <p>Turn me into an Adaptive Card</p>
+`);
+console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
+/*
+    JSON returned
 
-        {
-            "type": "AdaptiveCard",
-            "body": [
-                {
-                    "type": "TextBlock",
-                    "text": "Turn me into an Adaptive Card",
-                    "wrap": true
-                }
-            ],
-            "actions": [],
-            "version": "1.0"
-        }
-    */
-    ```
+    {
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "TextBlock",
+                "text": "Turn me into an Adaptive Card",
+                "wrap": true
+            }
+        ],
+        "actions": [],
+        "version": "1.0"
+    }
+*/
+```
+### Override version of Adaptive Card schema used
+The `toJSON` method has an optional options object that can be passed in as the second parameter. The only accepted property within this object at the moment is `version`, which should be the [version of the Adaptive Card schema](https://github.com/microsoft/AdaptiveCards/tree/main/schemas#referenceable-versions) that you would like associated with the generated Adaptive Card JSON output. By default, the version will be "1.0".
+
+```javascript
+var adaptiveCardJson = AdaptiveHtml.toJSON(`
+    <p>Turn me into an Adaptive Card</p>
+`, {
+    version: '1.5',
+});
+console.log(JSON.stringify(adaptiveCardJson, null, '\t'));
+/*
+    JSON returned
+
+    {
+        "type": "AdaptiveCard",
+        "body": [
+            {
+                "type": "TextBlock",
+                "text": "Turn me into an Adaptive Card",
+                "wrap": true
+            }
+        ],
+        "actions": [],
+        "version": "1.5"
+    }
+*/
+```
 
 ## Currently supported HTML tags
 - p
