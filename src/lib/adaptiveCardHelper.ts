@@ -49,6 +49,7 @@ export function createHeadingTextBlock(
 ): ITextBlock {
   var weight = "bolder";
   var size = "default";
+  var style = "heading";
   switch (depth) {
     case 1:
       size = "extraLarge";
@@ -73,6 +74,7 @@ export function createHeadingTextBlock(
   return createTextBlock(text, {
     size,
     weight,
+    style,
   });
 }
 
