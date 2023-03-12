@@ -21,7 +21,7 @@
     "prepack": "npm-run-all test build",
     "start": "npm-run-all --parallel client client:build",
     "clean": "rimraf .nyc_output coverage client/public/adaptive-html.js client/node_modules node_modules",
-    "format": "prettier --write src test"
+    "format": "prettier --write ."
   },
   "keywords": [
     "htmltoadaptivecard",
