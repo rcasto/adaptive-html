@@ -11,6 +11,7 @@ import {
 } from '../lib/utilityHelper';
 import { findRule } from './rules';
 import RootNode from './root-node';
+import { IToJSONOptions } from '../interfaces';
 
 /*!
  * Code in files within the turndown folder is taken and modified from the Turndown
@@ -47,7 +48,7 @@ import RootNode from './root-node';
  * @returns A Markdown representation of the input
  * @type String
  */
-export function turndown(input: string | Node) {
+export function turndown(input: string | Node, options: IToJSONOptions = {}) {
     if (!canConvert(input)) {
         throw new TypeError(`${input} is not a string, or an element/document/fragment node.`);
     }
