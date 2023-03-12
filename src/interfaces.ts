@@ -4,5 +4,5 @@ export type AdaptiveCardElement = ITextBlock | NonTextAdaptiveCardElement;
 export type NonTextAdaptiveCardElement = IContainer | IImage;
 
 export interface IToJSONOptions {
-    version?: string;
+  version?: string;
 }

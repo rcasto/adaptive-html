@@ -1,8 +1,13 @@
 import { toArray } from "./utilityHelper";
 import { CARD_TYPES, isContainer } from "./adaptiveCardFilter";
 import { IAdaptiveCard } from "adaptivecards";
-import { ICardElement, IContainer, IImage, ITextBlock } from 'adaptivecards/lib/schema';
-import { IToJSONOptions } from '../interfaces';
+import {
+  ICardElement,
+  IContainer,
+  IImage,
+  ITextBlock,
+} from "adaptivecards/lib/schema";
+import { IToJSONOptions } from "../interfaces";
 
 function setOptions(obj, options = {}) {
   Object.keys(options).forEach((optionKey) => {
@@ -10,21 +15,26 @@ function setOptions(obj, options = {}) {
   });
 }
 
-export function createCard(elements, options: IToJSONOptions = {}): IAdaptiveCard {
-    var card: IAdaptiveCard = {
-        type: CARD_TYPES.ADAPTIVE_CARD,
-        body: [],
-        actions: [],
-        version: options.version || '1.0',
-    };
-    var body = toArray(elements);
-    if (Array.isArray(elements) &&
-        elements.length === 1 &&
-        isContainer(elements[0])) {
-        body = toArray(unwrap(elements[0]));
-    }
-    card.body = body;
-    return card;
+export function createCard(
+  elements,
+  options: IToJSONOptions = {}
+): IAdaptiveCard {
+  var card: IAdaptiveCard = {
+    type: CARD_TYPES.ADAPTIVE_CARD,
+    body: [],
+    actions: [],
+    version: options.version || "1.0",
+  };
+  var body = toArray(elements);
+  if (
+    Array.isArray(elements) &&
+    elements.length === 1 &&
+    isContainer(elements[0])
+  ) {
+    body = toArray(unwrap(elements[0]));
+  }
+  card.body = body;
+  return card;
 }
 
 export function createTextBlock(text: string, options = {}): ITextBlock {
